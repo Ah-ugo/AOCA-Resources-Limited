@@ -1,0 +1,122 @@
+@import "tailwindcss";
+/* Base styles with hardcoded colors */
+* {
+  border-color: #e5e7eb;
+}
+
+body {
+  background-color: #ffffff;
+  color: #1f2937;
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+/* Custom color classes with hardcoded values */
+.bg-background {
+  background-color: #ffffff;
+}
+
+.text-foreground {
+  color: #1f2937;
+}
+
+.text-primary {
+  color: #16a34a;
+}
+
+.bg-primary {
+  background-color: #16a34a;
+}
+
+.text-primary-foreground {
+  color: #f9fafb;
+}
+
+.text-muted-foreground {
+  color: #6b7280;
+}
+
+.bg-muted {
+  background-color: #f3f4f6;
+}
+
+.bg-muted\/50 {
+  background-color: rgba(243, 244, 246, 0.5);
+}
+
+.bg-primary\/20 {
+  background-color: rgba(22, 163, 74, 0.2);
+}
+
+.bg-primary\/5 {
+  background-color: rgba(22, 163, 74, 0.05);
+}
+
+.bg-accent {
+  background-color: #e5e7eb;
+}
+
+.text-accent-foreground {
+  color: #1f2937;
+}
+
+.border-input {
+  border-color: #d1d5db;
+}
+
+.bg-background\/80 {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.text-foreground\/80 {
+  color: rgba(31, 41, 55, 0.8);
+}
+
+.border-primary-foreground\/20 {
+  border-color: rgba(249, 250, 251, 0.2);
+}
+
+.text-primary-foreground\/80 {
+  color: rgba(249, 250, 251, 0.8);
+}
+
+.hover\:bg-primary\/90:hover {
+  background-color: rgba(22, 163, 74, 0.9);
+}
+
+.hover\:bg-accent:hover {
+  background-color: #e5e7eb;
+}
+
+.hover\:text-accent-foreground:hover {
+  color: #1f2937;
+}
+
+.hover\:bg-primary-foreground\/30:hover {
+  background-color: rgba(249, 250, 251, 0.3);
+}
+
+.hover\:text-primary:hover {
+  color: #16a34a;
+}
+
+.hover\:text-primary-foreground:hover {
+  color: #f9fafb;
+}
+
+.focus\:ring-primary:focus {
+  --tw-ring-color: #16a34a;
+}
+
+.focus\:outline-none:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.focus\:ring-2:focus {
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0
+    var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0
+    calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
+    var(--tw-shadow, 0 0 #0000);
+}
