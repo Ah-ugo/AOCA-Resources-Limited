@@ -5,18 +5,70 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import {
   Calendar,
   ChevronRight,
+  Clock,
+  FileText,
   Globe,
   GraduationCap,
-  Languages,
+  Laptop,
   MapPin,
   Menu,
   MessageSquare,
   Phone,
   User,
+  Video,
   X,
 } from "lucide-react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  Navigate,
+} from "react-router-dom";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
+import AboutUs from "./pages/AboutUs";
+import ContactUs from "./pages/ContactUs";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 
 function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route
+          path="/dashboard/*"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/contact" element={<ContactUs />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:slug" element={<BlogPost />} />
+      </Routes>
+    </Router>
+  );
+}
+
+// Private route component to protect dashboard
+function PrivateRoute({ children }) {
+  const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+}
+
+function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { scrollYProgress } = useScroll();
   const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
@@ -25,81 +77,74 @@ function App() {
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
-  const services = [
+  const pathways = [
     {
-      title: "Visa Consultancy",
+      title: "Nursing Work Contract",
       description:
-        "Expert guidance on visa applications for study, work, and immigration to various countries.",
+        "Specialized pathway for nursing professionals to secure work contracts with German healthcare institutions.",
       icon: <Globe className="h-10 w-10 text-primary" />,
     },
     {
-      title: "Language Learning",
+      title: "Ausbildung Training",
       description:
-        "Professional language courses in German, French, Spanish, and more with certified instructors.",
-      icon: <Languages className="h-10 w-10 text-primary" />,
+        "Vocational training pathway that combines theoretical learning with practical work experience in Germany.",
+      icon: <GraduationCap className="h-10 w-10 text-primary" />,
     },
     {
-      title: "Recruitment Services",
+      title: "Study Pathway",
       description:
-        "Connecting Nigerian talent with German employers through our specialized recruitment program.",
-      icon: <GraduationCap className="h-10 w-10 text-primary" />,
+        "Academic route for students looking to pursue higher education at German universities and colleges.",
+      icon: <FileText className="h-10 w-10 text-primary" />,
+    },
+    {
+      title: "Opportunity/Job Seeker",
+      description:
+        "Pathway for qualified professionals seeking employment opportunities in the German job market.",
+      icon: <Laptop className="h-10 w-10 text-primary" />,
     },
   ];
 
-  const languages = [
+  const courses = [
     {
-      name: "German",
-      level: "A1-C2",
-      flag: "https://img.freepik.com/free-vector/illustration-german-flag_53876-27101.jpg?t=st=1742664322~exp=1742667922~hmac=83aa88f70986769cb5a36b489cea632f0938a027eaedfcd4842959f16ed83178&w=2000",
+      name: "Beginner Course",
+      level: "A1",
+      flag: "https://via.placeholder.com/60x40",
     },
     {
-      name: "French",
-      level: "A1-C2",
-      flag: "https://img.freepik.com/free-vector/illustration-france-flag_53876-27099.jpg?t=st=1742664355~exp=1742667955~hmac=f29bba22cc8b265dce7f821aa8a419aca3a1fe77115823ed263a0310a37bac86&w=2000",
+      name: "Intermediary Course",
+      level: "A2",
+      flag: "https://via.placeholder.com/60x40",
     },
     {
-      name: "Spanish",
-      level: "A1-C2",
-      flag: "https://img.freepik.com/free-vector/illustration-spain-flag_53876-18168.jpg?t=st=1742664385~exp=1742667985~hmac=cf8956023135d7e7ccdd59db6ccfcf72fddb8996b4e6aea4b7391f9d40e9d0e6&w=2000",
+      name: "Advance Course",
+      level: "B1",
+      flag: "https://via.placeholder.com/60x40",
     },
     {
-      name: "Italian",
-      level: "A1-B2",
-      flag: "https://img.freepik.com/free-vector/illustration-italy-flag_53876-27098.jpg?t=st=1742664410~exp=1742668010~hmac=4c7a357a48ba009d2f0095af1662121761d60eea3ad31430fc0430a65fa0fc75&w=2000",
-    },
-    {
-      name: "Dutch",
-      level: "A1-B2",
-      flag: "https://img.freepik.com/free-vector/illustration-netherlands-flag_53876-27103.jpg?t=st=1742664436~exp=1742668036~hmac=a30b9904ee5058eefb5f36e37ff5d3eb2bcbca8fcbac90b4d950cad9589fb06e&w=2000",
-    },
-    {
-      name: "Portuguese",
-      level: "A1-B2",
-      flag: "https://img.freepik.com/free-vector/illustration-portugal-flag_53876-18170.jpg?t=st=1742664464~exp=1742668064~hmac=346bcd1e8048e75ea536cf3d5c8fd436216875e60f4accfa752fbe8eb92a5777&w=2000",
+      name: "Upper Advance Course",
+      level: "B2",
+      flag: "https://via.placeholder.com/60x40",
     },
   ];
 
   const testimonials = [
     {
       name: "Chioma A.",
-      role: "Student",
-      text: "The German language course was excellent! I passed my A1 exam with flying colors and got my student visa approved.",
-      image:
-        "https://img.freepik.com/free-photo/casual-young-african-man-smiling-isolated-white_93675-128895.jpg?t=st=1742664596~exp=1742668196~hmac=c2c3fed3817ef575a238444daa65d048894b9904b08e5cf70c7b579226c54cfe&w=1380",
+      role: "Nursing Professional",
+      text: "The German language course was excellent! I passed my B1 exam and secured a nursing position in Berlin through AOCA's work contract pathway.",
+      image: "https://via.placeholder.com/80x80",
     },
     {
       name: "Emmanuel O.",
       role: "IT Professional",
-      text: "Thanks to their recruitment services, I secured a job with a top German tech company. The visa process was smooth and well-guided.",
-      image:
-        "https://img.freepik.com/free-photo/confident-business-woman-portrait-smiling-face_53876-137693.jpg?t=st=1742664616~exp=1742668216~hmac=03f23f509c161478460b977f81d6b4661aca3a866923e3c6b0fa0d1675968fcc&w=1480",
+      text: "Thanks to their job seeker pathway services, I secured a job with a top German tech company. The visa process was smooth and well-guided.",
+      image: "https://via.placeholder.com/80x80",
     },
     {
       name: "Blessing M.",
       role: "Healthcare Worker",
       text: "From language training to visa application, they handled everything professionally. Now I'm working as a nurse in Germany.",
-      image:
-        "https://img.freepik.com/free-photo/man-with-arms-crossed_23-2148666516.jpg?t=st=1742664635~exp=1742668235~hmac=05ab8e61175572eb67a7a316c7e9dc15942a2f640cedc993f427363842c5f8a3&w=1060",
+      image: "https://via.placeholder.com/80x80",
     },
   ];
 
@@ -138,58 +183,60 @@ function App() {
       slug: "master-german-quickly",
     },
   ];
-
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <a href="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <Globe className="h-8 w-8 text-primary" />
             <span className="font-bold text-xl">AOCA Resources Limited</span>
-          </a>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6">
             <a
-              href="#services"
+              href="#pathways"
               className="text-foreground/80 hover:text-primary transition-colors"
             >
-              Services
+              Pathways
             </a>
             <a
-              href="#languages"
+              href="#courses"
               className="text-foreground/80 hover:text-primary transition-colors"
             >
-              Languages
+              Courses
             </a>
             <a
-              href="#blog"
+              href="/blog"
               className="text-foreground/80 hover:text-primary transition-colors"
             >
               Blog
             </a>
-            <a
-              href="#testimonials"
-              className="text-foreground/80 hover:text-primary transition-colors"
-            >
-              Testimonials
-            </a>
-            <a
-              href="#about"
+            <Link
+              to="/about"
               className="text-foreground/80 hover:text-primary transition-colors"
             >
               About Us
-            </a>
-            <a
-              href="#contact"
+            </Link>
+            <Link
+              to="/contact"
               className="text-foreground/80 hover:text-primary transition-colors"
             >
               Contact
-            </a>
-            <button className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors">
-              Get Started
-            </button>
+            </Link>
+            <Link
+              to="/login"
+              className="text-foreground/80 hover:text-primary transition-colors"
+            >
+              Login
+            </Link>
+            <Link
+              to="/register"
+              className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
+            >
+              Register
+            </Link>
           </nav>
 
           {/* Mobile Menu Button */}
@@ -207,16 +254,16 @@ function App() {
             initial={{ opacity: 0, x: "100%" }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
-            className="fixed inset-0 bg-white z-50 md:hidden"
+            className="fixed inset-0 bg-background z-50 md:hidden"
           >
-            <div className="flex flex-col h-full bg-white">
+            <div className="flex flex-col h-full">
               <div className="flex justify-between items-center p-4 border-b">
-                <a href="/" className="flex items-center gap-2">
+                <Link to="/" className="flex items-center gap-2">
                   <Globe className="h-8 w-8 text-primary" />
                   <span className="font-bold text-xl">
                     AOCA Resources Limited
                   </span>
-                </a>
+                </Link>
                 <button
                   className="p-2 rounded-md hover:bg-muted/50 transition-colors"
                   onClick={toggleMenu}
@@ -224,20 +271,20 @@ function App() {
                   <X className="h-6 w-6" />
                 </button>
               </div>
-              <nav className="flex flex-col gap-4 p-6 bg-white">
+              <nav className="flex flex-col gap-4 p-6">
                 <a
-                  href="#services"
+                  href="#pathways"
                   className="text-lg font-medium py-2 hover:text-primary transition-colors"
                   onClick={toggleMenu}
                 >
-                  Services
+                  Pathways
                 </a>
                 <a
-                  href="#languages"
+                  href="#courses"
                   className="text-lg font-medium py-2 hover:text-primary transition-colors"
                   onClick={toggleMenu}
                 >
-                  Languages
+                  Courses
                 </a>
                 <a
                   href="#blog"
@@ -246,30 +293,34 @@ function App() {
                 >
                   Blog
                 </a>
-                <a
-                  href="#testimonials"
-                  className="text-lg font-medium py-2 hover:text-primary transition-colors"
-                  onClick={toggleMenu}
-                >
-                  Testimonials
-                </a>
-                <a
-                  href="#about"
+                <Link
+                  to="/about"
                   className="text-lg font-medium py-2 hover:text-primary transition-colors"
                   onClick={toggleMenu}
                 >
                   About Us
-                </a>
-                <a
-                  href="#contact"
+                </Link>
+                <Link
+                  to="/contact"
                   className="text-lg font-medium py-2 hover:text-primary transition-colors"
                   onClick={toggleMenu}
                 >
                   Contact
-                </a>
-                <button className="mt-4 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors">
-                  Get Started
-                </button>
+                </Link>
+                <Link
+                  to="/login"
+                  className="text-lg font-medium py-2 hover:text-primary transition-colors"
+                  onClick={toggleMenu}
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="mt-4 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
+                  onClick={toggleMenu}
+                >
+                  Register
+                </Link>
               </nav>
             </div>
           </motion.div>
@@ -292,8 +343,8 @@ function App() {
                 transition={{ duration: 0.5 }}
               >
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-                  Your Gateway to Global{" "}
-                  <span className="text-primary">Opportunities</span>
+                  Your Gateway to <span className="text-primary">German</span>{" "}
+                  Opportunities
                 </h1>
               </motion.div>
               <motion.p
@@ -302,7 +353,7 @@ function App() {
                 transition={{ duration: 0.5, delay: 0.2 }}
                 className="text-xl text-muted-foreground"
               >
-                Professional visa consultancy, language learning, and
+                Professional German language training, visa consultancy, and
                 recruitment services to help Nigerians achieve their
                 international dreams.
               </motion.p>
@@ -312,12 +363,18 @@ function App() {
                 transition={{ duration: 0.5, delay: 0.4 }}
                 className="flex flex-col sm:flex-row gap-4"
               >
-                <button className="bg-primary text-white px-6 py-3 rounded-md text-lg font-medium hover:bg-primary/90 transition-colors">
-                  Explore Services
-                </button>
-                <button className="border border-input bg-background px-6 py-3 rounded-md text-lg font-medium hover:bg-accent hover:text-accent-foreground transition-colors">
+                <Link
+                  to="/register"
+                  className="bg-primary text-white px-6 py-3 rounded-md text-lg font-medium hover:bg-primary/90 transition-colors"
+                >
+                  Start Learning
+                </Link>
+                <Link
+                  to="/contact"
+                  className="border border-input bg-background px-6 py-3 rounded-md text-lg font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+                >
                   Contact Us
-                </button>
+                </Link>
               </motion.div>
             </div>
             <motion.div
@@ -349,8 +406,8 @@ function App() {
         </motion.div>
       </section>
 
-      {/* Services Section */}
-      <section id="services" className="py-20 bg-muted/50">
+      {/* Germany Travel Pathways Section */}
+      <section id="pathways" className="py-20 bg-muted/50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <motion.h2
@@ -360,7 +417,7 @@ function App() {
               transition={{ duration: 0.5 }}
               className="text-3xl md:text-4xl font-bold mb-4"
             >
-              Our Services
+              Germany Travel Pathways
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -369,13 +426,13 @@ function App() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-xl text-muted-foreground max-w-2xl mx-auto"
             >
-              Comprehensive solutions to help you achieve your international
-              goals
+              Comprehensive solutions to help you achieve your German
+              immigration goals
             </motion.p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {services.map((service, index) => (
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {pathways.map((pathway, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 30 }}
@@ -385,10 +442,10 @@ function App() {
               >
                 <div className="bg-white rounded-lg shadow-md h-full hover:shadow-lg transition-shadow">
                   <div className="p-6 flex flex-col h-full">
-                    <div className="mb-4">{service.icon}</div>
-                    <h3 className="text-xl font-bold mb-2">{service.title}</h3>
+                    <div className="mb-4">{pathway.icon}</div>
+                    <h3 className="text-xl font-bold mb-2">{pathway.title}</h3>
                     <p className="text-muted-foreground mb-6 flex-grow">
-                      {service.description}
+                      {pathway.description}
                     </p>
                     <button className="border border-input bg-background px-4 py-2 rounded-md w-full flex justify-between items-center group hover:bg-accent hover:text-accent-foreground transition-colors">
                       Learn More
@@ -402,8 +459,8 @@ function App() {
         </div>
       </section>
 
-      {/* Languages Section */}
-      <section id="languages" className="py-20">
+      {/* German Courses Section */}
+      <section id="courses" className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <motion.h2
@@ -413,7 +470,7 @@ function App() {
               transition={{ duration: 0.5 }}
               className="text-3xl md:text-4xl font-bold mb-4"
             >
-              Languages We Teach
+              German Courses
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -422,12 +479,12 @@ function App() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-xl text-muted-foreground max-w-2xl mx-auto"
             >
-              Professional language courses with certified instructors
+              Professional German language courses with certified instructors
             </motion.p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            {languages.map((language, index) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {courses.map((course, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -438,16 +495,36 @@ function App() {
                 className="bg-background rounded-xl p-6 text-center shadow-md border"
               >
                 <div className="mb-4 flex justify-center">
-                  <img
-                    src={language.flag || "/placeholder.svg"}
-                    alt={language.name}
-                    className="w-[60px] h-[40px] rounded"
-                  />
+                  <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+                    <span className="text-3xl font-bold text-primary">
+                      {course.level}
+                    </span>
+                  </div>
                 </div>
-                <h3 className="font-bold text-lg mb-1">{language.name}</h3>
-                <p className="text-muted-foreground text-sm">
-                  {language.level}
+                <h3 className="font-bold text-lg mb-1">{course.name}</h3>
+                <p className="text-muted-foreground text-sm mb-4">
+                  Level {course.level}
                 </p>
+                <div className="space-y-2 text-left mb-6">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-primary" />
+                    <span className="text-sm">3 months duration</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Video className="h-4 w-4 text-primary" />
+                    <span className="text-sm">Live online classes</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-primary" />
+                    <span className="text-sm">Certification exam prep</span>
+                  </div>
+                </div>
+                <Link
+                  to="/register"
+                  className="inline-block w-full bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
+                >
+                  Enroll Now
+                </Link>
               </motion.div>
             ))}
           </div>
@@ -459,9 +536,12 @@ function App() {
             transition={{ duration: 0.5, delay: 0.4 }}
             className="mt-12 text-center"
           >
-            <button className="bg-primary text-white px-6 py-3 rounded-md text-lg font-medium hover:bg-primary/90 transition-colors">
-              View All Courses
-            </button>
+            <Link
+              to="/contact"
+              className="border border-input bg-background px-6 py-3 rounded-md text-lg font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+            >
+              Request Course Information
+            </Link>
           </motion.div>
         </div>
       </section>
@@ -486,8 +566,8 @@ function App() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-xl text-muted-foreground max-w-2xl mx-auto"
             >
-              Insights, guides, and news about visa applications, language
-              learning, and international opportunities
+              Insights, guides, and news about German visa applications,
+              language learning, and international opportunities
             </motion.p>
           </div>
 
@@ -572,8 +652,8 @@ function App() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-xl text-muted-foreground max-w-2xl mx-auto"
             >
-              Hear from our clients who have successfully achieved their
-              international goals
+              Hear from our clients who have successfully achieved their German
+              immigration goals
             </motion.p>
           </div>
 
@@ -616,260 +696,67 @@ function App() {
         </div>
       </section>
 
-      {/* About Section */}
-      <section id="about" className="py-20 bg-muted/50">
+      {/* CTA Section */}
+      <section className="py-20 bg-primary text-white">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="relative"
-            >
-              <div className="relative h-[500px] w-full rounded-2xl overflow-hidden shadow-xl">
-                <img
-                  src="https://img.freepik.com/free-photo/business-people-doing-teamwork-startup-presentation-anlayzing-research-data-information-documents-planning-report-project-with-notes-paperwork-files-office-with-big-windows_482257-49771.jpg?t=st=1742664704~exp=1742668304~hmac=b2c3a671eead2d806d89d1224dd343e6cfe48af532779b94ce8481a0074537a7&w=2000"
-                  alt="About AOCA Resources Limited"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="absolute -bottom-6 -right-6 bg-primary p-6 rounded-lg shadow-lg">
-                <p className="text-primary-foreground text-lg font-bold">
-                  Established 2010
-                </p>
-              </div>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="space-y-6"
-            >
-              <h2 className="text-3xl md:text-4xl font-bold">
-                About AOCA Resources Limited
-              </h2>
-              <p className="text-muted-foreground">
-                AOCA Resources Limited is a leading visa consultancy, language
-                learning, and recruitment agency based in Lagos, Nigeria. With
-                over a decade of experience, we have helped thousands of
-                Nigerians achieve their dreams of studying, working, and living
-                abroad.
-              </p>
-              <p className="text-muted-foreground">
-                Our team of experienced consultants and language instructors are
-                dedicated to providing personalized services tailored to meet
-                your specific needs. We pride ourselves on our high success rate
-                and the trust our clients place in us.
-              </p>
-              <div className="grid grid-cols-2 gap-4 pt-4">
-                <div className="flex items-center gap-2">
-                  <div className="bg-primary/20 p-2 rounded-full">
-                    <GraduationCap className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-medium">Successful Visas</p>
-                    <p className="text-2xl font-bold">5000+</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="bg-primary/20 p-2 rounded-full">
-                    <Languages className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-medium">Language Students</p>
-                    <p className="text-2xl font-bold">10,000+</p>
-                  </div>
-                </div>
-              </div>
-              <button className="border border-input bg-background px-6 py-3 rounded-md text-lg font-medium hover:bg-accent hover:text-accent-foreground transition-colors mt-4">
-                Learn More About Us
-              </button>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Contact Section */}
-      <section id="contact" className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
+          <div className="text-center max-w-3xl mx-auto">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="text-3xl md:text-4xl font-bold mb-4"
+              className="text-3xl md:text-4xl font-bold mb-6"
             >
-              Get In Touch
+              Ready to Start Your German Journey?
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-xl text-muted-foreground max-w-2xl mx-auto"
+              className="text-xl mb-8 text-white/90"
             >
-              Have questions? Contact us today for a consultation
+              Join our language courses, explore visa pathways, and take the
+              first step toward your future in Germany.
             </motion.p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-12">
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="space-y-6"
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center"
             >
-              <div className="flex items-center gap-4">
-                <div className="bg-primary/20 p-3 rounded-full">
-                  <MapPin className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg">Visit Us</h3>
-                  <p className="text-muted-foreground">
-                    123 Victoria Island, Lagos, Nigeria
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="bg-primary/20 p-3 rounded-full">
-                  <Phone className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg">Call Us</h3>
-                  <p className="text-muted-foreground">+234 123 456 7890</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="bg-primary/20 p-3 rounded-full">
-                  <MessageSquare className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg">Email Us</h3>
-                  <p className="text-muted-foreground">
-                    info@aocaresources.com
-                  </p>
-                </div>
-              </div>
-              <div className="pt-6">
-                <div className="relative h-[300px] w-full rounded-xl overflow-hidden">
-                  <img
-                    src="https://img.freepik.com/free-vector/informational-city-map-with-streets-name_23-2148309621.jpg?t=st=1742665016~exp=1742668616~hmac=b85ca40aac58c0038ecc0d49ba48fab2f91632e9071f10ef70742b39bcdbba69&w=1800"
-                    alt="Office location"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <div className="bg-white rounded-lg shadow-md">
-                <div className="p-6">
-                  <h3 className="font-bold text-xl mb-6">Send Us a Message</h3>
-                  <form className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label
-                          htmlFor="firstName"
-                          className="text-sm font-medium"
-                        >
-                          First Name
-                        </label>
-                        <input
-                          id="firstName"
-                          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label
-                          htmlFor="lastName"
-                          className="text-sm font-medium"
-                        >
-                          Last Name
-                        </label>
-                        <input
-                          id="lastName"
-                          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor="email" className="text-sm font-medium">
-                        Email
-                      </label>
-                      <input
-                        id="email"
-                        type="email"
-                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor="phone" className="text-sm font-medium">
-                        Phone
-                      </label>
-                      <input
-                        id="phone"
-                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor="service" className="text-sm font-medium">
-                        Service Interested In
-                      </label>
-                      <select
-                        id="service"
-                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                      >
-                        <option value="">Select a service</option>
-                        <option value="visa">Visa Consultancy</option>
-                        <option value="language">Language Learning</option>
-                        <option value="recruitment">
-                          Recruitment Services
-                        </option>
-                      </select>
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor="message" className="text-sm font-medium">
-                        Message
-                      </label>
-                      <textarea
-                        id="message"
-                        rows={4}
-                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                      ></textarea>
-                    </div>
-                    <button className="w-full bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors">
-                      Send Message
-                    </button>
-                  </form>
-                </div>
-              </div>
+              <Link
+                to="/register"
+                className="bg-white text-primary px-6 py-3 rounded-md text-lg font-medium hover:bg-white/90 transition-colors"
+              >
+                Register Now
+              </Link>
+              <Link
+                to="/contact"
+                className="border border-white bg-transparent px-6 py-3 rounded-md text-lg font-medium hover:bg-white/10 transition-colors"
+              >
+                Contact Us
+              </Link>
             </motion.div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-primary text-primary-foreground py-12">
+      <footer className="bg-gray-900 text-white py-12">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <a href="/" className="flex items-center gap-2 mb-4">
+              <Link to="/" className="flex items-center gap-2 mb-4">
                 <Globe className="h-8 w-8" />
                 <span className="font-bold text-xl">
                   AOCA Resources Limited
                 </span>
-              </a>
-              <p className="text-primary-foreground/80 mb-4">
-                Your trusted partner for visa consultancy, language learning,
-                and recruitment services.
+              </Link>
+              <p className="text-gray-400 mb-4">
+                Your trusted partner for German language training, visa
+                consultancy, and recruitment services.
               </p>
             </div>
             <div>
@@ -877,125 +764,93 @@ function App() {
               <ul className="space-y-2">
                 <li>
                   <a
-                    href="#services"
-                    className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
+                    href="#pathways"
+                    className="text-gray-400 hover:text-white transition-colors"
                   >
-                    Services
+                    Pathways
                   </a>
                 </li>
                 <li>
                   <a
-                    href="#languages"
-                    className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
+                    href="#courses"
+                    className="text-gray-400 hover:text-white transition-colors"
                   >
-                    Languages
+                    Courses
                   </a>
                 </li>
                 <li>
                   <a
                     href="#blog"
-                    className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
+                    className="text-gray-400 hover:text-white transition-colors"
                   >
                     Blog
                   </a>
                 </li>
                 <li>
-                  <a
-                    href="#testimonials"
-                    className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
-                  >
-                    Testimonials
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#about"
-                    className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
+                  <Link
+                    to="/about"
+                    className="text-gray-400 hover:text-white transition-colors"
                   >
                     About Us
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#contact"
-                    className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
+                  <Link
+                    to="/contact"
+                    className="text-gray-400 hover:text-white transition-colors"
                   >
                     Contact
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold text-lg mb-4">Services</h3>
-              <ul className="space-y-2">
-                <li>
-                  <a
-                    href="#"
-                    className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
-                  >
-                    Visa Consultancy
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
-                  >
-                    Language Learning
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
-                  >
-                    Recruitment Services
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
-                  >
-                    Study Abroad
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
-                  >
-                    Immigration Services
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
             <div>
               <h3 className="font-bold text-lg mb-4">Contact</h3>
-              <ul className="space-y-2">
+              <ul className="space-y-3">
+                <li className="flex items-start gap-2">
+                  <MapPin className="h-5 w-5 mt-0.5" />
+                  <div>
+                    <p className="font-medium">Lagos Office:</p>
+                    <p className="text-gray-400">
+                      8 Bayo Adetuna Street off Sangotedo. Lagos.
+                    </p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-2">
+                  <MapPin className="h-5 w-5 mt-0.5" />
+                  <div>
+                    <p className="font-medium">Port Harcourt Office:</p>
+                    <p className="text-gray-400">
+                      7 Salvation Avenue, Off Igbo Etche Road, Rumukwurusi, Port
+                      Harcourt
+                    </p>
+                  </div>
+                </li>
                 <li className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4" />
-                  <span className="text-primary-foreground/80">
-                    123 Victoria Island, Lagos, Nigeria
+                  <Phone className="h-5 w-5" />
+                  <span className="text-gray-400">
+                    08038867495, 08036714612
                   </span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Phone className="h-4 w-4" />
-                  <span className="text-primary-foreground/80">
-                    +234 123 456 7890
-                  </span>
+                  <MessageSquare className="h-5 w-5" />
+                  <span className="text-gray-400">WhatsApp: 08038865466</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <MessageSquare className="h-4 w-4" />
-                  <span className="text-primary-foreground/80">
-                    info@aocaresources.com
-                  </span>
+                <li className="flex items-start gap-2">
+                  <MessageSquare className="h-5 w-5 mt-0.5" />
+                  <div>
+                    <p className="text-gray-400">info@aocaresorcesltd.com</p>
+                    <p className="text-gray-400">aocaresources@gmail.com</p>
+                  </div>
                 </li>
               </ul>
-              <div className="mt-4 flex gap-4">
+            </div>
+            <div>
+              <h3 className="font-bold text-lg mb-4">Follow Us</h3>
+              <div className="flex gap-4 mb-6">
                 <a
                   href="#"
-                  className="bg-primary-foreground/20 p-2 rounded-full hover:bg-primary-foreground/30 transition-colors"
+                  className="bg-gray-800 p-2 rounded-full hover:bg-primary transition-colors"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -1009,7 +864,7 @@ function App() {
                 </a>
                 <a
                   href="#"
-                  className="bg-primary-foreground/20 p-2 rounded-full hover:bg-primary-foreground/30 transition-colors"
+                  className="bg-gray-800 p-2 rounded-full hover:bg-primary transition-colors"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -1023,7 +878,7 @@ function App() {
                 </a>
                 <a
                   href="#"
-                  className="bg-primary-foreground/20 p-2 rounded-full hover:bg-primary-foreground/30 transition-colors"
+                  className="bg-gray-800 p-2 rounded-full hover:bg-primary transition-colors"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -1036,10 +891,17 @@ function App() {
                   </svg>
                 </a>
               </div>
+              <h3 className="font-bold text-lg mb-4">Student Portal</h3>
+              <Link
+                to="/login"
+                className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors inline-block"
+              >
+                Login to Dashboard
+              </Link>
             </div>
           </div>
-          <div className="border-t border-primary-foreground/20 mt-8 pt-8 text-center">
-            <p className="text-primary-foreground/80">
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center">
+            <p className="text-gray-400">
               &copy; {new Date().getFullYear()} AOCA Resources Limited. All
               rights reserved.
             </p>
