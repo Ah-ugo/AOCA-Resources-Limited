@@ -254,10 +254,10 @@ function HomePage() {
             initial={{ opacity: 0, x: "100%" }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
-            className="fixed inset-0 bg-background z-50 md:hidden"
+            className="fixed inset-0 bg-white z-50 md:hidden"
           >
-            <div className="flex flex-col h-full">
-              <div className="flex justify-between items-center p-4 border-b">
+            <div className="flex flex-col h-full bg-white">
+              <div className="flex justify-between items-center p-4 border-b bg-white">
                 <Link to="/" className="flex items-center gap-2">
                   <Globe className="h-8 w-8 text-primary" />
                   <span className="font-bold text-xl">
@@ -271,7 +271,7 @@ function HomePage() {
                   <X className="h-6 w-6" />
                 </button>
               </div>
-              <nav className="flex flex-col gap-4 p-6">
+              <nav className="flex flex-col gap-4 p-6 bg-white">
                 <a
                   href="#pathways"
                   className="text-lg font-medium py-2 hover:text-primary transition-colors"
