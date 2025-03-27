@@ -50,7 +50,7 @@ function App() {
         />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/contact" element={<ContactUs />} />
-        <Route path="/blog" element={<Blog />} />
+        <Route path="/blogs" element={<Blog />} />
         <Route path="/blog/:slug" element={<BlogPost />} />
       </Routes>
     </Router>
@@ -208,7 +208,7 @@ function HomePage() {
               Courses
             </a>
             <a
-              href="/blog"
+              href="/blogs"
               className="text-foreground/80 hover:text-primary transition-colors"
             >
               Blog
@@ -287,7 +287,7 @@ function HomePage() {
                   Courses
                 </a>
                 <a
-                  href="#blog"
+                  href="/blogs"
                   className="text-lg font-medium py-2 hover:text-primary transition-colors"
                   onClick={toggleMenu}
                 >
