@@ -24,6 +24,7 @@ import {
   Route,
   Link,
   Navigate,
+  useNavigate,
 } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -34,6 +35,7 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import Header from "./components/Header";
 import FAQ from "./pages/FAQ";
+import { blogPosts } from "./data/blogData";
 
 function App() {
   return (
@@ -79,6 +81,7 @@ function HomePage() {
   const targetRef = useRef(null);
   const pathwaysRef = useRef(null);
   const coursesRef = useRef(null);
+  const navigate = useNavigate();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -153,41 +156,6 @@ function HomePage() {
     },
   ];
 
-  const blogPosts = [
-    {
-      title: "Complete Guide to German Student Visa Application",
-      excerpt:
-        "Learn everything you need to know about applying for a German student visa, from documentation to interview preparation.",
-      date: "October 15, 2023",
-      author: "Dr. Adebayo Johnson",
-      category: "Visa Guides",
-      image:
-        "https://img.freepik.com/free-vector/woman-tourist-with-global-map-passport_24877-53474.jpg?t=st=1742664124~exp=1742667724~hmac=acba006c9c652fde40912876f38d4cc25f92cb99f2084b59c48915667f9215f8&w=1380",
-      slug: "german-student-visa-guide",
-    },
-    {
-      title: "Top 10 In-Demand Jobs in Germany for Foreigners",
-      excerpt:
-        "Discover the most sought-after professions in Germany and how to position yourself for employment opportunities.",
-      date: "September 28, 2023",
-      author: "Ngozi Okafor",
-      category: "Career Advice",
-      image:
-        "https://img.freepik.com/free-vector/job-vacancy-background-with-chair-flat-style_23-2147875408.jpg?t=st=1742664225~exp=1742667825~hmac=6b2f92e8c533455ac789811eff6338d5d1964ea0fcaa53f27f42dec68800415a&w=1060",
-      slug: "in-demand-jobs-germany",
-    },
-    {
-      title: "How to Master German Language Quickly: Proven Methods",
-      excerpt:
-        "Effective strategies and techniques to accelerate your German language learning journey from beginner to fluent speaker.",
-      date: "August 12, 2023",
-      author: "Prof. Chibuike Eze",
-      category: "Language Learning",
-      image:
-        "https://img.freepik.com/free-vector/oktoberfest-germany-celebration_24908-56011.jpg?t=st=1742664266~exp=1742667866~hmac=aa85b1b9726b3b8f33c299cac6d5d0380a2268f82340dff332a38d6e0cc93f15&w=1060",
-      slug: "master-german-quickly",
-    },
-  ];
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -631,6 +599,7 @@ function HomePage() {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.4 }}
             className="mt-12 text-center"
+            onClick={() => navigate("/blogs")}
           >
             <button className="border border-input bg-background px-6 py-3 rounded-md text-lg font-medium hover:bg-accent hover:text-accent-foreground transition-colors">
               View All Articles
