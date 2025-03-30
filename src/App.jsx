@@ -32,6 +32,8 @@ import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import Header from "./components/Header";
+import FAQ from "./pages/FAQ";
 
 function App() {
   return (
@@ -48,6 +50,7 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route path="/faq" element={<FAQ />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/blogs" element={<Blog />} />
@@ -74,6 +77,8 @@ function HomePage() {
   const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
   const scale = useTransform(scrollYProgress, [0, 0.2], [1, 0.9]);
   const targetRef = useRef(null);
+  const pathwaysRef = useRef(null);
+  const coursesRef = useRef(null);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -186,14 +191,14 @@ function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
+      {/* <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-2">
             <Globe className="h-8 w-8 text-primary" />
             <span className="font-bold text-xl">AOCA Resources Limited</span>
           </Link>
 
-          {/* Desktop Navigation */}
+           Desktop Navigation 
           <nav className="hidden md:flex items-center gap-6">
             <a
               href="#pathways"
@@ -239,7 +244,7 @@ function HomePage() {
             </Link>
           </nav>
 
-          {/* Mobile Menu Button */}
+         Mobile Menu Button 
           <button
             className="md:hidden p-2 rounded-md hover:bg-muted/50 transition-colors"
             onClick={toggleMenu}
@@ -248,7 +253,7 @@ function HomePage() {
           </button>
         </div>
 
-        {/* Mobile Navigation */}
+        Mobile Navigation 
         {isMenuOpen && (
           <motion.div
             initial={{ opacity: 0, x: "100%" }}
@@ -325,7 +330,9 @@ function HomePage() {
             </div>
           </motion.div>
         )}
-      </header>
+      </header> */}
+
+      <Header pathwaysRef={pathwaysRef} coursesRef={coursesRef} />
 
       {/* Hero Section */}
       <section className="pt-32 pb-20 md:pt-40 md:pb-32 relative overflow-hidden">
@@ -407,7 +414,7 @@ function HomePage() {
       </section>
 
       {/* Germany Travel Pathways Section */}
-      <section id="pathways" className="py-20 bg-muted/50">
+      <section id="pathways" className="py-20 bg-muted/50" ref={pathwaysRef}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <motion.h2
@@ -460,7 +467,7 @@ function HomePage() {
       </section>
 
       {/* German Courses Section */}
-      <section id="courses" className="py-20">
+      <section id="courses" className="py-20" ref={coursesRef}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <motion.h2

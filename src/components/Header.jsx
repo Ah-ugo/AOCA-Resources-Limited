@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Globe, Menu, X } from "lucide-react";
 
-function Header() {
+function Header({ pathwaysRef, coursesRef }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  // const pathwaysRef = useRef(null);
+  // const coursesRef = useRef(null);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -20,15 +22,22 @@ function Header() {
 
   const navItems = [
     { name: "Home", path: "/" },
-    { name: "Pathways", path: "/application-process" },
-    { name: "Courses", path: "/pricing" },
-    { name: "Blog", path: "/blog" },
-    { name: "Events", path: "/events" },
-    { name: "Success Stories", path: "/success-stories" },
+    { name: "Pathways", path: "/#pathways", ref: pathwaysRef },
+    { name: "Courses", path: "/#courses", ref: coursesRef },
+    { name: "Blog", path: "/blogs" },
+    // { name: "Events", path: "/events" },
+    // { name: "Success Stories", path: "/success-stories" },
     { name: "FAQ", path: "/faq" },
     { name: "About Us", path: "/about" },
     { name: "Contact", path: "/contact" },
   ];
+
+  const scrollToRef = (ref) => {
+    if (ref && ref.current) {
+      ref.current.scrollIntoView({ behavior: "smooth" });
+    }
+    toggleMenu(); // Move toggleMenu() here
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
@@ -49,6 +58,11 @@ function Header() {
                   ? "text-primary font-medium"
                   : "text-foreground/80 hover:text-primary"
               }`}
+              onClick={() => {
+                if (item.ref) {
+                  scrollToRef(item.ref);
+                }
+              }}
             >
               {item.name}
             </Link>
@@ -82,10 +96,10 @@ function Header() {
           initial={{ opacity: 0, x: "100%" }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: "100%" }}
-          className="fixed inset-0 bg-background z-50 md:hidden"
+          className="fixed inset-0 bg-white z-50 h-full md:hidden"
         >
-          <div className="flex flex-col h-full">
-            <div className="flex justify-between items-center p-4 border-b">
+          <div className="flex flex-col h-full bg-white">
+            <div className="flex justify-between items-center p-4 border-b bg-white">
               <Link to="/" className="flex items-center gap-2">
                 <Globe className="h-8 w-8 text-primary" />
                 <span className="font-bold text-xl">
@@ -99,23 +113,39 @@ function Header() {
                 <X className="h-6 w-6" />
               </button>
             </div>
-            <nav className="flex flex-col gap-2 p-6 overflow-y-auto">
-              {navItems.map((item, index) => (
+            <nav className="flex flex-col flex-grow justify-center gap-4 p-6 bg-white">
+              <Link
+                key={0}
+                to="/"
+                className={`text-lg font-medium py-4 text-center hover:text-primary transition-colors ${
+                  isActive("/") ? "text-primary" : ""
+                }`}
+                onClick={toggleMenu}
+              >
+                Home
+              </Link>
+              {navItems.slice(1).map((item, index) => (
                 <Link
-                  key={index}
+                  key={index + 1}
                   to={item.path}
-                  className={`text-lg font-medium py-2 hover:text-primary transition-colors ${
+                  className={`text-lg font-medium py-4 text-center hover:text-primary transition-colors ${
                     isActive(item.path) ? "text-primary" : ""
                   }`}
-                  onClick={toggleMenu}
+                  onClick={() => {
+                    if (item.ref) {
+                      scrollToRef(item.ref);
+                    } else {
+                      toggleMenu();
+                    }
+                  }}
                 >
                   {item.name}
                 </Link>
               ))}
-              <div className="border-t my-4 pt-4">
+              <div className="border-t pt-4">
                 <Link
                   to="/login"
-                  className="block text-lg font-medium py-2 hover:text-primary transition-colors"
+                  className="block text-lg font-medium py-4 text-center hover:text-primary transition-colors"
                   onClick={toggleMenu}
                 >
                   Login

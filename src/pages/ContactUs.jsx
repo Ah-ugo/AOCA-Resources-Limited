@@ -12,6 +12,7 @@ import {
   Send,
   CheckCircle,
 } from "lucide-react";
+import Header from "../components/Header";
 
 function ContactUs() {
   const [formData, setFormData] = useState({
@@ -61,14 +62,14 @@ function ContactUs() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
+      {/* <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-2">
             <Globe className="h-8 w-8 text-primary" />
             <span className="font-bold text-xl">AOCA Resources Limited</span>
           </Link>
 
-          {/* Desktop Navigation */}
+           Desktop Navigation 
           <nav className="hidden md:flex items-center gap-6">
             <Link
               to="/#pathways"
@@ -111,7 +112,8 @@ function ContactUs() {
             </Link>
           </nav>
         </div>
-      </header>
+      </header> */}
+      <Header />
 
       {/* Page Content */}
       <main className="pt-24 pb-16">
