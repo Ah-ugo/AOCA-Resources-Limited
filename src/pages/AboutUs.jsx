@@ -11,6 +11,7 @@ import {
   Phone,
   CheckCircle,
 } from "lucide-react";
+import ukaegbuImage from "../assets/ukaegbu.jpeg";
 
 function AboutUs() {
   return (
@@ -98,7 +99,7 @@ function AboutUs() {
               >
                 <div className="relative h-[500px] w-full rounded-2xl overflow-hidden shadow-xl">
                   <img
-                    src="/about-image.jpg"
+                    src="https://img.freepik.com/free-vector/tropical-vacation-air-travel-service-composition_98292-6990.jpg?t=st=1743321671~exp=1743325271~hmac=7e621fbb8758e3e2e85f53d5b513e9e876d89e957d33e3daef40d151e9106688&w=1060"
                     alt="About AOCA Resources Limited"
                     className="w-full h-full object-cover"
                   />
@@ -269,25 +270,26 @@ function AboutUs() {
               <div className="bg-white rounded-lg shadow-md overflow-hidden">
                 <div className="h-64 overflow-hidden">
                   <img
-                    src="https://via.placeholder.com/400x400"
+                    src={ukaegbuImage}
                     alt="Team Member"
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-bold mb-1">
-                    Dr. Adebayo Johnson
-                  </h3>
-                  <p className="text-primary font-medium mb-3">Founder & CEO</p>
+                  <h3 className="text-xl font-bold mb-1">Obinna Ukaegbu</h3>
+                  <p className="text-primary font-medium mb-3">
+                    MD and Principal Partner
+                  </p>
                   <p className="text-gray-600">
-                    With over 15 years of experience in international education
-                    and immigration, Dr. Johnson leads our team with passion and
-                    expertise.
+                    A Nigerian based German Resident with a track records of
+                    accomplishments on German visa travels, German job recruiter
+                    and a seasoned advisor and consultant on visa and travel and
+                    related matters.
                   </p>
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg shadow-md overflow-hidden">
+              {/* <div className="bg-white rounded-lg shadow-md overflow-hidden">
                 <div className="h-64 overflow-hidden">
                   <img
                     src="https://via.placeholder.com/400x400"
@@ -325,7 +327,7 @@ function AboutUs() {
                     rate and extensive knowledge of immigration procedures.
                   </p>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </section>
