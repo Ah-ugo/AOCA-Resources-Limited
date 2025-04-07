@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const API_URL = "https://aoca-resources-backend.onrender.com";
+const token = localStorage.getItem("token");
 
 // Create axios instance with base URL
 const api = axios.create({
@@ -8,8 +9,7 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
     accept: "application/json",
-    Authorization:
-      "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzQzOTQ2Mjg3fQ.xXSMtoip5qp9SY7Zx3namek7PonsiL5_RIZ6UF8qKxc",
+    Authorization: `Bearer ${token}`,
   },
 });
 
