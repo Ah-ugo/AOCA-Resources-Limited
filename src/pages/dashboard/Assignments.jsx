@@ -1,4 +1,7 @@
-import { useState } from "react";
+"use client";
+
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import {
   FileText,
   Calendar,
@@ -6,73 +9,95 @@ import {
   CheckCircle,
   AlertCircle,
   ChevronRight,
+  Loader,
 } from "lucide-react";
+import { getAssignments } from "../../services/dashboard-service";
 
 function Assignments() {
-  const [assignments, setAssignments] = useState([
-    {
-      id: 1,
-      title: "A1 Grammar Exercise - Week 11",
-      dueDate: "March 29, 2025",
-      status: "pending",
-      description:
-        "Complete exercises on verb conjugation and sentence structure.",
-      type: "quiz",
-    },
-    {
-      id: 2,
-      title: "Vocabulary Quiz - Family Members",
-      dueDate: "March 27, 2025",
-      status: "completed",
-      description: "Test your knowledge of German family vocabulary.",
-      type: "quiz",
-      score: "85%",
-    },
-    {
-      id: 3,
-      title: "Writing Assignment - My Daily Routine",
-      dueDate: "April 2, 2025",
-      status: "pending",
-      description: "Write a 200-word essay about your daily routine in German.",
-      type: "essay",
-    },
-    {
-      id: 4,
-      title: "Listening Comprehension - Dialogues",
-      dueDate: "March 25, 2025",
-      status: "overdue",
-      description:
-        "Listen to dialogues and answer questions about the content.",
-      type: "listening",
-    },
-    {
-      id: 5,
-      title: "A1 Mid-Term Assessment",
-      dueDate: "April 10, 2025",
-      status: "pending",
-      description:
-        "Comprehensive assessment covering all A1 material from weeks 1-6.",
-      type: "exam",
-    },
-    {
-      id: 6,
-      title: "Reading Comprehension - Short Stories",
-      dueDate: "March 20, 2025",
-      status: "completed",
-      description: "Read short stories and answer comprehension questions.",
-      type: "reading",
-      score: "92%",
-    },
-  ]);
-
+  const [assignments, setAssignments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all");
+
+  useEffect(() => {
+    const fetchAssignments = async () => {
+      try {
+        setLoading(true);
+        const data = await getAssignments(filter);
+        setAssignments(data.assignments || []);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching assignments:", err);
+        setError("Failed to load assignments. Please try again later.");
+        setLoading(false);
+
+        // Fallback data if API fails
+        setAssignments([
+          {
+            id: 1,
+            title: "A1 Grammar Exercise - Week 11",
+            dueDate: "March 29, 2025",
+            status: "pending",
+            description:
+              "Complete exercises on verb conjugation and sentence structure.",
+            type: "quiz",
+          },
+          {
+            id: 2,
+            title: "Vocabulary Quiz - Family Members",
+            dueDate: "March 27, 2025",
+            status: "completed",
+            description: "Test your knowledge of German family vocabulary.",
+            type: "quiz",
+            score: "85%",
+          },
+          {
+            id: 3,
+            title: "Writing Assignment - My Daily Routine",
+            dueDate: "April 2, 2025",
+            status: "pending",
+            description:
+              "Write a 200-word essay about your daily routine in German.",
+            type: "essay",
+          },
+          {
+            id: 4,
+            title: "Listening Comprehension - Dialogues",
+            dueDate: "March 25, 2025",
+            status: "overdue",
+            description:
+              "Listen to dialogues and answer questions about the content.",
+            type: "listening",
+          },
+          {
+            id: 5,
+            title: "A1 Mid-Term Assessment",
+            dueDate: "April 10, 2025",
+            status: "pending",
+            description:
+              "Comprehensive assessment covering all A1 material from weeks 1-6.",
+            type: "exam",
+          },
+          {
+            id: 6,
+            title: "Reading Comprehension - Short Stories",
+            dueDate: "March 20, 2025",
+            status: "completed",
+            description:
+              "Read short stories and answer comprehension questions.",
+            type: "reading",
+            score: "92%",
+          },
+        ]);
+      }
+    };
+
+    fetchAssignments();
+  }, [filter]);
 
   const filteredAssignments = assignments.filter((assignment) => {
     if (filter === "all") return true;
-    if (filter === "pending") return assignment.status === "pending";
-    if (filter === "completed") return assignment.status === "completed";
-    if (filter === "overdue") return assignment.status === "overdue";
-    return true;
+    return assignment.status === filter;
   });
 
   const getStatusBadge = (status, score) => {
@@ -198,7 +223,22 @@ function Assignments() {
           </div>
         </div>
 
-        {filteredAssignments.length === 0 ? (
+        {loading ? (
+          <div className="p-8 text-center">
+            <Loader className="h-8 w-8 text-primary animate-spin mx-auto" />
+            <p className="mt-2 text-gray-500">Loading assignments...</p>
+          </div>
+        ) : error ? (
+          <div className="p-6 text-center">
+            <p className="text-red-500">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-2 text-sm underline text-primary"
+            >
+              Try again
+            </button>
+          </div>
+        ) : filteredAssignments.length === 0 ? (
           <div className="p-8 text-center">
             <p className="text-gray-500">
               No assignments found matching your filter.
@@ -225,12 +265,15 @@ function Assignments() {
                   </div>
 
                   {assignment.status !== "completed" && (
-                    <button className="bg-primary text-white px-4 py-2 rounded-md text-sm hover:bg-primary/90 transition-colors inline-flex items-center gap-1">
+                    <Link
+                      to={`/dashboard/assignments/${assignment.id}`}
+                      className="bg-primary text-white px-4 py-2 rounded-md text-sm hover:bg-primary/90 transition-colors inline-flex items-center gap-1"
+                    >
                       {assignment.status === "overdue"
                         ? "Submit Late"
                         : "Start Assignment"}
                       <ChevronRight className="h-4 w-4" />
-                    </button>
+                    </Link>
                   )}
                 </div>
               </div>

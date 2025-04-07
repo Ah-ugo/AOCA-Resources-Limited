@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Book,
   FileText,
@@ -8,100 +8,159 @@ import {
   Download,
   ExternalLink,
   Search,
+  Loader,
 } from "lucide-react";
+import {
+  getResources,
+  getResourceCategories,
+} from "../../services/dashboard-service";
 
 function Resources() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [resources, setResources] = useState([
-    {
-      id: 1,
-      title: "A1 Grammar Guide",
-      type: "document",
-      description:
-        "Comprehensive guide to German A1 grammar rules and examples.",
-      link: "#",
-      category: "grammar",
-    },
-    {
-      id: 2,
-      title: "Vocabulary Flashcards - Basics",
-      type: "interactive",
-      description:
-        "Interactive flashcards to help you memorize essential German vocabulary.",
-      link: "#",
-      category: "vocabulary",
-    },
-    {
-      id: 3,
-      title: "Pronunciation Guide",
-      type: "audio",
-      description: "Audio examples and tips for proper German pronunciation.",
-      link: "#",
-      category: "pronunciation",
-    },
-    {
-      id: 4,
-      title: "German Alphabet and Sounds",
-      type: "video",
-      description: "Video tutorial on the German alphabet and pronunciation.",
-      link: "#",
-      category: "pronunciation",
-    },
-    {
-      id: 5,
-      title: "Common Phrases for Beginners",
-      type: "document",
-      description: "PDF with essential phrases for everyday conversations.",
-      link: "#",
-      category: "conversation",
-    },
-    {
-      id: 6,
-      title: "Numbers and Counting Practice",
-      type: "interactive",
-      description: "Interactive exercises to practice numbers in German.",
-      link: "#",
-      category: "vocabulary",
-    },
-    {
-      id: 7,
-      title: "A1 Practice Tests",
-      type: "document",
-      description: "Sample tests to prepare for the A1 certification exam.",
-      link: "#",
-      category: "exam",
-    },
-    {
-      id: 8,
-      title: "German Culture - Introduction",
-      type: "video",
-      description: "Video introduction to German culture and customs.",
-      link: "#",
-      category: "culture",
-    },
-  ]);
-
+  const [resources, setResources] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [activeCategory, setActiveCategory] = useState("all");
 
-  const categories = [
-    { id: "all", name: "All Resources" },
-    { id: "grammar", name: "Grammar" },
-    { id: "vocabulary", name: "Vocabulary" },
-    { id: "pronunciation", name: "Pronunciation" },
-    { id: "conversation", name: "Conversation" },
-    { id: "exam", name: "Exam Prep" },
-    { id: "culture", name: "Culture" },
-  ];
+  useEffect(() => {
+    const fetchResourceData = async () => {
+      try {
+        setLoading(true);
+
+        // Fetch categories
+        const categoriesData = await getResourceCategories();
+        if (categoriesData && categoriesData.categories) {
+          setCategories([
+            { id: "all", name: "All Resources" },
+            ...categoriesData.categories.map((cat) => ({
+              id: cat.id || cat._id || cat.name,
+              name: cat.name,
+            })),
+          ]);
+        } else {
+          // Fallback categories
+          setCategories([
+            { id: "all", name: "All Resources" },
+            { id: "grammar", name: "Grammar" },
+            { id: "vocabulary", name: "Vocabulary" },
+            { id: "pronunciation", name: "Pronunciation" },
+            { id: "conversation", name: "Conversation" },
+            { id: "exam", name: "Exam Prep" },
+            { id: "culture", name: "Culture" },
+          ]);
+        }
+
+        // Fetch resources
+        const resourcesData = await getResources(
+          activeCategory !== "all" ? activeCategory : null,
+          searchQuery || null
+        );
+
+        if (resourcesData && resourcesData.resources) {
+          setResources(resourcesData.resources);
+        } else {
+          // Fallback resources
+          setResources([
+            {
+              id: 1,
+              title: "A1 Grammar Guide",
+              type: "document",
+              description:
+                "Comprehensive guide to German A1 grammar rules and examples.",
+              link: "#",
+              category: "grammar",
+            },
+            {
+              id: 2,
+              title: "Vocabulary Flashcards - Basics",
+              type: "interactive",
+              description:
+                "Interactive flashcards to help you memorize essential German vocabulary.",
+              link: "#",
+              category: "vocabulary",
+            },
+            {
+              id: 3,
+              title: "Pronunciation Guide",
+              type: "audio",
+              description:
+                "Audio examples and tips for proper German pronunciation.",
+              link: "#",
+              category: "pronunciation",
+            },
+            {
+              id: 4,
+              title: "German Alphabet and Sounds",
+              type: "video",
+              description:
+                "Video tutorial on the German alphabet and pronunciation.",
+              link: "#",
+              category: "pronunciation",
+            },
+            {
+              id: 5,
+              title: "Common Phrases for Beginners",
+              type: "document",
+              description:
+                "PDF with essential phrases for everyday conversations.",
+              link: "#",
+              category: "conversation",
+            },
+            {
+              id: 6,
+              title: "Numbers and Counting Practice",
+              type: "interactive",
+              description:
+                "Interactive exercises to practice numbers in German.",
+              link: "#",
+              category: "vocabulary",
+            },
+            {
+              id: 7,
+              title: "A1 Practice Tests",
+              type: "document",
+              description:
+                "Sample tests to prepare for the A1 certification exam.",
+              link: "#",
+              category: "exam",
+            },
+            {
+              id: 8,
+              title: "German Culture - Introduction",
+              type: "video",
+              description: "Video introduction to German culture and customs.",
+              link: "#",
+              category: "culture",
+            },
+          ]);
+        }
+
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching resources:", err);
+        setError("Failed to load resources. Please try again later.");
+        setLoading(false);
+      }
+    };
+
+    fetchResourceData();
+  }, [activeCategory, searchQuery]);
 
   const filteredResources = resources.filter((resource) => {
-    const matchesSearch =
-      resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      resource.description.toLowerCase().includes(searchQuery.toLowerCase());
+    if (searchQuery) {
+      const matchesSearch =
+        resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        resource.description.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesCategory =
-      activeCategory === "all" || resource.category === activeCategory;
+      if (!matchesSearch) return false;
+    }
 
-    return matchesSearch && matchesCategory;
+    if (activeCategory !== "all") {
+      return resource.category === activeCategory;
+    }
+
+    return true;
   });
 
   const getResourceIcon = (type) => {
@@ -117,6 +176,10 @@ function Resources() {
       default:
         return <FileText className="h-5 w-5 text-gray-500" />;
     }
+  };
+
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
   };
 
   return (
@@ -140,7 +203,7 @@ function Resources() {
                 placeholder="Search resources..."
                 className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleSearch}
               />
             </div>
 
@@ -162,7 +225,22 @@ function Resources() {
           </div>
         </div>
 
-        {filteredResources.length === 0 ? (
+        {loading ? (
+          <div className="p-8 text-center">
+            <Loader className="h-8 w-8 text-primary animate-spin mx-auto" />
+            <p className="mt-2 text-gray-500">Loading resources...</p>
+          </div>
+        ) : error ? (
+          <div className="p-6 text-center">
+            <p className="text-red-500">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-2 text-sm underline text-primary"
+            >
+              Try again
+            </button>
+          </div>
+        ) : filteredResources.length === 0 ? (
           <div className="p-8 text-center">
             <p className="text-gray-500">
               No resources found matching your search.

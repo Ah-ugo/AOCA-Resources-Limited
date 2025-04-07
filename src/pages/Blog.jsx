@@ -13,8 +13,10 @@ import {
   ChevronLeft,
   Clock,
 } from "lucide-react";
-import { blogPosts } from "../data/blogData";
+// import { blogPosts } from "../data/blogData";
 import Header from "../components/Header";
+import { getBlogPosts } from "../services/blogService";
+// import { getBlogPost } from "../services/blogService";
 
 function Blog() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -36,9 +38,14 @@ function Blog() {
     setCurrentPage(1);
   }, [searchParams]);
 
+  const getBlogPostss = async () => {
+    const blogPosts = await getBlogPosts();
+    setPosts(blogPosts);
+  };
+
   // Initialize posts
   useEffect(() => {
-    setPosts(blogPosts);
+    getBlogPostss();
   }, []);
 
   // Filter posts based on search query and category
@@ -92,6 +99,37 @@ function Blog() {
       setSearchParams({ category });
       setSelectedCategory(category);
     }
+  };
+
+  // function formatCreatedAt(createdAt) {
+  //   const dateObj = new Date(createdAt);
+  //   const year = dateObj.getFullYear();
+  //   const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+  //   const day = String(dateObj.getDate()).padStart(2, "0");
+  //   const hours = String(dateObj.getHours()).padStart(2, "0");
+  //   const minutes = String(dateObj.getMinutes()).padStart(2, "0");
+
+  //   return `${year}-${month}-${day} ${hours}:${minutes}`;
+  // }
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  const formatCreatedAt = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
   };
 
   return (
@@ -235,7 +273,7 @@ function Blog() {
                       >
                         <div className="relative h-48 w-full overflow-hidden">
                           <img
-                            src={post.image || "/placeholder.svg"}
+                            src={post.featured_image || "/placeholder.svg"}
                             alt={post.title}
                             className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                           />
@@ -245,21 +283,21 @@ function Blog() {
                         </div>
                         <div className="p-6">
                           <h3 className="text-xl font-bold mb-2 hover:text-primary transition-colors">
-                            <Link to={`/blog/${post.slug}`}>{post.title}</Link>
+                            <Link to={`/blog/${post._id}`}>{post.title}</Link>
                           </h3>
                           <p className="text-gray-600 mb-4">{post.excerpt}</p>
                           <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
                             <div className="flex items-center gap-1">
                               <User className="h-4 w-4" />
-                              <span>{post.author}</span>
+                              <span>{post.author.name}</span>
                             </div>
                             <div className="flex items-center gap-1">
                               <Calendar className="h-4 w-4" />
-                              <span>{post.date}</span>
+                              <span>{formatDate(post.created_at)}</span>
                             </div>
                           </div>
                           <Link
-                            to={`/blog/${post.slug}`}
+                            to={`/blog/${post._id}`}
                             className="inline-flex items-center text-primary font-medium hover:underline"
                           >
                             Read More
@@ -367,18 +405,18 @@ function Blog() {
                       <div key={post.id} className="flex gap-3">
                         <div className="w-16 h-16 rounded-md overflow-hidden flex-shrink-0">
                           <img
-                            src={post.image || "/placeholder.svg"}
+                            src={post.featured_image || "/placeholder.svg"}
                             alt={post.title}
                             className="w-full h-full object-cover"
                           />
                         </div>
                         <div>
                           <h4 className="font-medium text-sm hover:text-primary transition-colors">
-                            <Link to={`/blog/${post.slug}`}>{post.title}</Link>
+                            <Link to={`/blog/${post._id}`}>{post.title}</Link>
                           </h4>
                           <div className="flex items-center gap-1 mt-1 text-xs text-gray-500">
                             <Clock className="h-3 w-3" />
-                            <span>{post.date}</span>
+                            <span>{formatCreatedAt(post.created_at)}</span>
                           </div>
                         </div>
                       </div>

@@ -25,7 +25,7 @@ function Header({ pathwaysRef, coursesRef }) {
     { name: "Pathways", path: "/#pathways", ref: pathwaysRef },
     { name: "Courses", path: "/#courses", ref: coursesRef },
     { name: "Blog", path: "/blogs" },
-    // { name: "Events", path: "/events" },
+    { name: "Careers", path: "/careers" },
     // { name: "Success Stories", path: "/success-stories" },
     { name: "FAQ", path: "/faq" },
     { name: "About Us", path: "/about" },

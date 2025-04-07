@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import {
   Calendar,
@@ -35,7 +35,11 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import Header from "./components/Header";
 import FAQ from "./pages/FAQ";
-import { blogPosts } from "./data/blogData";
+// import { blogPosts } from "./data/blogData";
+import NotFound from "./pages/NotFound";
+import { getBlogPosts } from "./services/blogService";
+import Careers from "./pages/Careers";
+import CareerDetail from "./pages/CareerDetail";
 
 function App() {
   return (
@@ -55,8 +59,11 @@ function App() {
         <Route path="/faq" element={<FAQ />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/contact" element={<ContactUs />} />
+        <Route path="/careers" element={<Careers />} />
+        <Route path="/career/:id" element={<CareerDetail />} />
         <Route path="/blogs" element={<Blog />} />
         <Route path="/blog/:slug" element={<BlogPost />} />
+        <Route path="/not-found" element={<NotFound />} />
       </Routes>
     </Router>
   );
@@ -82,9 +89,40 @@ function HomePage() {
   const pathwaysRef = useRef(null);
   const coursesRef = useRef(null);
   const navigate = useNavigate();
+  const [blogPosts, setPosts] = useState([]);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
+  const getBlogPostss = async () => {
+    const blogPosts = await getBlogPosts();
+    setPosts(blogPosts);
+  };
+
+  // Initialize posts
+  useEffect(() => {
+    getBlogPostss();
+  }, []);
+
+  // function formatCreatedAt(createdAt) {
+  //   const dateObj = new Date(createdAt);
+  //   const year = dateObj.getFullYear();
+  //   const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+  //   const day = String(dateObj.getDate()).padStart(2, "0");
+  //   const hours = String(dateObj.getHours()).padStart(2, "0");
+  //   const minutes = String(dateObj.getMinutes()).padStart(2, "0");
+
+  //   return `${year}-${month}-${day} ${hours}:${minutes}`;
+  // }
+
+  const formatCreatedAt = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
   const pathways = [
     {
       title: "Nursing Work Contract",
@@ -558,7 +596,7 @@ function HomePage() {
               >
                 <div className="relative h-48 w-full overflow-hidden">
                   <img
-                    src={post.image || "/placeholder.svg"}
+                    src={post.featured_image || "/placeholder.svg"}
                     alt={post.title}
                     className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                   />
@@ -568,21 +606,21 @@ function HomePage() {
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold mb-2 hover:text-primary transition-colors">
-                    <a href={`/blog/${post.slug}`}>{post.title}</a>
+                    <a href={`/blog/${post._id}`}>{post.title}</a>
                   </h3>
                   <p className="text-muted-foreground mb-4">{post.excerpt}</p>
                   <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
                     <div className="flex items-center gap-1">
                       <User className="h-4 w-4" />
-                      <span>{post.author}</span>
+                      <span>{post.author.name}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
-                      <span>{post.date}</span>
+                      <span>{formatCreatedAt(post.created_at)}</span>
                     </div>
                   </div>
                   <a
-                    href={`/blog/${post.slug}`}
+                    href={`/blog/${post._id}`}
                     className="inline-flex items-center text-primary font-medium hover:underline"
                   >
                     Read More

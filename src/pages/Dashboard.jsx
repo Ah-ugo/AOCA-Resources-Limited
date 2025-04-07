@@ -18,7 +18,13 @@ import {
   Video,
   LogOut,
   User,
+  Briefcase,
 } from "lucide-react";
+import {
+  isAuthenticated,
+  logoutUser,
+  getCurrentUser,
+} from "../services/auth-service";
 
 // Dashboard components
 import DashboardHome from "./dashboard/DashboardHome";
@@ -30,26 +36,39 @@ import Profile from "./dashboard/Profile";
 function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    // Get user from localStorage
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    // Check if user is authenticated
+    if (!isAuthenticated()) {
+      navigate("/login");
+      return;
+    }
+
+    // Get user from auth service
+    const currentUser = getCurrentUser();
+    if (currentUser) {
+      setUser(currentUser);
     } else {
-      // Redirect to login if no user found
       navigate("/login");
     }
+
+    setLoading(false);
   }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem("isAuthenticated");
-    localStorage.removeItem("user");
+    logoutUser();
     navigate("/login");
   };
 
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading...
+      </div>
+    );
   if (!user) return null;
 
   return (
@@ -92,8 +111,12 @@ function Dashboard() {
                 <User className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <p className="font-medium">{user.name}</p>
-                <p className="text-sm text-gray-500">{user.course} Student</p>
+                <p className="font-medium">
+                  {user.name || user.first_name + " " + user.last_name}
+                </p>
+                <p className="text-sm text-gray-500">
+                  {user.course || user.role}
+                </p>
               </div>
             </div>
           </div>
@@ -147,6 +170,18 @@ function Dashboard() {
               <Book className="h-5 w-5" />
               <span>Learning Resources</span>
             </Link>
+            {/* <Link
+              to="/careers"
+              className={`flex items-center gap-3 px-3 py-2 rounded-md ${
+                location.pathname.startsWith("/careers")
+                  ? "bg-primary text-white"
+                  : "hover:bg-gray-100"
+              }`}
+              onClick={() => setIsSidebarOpen(false)}
+            >
+              <Briefcase className="h-5 w-5" />
+              <span>Careers</span>
+            </Link> */}
             <Link
               to="/dashboard/profile"
               className={`flex items-center gap-3 px-3 py-2 rounded-md ${

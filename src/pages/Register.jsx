@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Globe, Eye, EyeOff, CheckCircle } from "lucide-react";
+import { Globe, Eye, EyeOff, CheckCircle, Upload } from "lucide-react";
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -13,11 +13,16 @@ function Register() {
     password: "",
     confirmPassword: "",
     course: "",
+    address: "",
+    bio: "",
+    role: "student", // Default role
+    image: null,
   });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
 
   const navigate = useNavigate();
 
@@ -34,6 +39,23 @@ function Register() {
         ...prev,
         [name]: "",
       }));
+    }
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData((prev) => ({
+        ...prev,
+        image: file,
+      }));
+
+      // Create a preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -67,7 +89,37 @@ function Register() {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const uploadImage = async (token) => {
+    if (!formData.image) return null;
+
+    const imageFormData = new FormData();
+    imageFormData.append("file", formData.image);
+
+    try {
+      const response = await fetch(
+        "https://aoca-resources-backend.onrender.com/upload/image",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: imageFormData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Image upload failed");
+      }
+
+      const data = await response.json();
+      return data.url || data.file_path || null;
+    } catch (error) {
+      console.error("Image upload error:", error);
+      return null;
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const formErrors = validateForm();
@@ -78,16 +130,59 @@ function Register() {
 
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      // Register the user
+      const registerResponse = await fetch(
+        "https://aoca-resources-backend.onrender.com/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            accept: "application/json",
+          },
+          body: JSON.stringify({
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            email: formData.email,
+            phone: formData.phone,
+            address: formData.address || "",
+            bio: formData.bio || "",
+            image: "", // Will update after image upload if needed
+            role: formData.role,
+            password: formData.password,
+          }),
+        }
+      );
+
+      if (!registerResponse.ok) {
+        const errorData = await registerResponse.json();
+        throw new Error(errorData.detail || "Registration failed");
+      }
+
+      const userData = await registerResponse.json();
+
+      // If we have an image and got a token in the response, upload the image
+      if (formData.image && userData.access_token) {
+        const imageUrl = await uploadImage(userData.access_token);
+
+        // TODO: If needed, update the user profile with the image URL
+        // This would require an additional API endpoint to update the user profile
+      }
+
       setIsSuccess(true);
 
       // Redirect to login after 2 seconds
       setTimeout(() => {
         navigate("/login");
       }, 2000);
-    }, 1500);
+    } catch (error) {
+      console.error("Registration error:", error);
+      setErrors({
+        submit: error.message || "Registration failed. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isSuccess) {
@@ -245,6 +340,25 @@ function Register() {
 
             <div>
               <label
+                htmlFor="address"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Address (optional)
+              </label>
+              <div className="mt-1">
+                <input
+                  id="address"
+                  name="address"
+                  type="text"
+                  value={formData.address}
+                  onChange={handleChange}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
                 htmlFor="course"
                 className="block text-sm font-medium text-gray-700"
               >
@@ -268,6 +382,56 @@ function Register() {
                 </select>
                 {errors.course && (
                   <p className="mt-1 text-sm text-red-600">{errors.course}</p>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="bio"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Bio (optional)
+              </label>
+              <div className="mt-1">
+                <textarea
+                  id="bio"
+                  name="bio"
+                  rows="3"
+                  value={formData.bio}
+                  onChange={handleChange}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                ></textarea>
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="image"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Profile Image (optional)
+              </label>
+              <div className="mt-1 flex items-center space-x-4">
+                <label className="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                  <span>Upload a file</span>
+                  <input
+                    id="image"
+                    name="image"
+                    type="file"
+                    accept="image/*"
+                    className="sr-only"
+                    onChange={handleImageChange}
+                  />
+                </label>
+                {imagePreview && (
+                  <div className="h-12 w-12 rounded-full overflow-hidden bg-gray-100">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
                 )}
               </div>
             </div>
@@ -334,6 +498,21 @@ function Register() {
                 )}
               </div>
             </div>
+
+            {errors.submit && (
+              <div className="rounded-md bg-red-50 p-4">
+                <div className="flex">
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-red-800">
+                      Registration Error
+                    </h3>
+                    <div className="mt-2 text-sm text-red-700">
+                      <p>{errors.submit}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div>
               <button

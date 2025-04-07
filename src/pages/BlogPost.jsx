@@ -15,9 +15,13 @@ import {
   Twitter,
   Linkedin,
   MessageSquare,
+  AlertCircle,
+  Loader,
+  CheckCircle,
 } from "lucide-react";
-import { blogPosts } from "../data/blogData";
 import Header from "../components/Header";
+import { getBlogPost, getBlogPosts } from "../services/blogService";
+import { addComment } from "../services/commentService";
 
 function BlogPost() {
   const { slug } = useParams();
@@ -25,32 +29,147 @@ function BlogPost() {
   const [post, setPost] = useState(null);
   const [relatedPosts, setRelatedPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [blogPosts, setBlogPosts] = useState([]);
 
-  useEffect(() => {
-    // Find the post with the matching slug
-    const foundPost = blogPosts.find((post) => post.slug === slug);
+  // Comment form state
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [comment, setComment] = useState("");
+  const [commentLoading, setCommentLoading] = useState(false);
+  const [commentError, setCommentError] = useState("");
+  const [commentSuccess, setCommentSuccess] = useState(false);
+  const [formErrors, setFormErrors] = useState({
+    name: "",
+    email: "",
+    comment: "",
+  });
 
-    if (foundPost) {
-      setPost(foundPost);
+  const validateForm = () => {
+    let isValid = true;
+    const errors = { name: "", email: "", comment: "" };
 
-      // Find related posts (same category, excluding current post)
-      const related = blogPosts
-        .filter(
-          (p) => p.category === foundPost.category && p.id !== foundPost.id
-        )
-        .slice(0, 3);
-
-      setRelatedPosts(related);
-    } else {
-      // If post not found, navigate to 404 page
-      navigate("/not-found");
+    if (!name.trim()) {
+      errors.name = "Name is required";
+      isValid = false;
     }
 
-    setLoading(false);
+    if (!email.trim()) {
+      errors.email = "Email is required";
+      isValid = false;
+    } else if (!/^\S+@\S+\.\S+$/.test(email)) {
+      errors.email = "Please enter a valid email address";
+      isValid = false;
+    }
 
-    // Scroll to top when post changes
+    if (!comment.trim()) {
+      errors.comment = "Comment is required";
+      isValid = false;
+    }
+
+    setFormErrors(errors);
+    return isValid;
+  };
+
+  const AddComment = async () => {
+    // Reset states
+    setCommentError("");
+    setCommentSuccess(false);
+
+    // Validate form
+    if (!validateForm()) {
+      return;
+    }
+
+    // Set loading state
+    setCommentLoading(true);
+
+    const payload = {
+      content: comment,
+      name: name,
+      email: email,
+    };
+
+    try {
+      const resp = await addComment(slug, payload);
+      console.log(resp, "comment===");
+
+      // Show success message
+      setCommentSuccess(true);
+
+      // Clear form
+      setName("");
+      setEmail("");
+      setComment("");
+
+      // Reset form errors
+      setFormErrors({ name: "", email: "", comment: "" });
+
+      // Refresh post data to show new comment
+      refreshPostData();
+
+      // Auto-hide success message after 5 seconds
+      setTimeout(() => {
+        setCommentSuccess(false);
+      }, 5000);
+    } catch (error) {
+      console.error("Error adding comment:", error);
+      setCommentError(
+        error.message || "Failed to add comment. Please try again."
+      );
+    } finally {
+      setCommentLoading(false);
+    }
+  };
+
+  const refreshPostData = async () => {
+    try {
+      const fetchedPost = await getBlogPost(slug);
+      setPost(fetchedPost);
+
+      // Update related posts if they exist
+      if (fetchedPost.related_posts && fetchedPost.related_posts.length > 0) {
+        setRelatedPosts(fetchedPost.related_posts);
+      }
+    } catch (error) {
+      console.error("Error refreshing post data:", error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      setLoading(true);
+      try {
+        const fetchedPost = await getBlogPost(slug);
+        // Transform related posts if they exist
+        if (fetchedPost.related_posts && fetchedPost.related_posts.length > 0) {
+          setRelatedPosts(fetchedPost.related_posts);
+        }
+        setPost(fetchedPost);
+        console.log(fetchedPost, "yello===");
+      } catch (error) {
+        console.error("Error fetching blog post:", error);
+        navigate("/not-found");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPost();
     window.scrollTo(0, 0);
   }, [slug, navigate]);
+
+  useEffect(() => {
+    const fetchAllPosts = async () => {
+      try {
+        const posts = await getBlogPosts();
+
+        setBlogPosts(posts);
+      } catch (error) {
+        console.error("Error fetching all blog posts:", error);
+      }
+    };
+    fetchAllPosts();
+  }, []);
 
   if (loading) {
     return (
@@ -61,63 +180,28 @@ function BlogPost() {
   }
 
   if (!post) {
-    return null; // This should not happen as we navigate to 404 if post not found
+    return null;
   }
+
+  // Format date from API data (assuming it's in YYYY-MM-DD format)
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  // Find previous and next posts
+  const currentIndex = blogPosts.findIndex((p) => p._id === post._id);
+  const prevPost = currentIndex > 0 ? blogPosts[currentIndex - 1] : null;
+  const nextPost =
+    currentIndex < blogPosts.length - 1 ? blogPosts[currentIndex + 1] : null;
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      {/* <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-2">
-            <Globe className="h-8 w-8 text-primary" />
-            <span className="font-bold text-xl">AOCA Resources Limited</span>
-          </Link>
-
-          Desktop Navigation 
-          <nav className="hidden md:flex items-center gap-6">
-            <Link
-              to="/#pathways"
-              className="text-foreground/80 hover:text-primary transition-colors"
-            >
-              Pathways
-            </Link>
-            <Link
-              to="/#courses"
-              className="text-foreground/80 hover:text-primary transition-colors"
-            >
-              Courses
-            </Link>
-            <Link to="/blog" className="text-primary font-medium">
-              Blog
-            </Link>
-            <Link
-              to="/about"
-              className="text-foreground/80 hover:text-primary transition-colors"
-            >
-              About Us
-            </Link>
-            <Link
-              to="/contact"
-              className="text-foreground/80 hover:text-primary transition-colors"
-            >
-              Contact
-            </Link>
-            <Link
-              to="/login"
-              className="text-foreground/80 hover:text-primary transition-colors"
-            >
-              Login
-            </Link>
-            <Link
-              to="/register"
-              className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
-            >
-              Register
-            </Link>
-          </nav>
-        </div>
-      </header> */}
       <Header />
 
       {/* Page Content */}
@@ -127,7 +211,7 @@ function BlogPost() {
           <div className="h-[300px] md:h-[400px] w-full relative">
             <div className="absolute inset-0 bg-black/50 z-10"></div>
             <img
-              src={post.image || "/placeholder.svg"}
+              src={post.featured_image || "/placeholder.svg"}
               alt={post.title}
               className="w-full h-full object-cover"
             />
@@ -143,15 +227,13 @@ function BlogPost() {
                 <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
                   <div className="flex items-center gap-1">
                     <User className="h-4 w-4" />
-                    <span>{post.author}</span>
+                    <span>
+                      {post.author ? post.author.name : "Unknown Author"}
+                    </span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
-                    <span>{post.date}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
-                    <span>{post.readTime} min read</span>
+                    <span>{formatDate(post.created_at)}</span>
                   </div>
                 </div>
               </div>
@@ -175,15 +257,16 @@ function BlogPost() {
                   <div className="mt-8 pt-6 border-t">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-medium">Tags:</span>
-                      {post.tags.map((tag, index) => (
-                        <Link
-                          key={index}
-                          to={`/blog?tag=${tag}`}
-                          className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm"
-                        >
-                          {tag}
-                        </Link>
-                      ))}
+                      {post.tags &&
+                        post.tags.map((tag, index) => (
+                          <Link
+                            key={index}
+                            to={`/blog?tag=${tag}`}
+                            className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm"
+                          >
+                            {tag}
+                          </Link>
+                        ))}
                     </div>
                   </div>
 
@@ -212,17 +295,22 @@ function BlogPost() {
                       <div className="w-20 h-20 rounded-full bg-gray-200 overflow-hidden">
                         <img
                           src={
-                            post.authorImage ||
-                            "https://via.placeholder.com/80x80"
+                            post.author && post.author.image
+                              ? post.author.image
+                              : "https://via.placeholder.com/80x80"
                           }
-                          alt={post.author}
+                          alt={post.author ? post.author.name : "Author"}
                           className="w-full h-full object-cover"
                         />
                       </div>
                       <div>
-                        <h3 className="font-bold text-lg">{post.author}</h3>
+                        <h3 className="font-bold text-lg">
+                          {post.author ? post.author.name : "Unknown Author"}
+                        </h3>
                         <p className="text-gray-500 mb-2">
-                          {post.authorRole || "Content Writer"}
+                          {post.author && post.author.role
+                            ? post.author.role
+                            : "Content Writer"}
                         </p>
                         <p className="text-gray-600">
                           {post.authorBio ||
@@ -235,36 +323,32 @@ function BlogPost() {
                   {/* Post Navigation */}
                   <div className="mt-8 pt-6 border-t grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      {post.prevPost ? (
+                      {prevPost ? (
                         <Link
-                          to={`/blog/${post.prevPost.slug}`}
+                          to={`/blog/${prevPost.slug}`}
                           className="flex flex-col p-4 border rounded-lg hover:bg-gray-50"
                         >
                           <span className="text-sm text-gray-500 flex items-center">
                             <ChevronLeft className="h-4 w-4 mr-1" /> Previous
                             Article
                           </span>
-                          <span className="font-medium">
-                            {post.prevPost.title}
-                          </span>
+                          <span className="font-medium">{prevPost.title}</span>
                         </Link>
                       ) : (
                         <div></div>
                       )}
                     </div>
                     <div>
-                      {post.nextPost ? (
+                      {nextPost ? (
                         <Link
-                          to={`/blog/${post.nextPost.slug}`}
+                          to={`/blog/${nextPost.slug}`}
                           className="flex flex-col p-4 border rounded-lg hover:bg-gray-50 text-right"
                         >
                           <span className="text-sm text-gray-500 flex items-center justify-end">
                             Next Article{" "}
                             <ChevronRight className="h-4 w-4 ml-1" />
                           </span>
-                          <span className="font-medium">
-                            {post.nextPost.title}
-                          </span>
+                          <span className="font-medium">{nextPost.title}</span>
                         </Link>
                       ) : (
                         <div></div>
@@ -277,125 +361,96 @@ function BlogPost() {
                 <div className="bg-white rounded-lg shadow-md p-6 md:p-8 mt-8">
                   <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
                     <MessageSquare className="h-5 w-5" />
-                    Comments (3)
+                    Comments ({post.comments ? post.comments.length : 0})
                   </h3>
 
                   <div className="space-y-6">
-                    {/* Comment 1 */}
-                    <div className="flex gap-4">
-                      <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
-                        <img
-                          src="https://via.placeholder.com/40x40"
-                          alt="Commenter"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-medium">John Doe</h4>
-                          <span className="text-xs text-gray-500">
-                            2 days ago
-                          </span>
-                        </div>
-                        <p className="text-gray-600">
-                          This article was very helpful! I'm planning to apply
-                          for the nursing pathway and this gave me a clear
-                          understanding of the process.
-                        </p>
-                        <button className="text-sm text-primary mt-2">
-                          Reply
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Comment 2 */}
-                    <div className="flex gap-4">
-                      <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
-                        <img
-                          src="https://via.placeholder.com/40x40"
-                          alt="Commenter"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-medium">Sarah Johnson</h4>
-                          <span className="text-xs text-gray-500">
-                            1 week ago
-                          </span>
-                        </div>
-                        <p className="text-gray-600">
-                          Do you know if the language requirements are the same
-                          for all pathways? I'm particularly interested in the
-                          study pathway.
-                        </p>
-                        <button className="text-sm text-primary mt-2">
-                          Reply
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Comment 3 with reply */}
-                    <div className="flex gap-4">
-                      <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
-                        <img
-                          src="https://via.placeholder.com/40x40"
-                          alt="Commenter"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="w-full">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-medium">Michael Brown</h4>
-                          <span className="text-xs text-gray-500">
-                            2 weeks ago
-                          </span>
-                        </div>
-                        <p className="text-gray-600">
-                          I completed my B1 certification last month. How long
-                          does the visa process typically take after submitting
-                          all documents?
-                        </p>
-                        <button className="text-sm text-primary mt-2">
-                          Reply
-                        </button>
-
-                        {/* Reply */}
-                        <div className="mt-4 ml-6 pt-4 border-t flex gap-4">
-                          <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
+                    {/* Dynamic Comments based on API data */}
+                    {post.comments && post.comments.length > 0 ? (
+                      post.comments.map((comment, index) => (
+                        <div key={comment._id || index} className="flex gap-4">
+                          <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
                             <img
-                              src={
-                                post.authorImage ||
-                                "https://via.placeholder.com/32x32"
-                              }
-                              alt={post.author}
+                              src={comment.user_image}
+                              alt={comment.name}
                               className="w-full h-full object-cover"
                             />
                           </div>
                           <div>
                             <div className="flex items-center gap-2 mb-1">
-                              <h4 className="font-medium">{post.author}</h4>
+                              <h4 className="font-medium">{comment.name}</h4>
                               <span className="text-xs text-gray-500">
-                                1 week ago
+                                {formatDate(
+                                  comment.created_at || post.created_at
+                                )}
+                              </span>
+                            </div>
+                            <p className="text-gray-600">{comment.content}</p>
+                            <button className="text-sm text-primary mt-2">
+                              Reply
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-gray-500">
+                        No comments yet. Be the first to comment!
+                      </p>
+                    )}
+
+                    {/* Sample static comments - can be removed or kept based on preference */}
+                    {post.comments && post.comments.length === 0 && (
+                      <>
+                        <div className="flex gap-4">
+                          <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
+                            <img
+                              src="https://via.placeholder.com/40x40"
+                              alt="Commenter"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <h4 className="font-medium">John Doe</h4>
+                              <span className="text-xs text-gray-500">
+                                2 days ago
                               </span>
                             </div>
                             <p className="text-gray-600">
-                              Hi Michael, the visa processing time can vary, but
-                              typically it takes 4-8 weeks after submitting all
-                              required documents. Feel free to contact our
-                              office for more specific guidance based on your
-                              situation.
+                              This article was very helpful! I'm planning to
+                              apply for the nursing pathway and this gave me a
+                              clear understanding of the process.
                             </p>
+                            <button className="text-sm text-primary mt-2">
+                              Reply
+                            </button>
                           </div>
                         </div>
-                      </div>
-                    </div>
+                      </>
+                    )}
                   </div>
 
                   {/* Comment Form */}
                   <div className="mt-8 pt-6 border-t">
                     <h4 className="font-bold mb-4">Leave a Comment</h4>
-                    <form>
+
+                    {/* Success message */}
+                    {commentSuccess && (
+                      <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4 flex items-center">
+                        <CheckCircle className="h-5 w-5 mr-2" />
+                        <span>Your comment has been posted successfully!</span>
+                      </div>
+                    )}
+
+                    {/* Error message */}
+                    {commentError && (
+                      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 flex items-center">
+                        <AlertCircle className="h-5 w-5 mr-2" />
+                        <span>{commentError}</span>
+                      </div>
+                    )}
+
+                    <div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
                           <label
@@ -405,11 +460,21 @@ function BlogPost() {
                             Name *
                           </label>
                           <input
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
                             type="text"
                             id="name"
-                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+                              formErrors.name ? "border-red-500" : ""
+                            }`}
                             required
+                            disabled={commentLoading}
                           />
+                          {formErrors.name && (
+                            <p className="text-red-500 text-xs mt-1">
+                              {formErrors.name}
+                            </p>
+                          )}
                         </div>
                         <div>
                           <label
@@ -419,11 +484,21 @@ function BlogPost() {
                             Email *
                           </label>
                           <input
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             type="email"
                             id="email"
-                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+                              formErrors.email ? "border-red-500" : ""
+                            }`}
                             required
+                            disabled={commentLoading}
                           />
+                          {formErrors.email && (
+                            <p className="text-red-500 text-xs mt-1">
+                              {formErrors.email}
+                            </p>
+                          )}
                         </div>
                       </div>
                       <div className="mb-4">
@@ -434,19 +509,38 @@ function BlogPost() {
                           Comment *
                         </label>
                         <textarea
+                          value={comment}
+                          onChange={(e) => setComment(e.target.value)}
                           id="comment"
                           rows={4}
-                          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                          className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+                            formErrors.comment ? "border-red-500" : ""
+                          }`}
                           required
+                          disabled={commentLoading}
                         ></textarea>
+                        {formErrors.comment && (
+                          <p className="text-red-500 text-xs mt-1">
+                            {formErrors.comment}
+                          </p>
+                        )}
                       </div>
                       <button
-                        type="submit"
-                        className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
+                        onClick={AddComment}
+                        // type="submit"
+                        className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors flex items-center"
+                        disabled={commentLoading}
                       >
-                        Post Comment
+                        {commentLoading ? (
+                          <>
+                            <Loader className="h-4 w-4 mr-2 animate-spin" />
+                            Posting...
+                          </>
+                        ) : (
+                          "Post Comment"
+                        )}
                       </button>
-                    </form>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -459,10 +553,12 @@ function BlogPost() {
                   <div className="space-y-4">
                     {relatedPosts.length > 0 ? (
                       relatedPosts.map((relatedPost) => (
-                        <div key={relatedPost.id} className="flex gap-3">
+                        <div key={relatedPost._id} className="flex gap-3">
                           <div className="w-20 h-20 rounded-md overflow-hidden flex-shrink-0">
                             <img
-                              src={relatedPost.image || "/placeholder.svg"}
+                              src={
+                                relatedPost.featured_image || "/placeholder.svg"
+                              }
                               alt={relatedPost.title}
                               className="w-full h-full object-cover"
                             />
@@ -475,7 +571,7 @@ function BlogPost() {
                             </h4>
                             <div className="flex items-center gap-1 mt-1 text-xs text-gray-500">
                               <Calendar className="h-3 w-3" />
-                              <span>{relatedPost.date}</span>
+                              <span>{formatDate(relatedPost.created_at)}</span>
                             </div>
                           </div>
                         </div>
