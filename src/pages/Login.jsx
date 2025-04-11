@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Globe, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { Globe, Eye, EyeOff } from "lucide-react";
 import apiClient from "../services/api-client";
 
 function Login() {
@@ -22,12 +22,8 @@ function Login() {
     try {
       // Prepare form data
       const formData = new URLSearchParams();
-      formData.append("grant_type", "password");
       formData.append("username", email);
       formData.append("password", password);
-      formData.append("scope", "");
-      formData.append("client_id", "");
-      formData.append("client_secret", "");
 
       // Make the API call
       const response = await fetch(
@@ -56,22 +52,19 @@ function Login() {
 
         // Fetch user details
         const userResponse = await apiClient.get("/dashboard/profile");
-        localStorage.setItem("user", JSON.stringify(userResponse.data));
+        const userData = userResponse.data;
+
+        localStorage.setItem("user", JSON.stringify(userData));
         localStorage.setItem("isAuthenticated", "true");
+        localStorage.setItem("userRole", userData.role);
+
+        // Redirect based on user role
+        if (userData.role === "admin") {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/dashboard");
+        }
       }
-
-      // If the API returns user info, store it as well
-      // Otherwise, construct basic user info from the email
-      // const userInfo = data.user || {
-      //   name: email.split("@")[0],
-      //   email: email,
-      //   role: "student",
-      // };
-
-      // localStorage.setItem("user", JSON.stringify(userInfo));
-
-      // Redirect to dashboard
-      navigate("/dashboard");
     } catch (err) {
       setError(err.message || "An error occurred during login");
     } finally {
@@ -105,9 +98,6 @@ function Login() {
           {error && (
             <div className="mb-4 bg-red-50 border-l-4 border-red-400 p-4">
               <div className="flex">
-                <div className="flex-shrink-0">
-                  <AlertCircle className="h-5 w-5 text-red-400" />
-                </div>
                 <div className="ml-3">
                   <p className="text-sm text-red-700">{error}</p>
                 </div>
@@ -133,8 +123,6 @@ function Login() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-                  placeholder="Enter your email"
-                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -156,14 +144,11 @@ function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-                  placeholder="Enter your password"
-                  disabled={isLoading}
                 />
                 <button
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => setShowPassword(!showPassword)}
-                  disabled={isLoading}
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5 text-gray-400" />
@@ -181,7 +166,6 @@ function Login() {
                   name="remember-me"
                   type="checkbox"
                   className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                  disabled={isLoading}
                 />
                 <label
                   htmlFor="remember-me"
@@ -192,12 +176,12 @@ function Login() {
               </div>
 
               <div className="text-sm">
-                <Link
-                  to="/forgot-password"
+                <a
+                  href="#"
                   className="font-medium text-primary hover:text-primary/90"
                 >
                   Forgot your password?
-                </Link>
+                </a>
               </div>
             </div>
 
@@ -207,33 +191,7 @@ function Login() {
                 disabled={isLoading}
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? (
-                  <span className="flex items-center">
-                    <svg
-                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    Signing in...
-                  </span>
-                ) : (
-                  "Sign in"
-                )}
+                {isLoading ? "Signing in..." : "Sign in"}
               </button>
             </div>
           </form>
@@ -244,19 +202,17 @@ function Login() {
                 <div className="w-full border-t border-gray-300" />
               </div>
               {/* <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
-                  Demo credentials
-                </span>
+                <span className="px-2 bg-white text-gray-500">Demo credentials</span>
               </div> */}
             </div>
 
             {/* <div className="mt-6 grid grid-cols-1 gap-3">
               <div className="bg-gray-50 p-3 rounded-md text-sm text-gray-700">
                 <p>
-                  <strong>Email:</strong> user@example.com
+                  <strong>Email:</strong> student@example.com
                 </p>
                 <p>
-                  <strong>Password:</strong> string
+                  <strong>Password:</strong> password
                 </p>
               </div>
             </div> */}

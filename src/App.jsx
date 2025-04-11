@@ -26,45 +26,92 @@ import {
   Navigate,
   useNavigate,
 } from "react-router-dom";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
+import { AuthProvider } from "./contexts/auth-context";
+import { authService } from "./services/auth-service";
+
+// Public Pages
 import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
-import Header from "./components/Header";
 import FAQ from "./pages/FAQ";
-// import { blogPosts } from "./data/blogData";
 import NotFound from "./pages/NotFound";
-import { getBlogPosts } from "./services/blogService";
 import Careers from "./pages/Careers";
 import CareerDetail from "./pages/CareerDetail";
+
+// User Dashboard Pages
+import Dashboard from "./pages/Dashboard";
+
+// Admin Pages
+import AdminDashboard from "./pages/admin/Dashboard";
+import UsersList from "./pages/admin/users/UsersList";
+import BlogPosts from "./pages/admin/blog/BlogPosts";
+import CoursesList from "./pages/admin/courses/CoursesList";
+import LessonsList from "./pages/admin/lessons/LessonsList";
+import JobsList from "./pages/admin/careers/JobsList";
+import ApplicationsList from "./pages/admin/careers/ApplicationsList";
+import AdminLayout from "./components/admin/AdminLayout";
+import Header from "./components/Header";
+import { getBlogPosts } from "./services/blogService";
 
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route
-          path="/dashboard/*"
-          element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          }
-        />
-        <Route path="/faq" element={<FAQ />} />
-        <Route path="/about" element={<AboutUs />} />
-        <Route path="/contact" element={<ContactUs />} />
-        <Route path="/careers" element={<Careers />} />
-        <Route path="/career/:id" element={<CareerDetail />} />
-        <Route path="/blogs" element={<Blog />} />
-        <Route path="/blog/:slug" element={<BlogPost />} />
-        <Route path="/not-found" element={<NotFound />} />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route
+            path="/dashboard/*"
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/contact" element={<ContactUs />} />
+          <Route path="/careers" element={<Careers />} />
+          <Route path="/career/:id" element={<CareerDetail />} />
+          <Route path="/blogs" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
+
+          {/* Admin Routes */}
+          <Route
+            path="/admin"
+            element={<Navigate to="/admin/dashboard" replace />}
+          />
+          <Route
+            path="/admin/*"
+            element={
+              <AdminRoute>
+                <AdminLayout>
+                  <Routes>
+                    <Route path="dashboard" element={<AdminDashboard />} />
+                    <Route path="users" element={<UsersList />} />
+                    <Route path="blog/posts" element={<BlogPosts />} />
+                    <Route path="courses" element={<CoursesList />} />
+                    <Route path="lessons" element={<LessonsList />} />
+                    <Route path="careers/jobs" element={<JobsList />} />
+                    <Route
+                      path="careers/applications"
+                      element={<ApplicationsList />}
+                    />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </AdminLayout>
+              </AdminRoute>
+            }
+          />
+
+          <Route path="/not-found" element={<NotFound />} />
+          <Route path="*" element={<Navigate to="/not-found" replace />} />
+        </Routes>
+      </AuthProvider>
     </Router>
   );
 }
@@ -80,6 +127,22 @@ function PrivateRoute({ children }) {
   return children;
 }
 
+// Admin route component to protect admin pages
+function AdminRoute({ children }) {
+  const isAuthenticated = authService.isAuthenticated();
+  const currentUser = authService.getCurrentUser();
+  const isAdmin = currentUser?.role === "admin";
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!isAdmin) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
+}
 function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { scrollYProgress } = useScroll();
@@ -398,7 +461,8 @@ function HomePage() {
             >
               <div className="relative h-[400px] w-full rounded-2xl overflow-hidden shadow-2xl">
                 <img
-                  src="https://img.freepik.com/free-vector/cartoon-working-day-illustration_23-2148957047.jpg?t=st=1742664050~exp=1742667650~hmac=02ee70feee0252908460f36c19d158835a78b7633203586799c26ed6fc99d4d0&w=1800"
+                  src="https://img.freepik.com/free-photo/people-office-work-day_23-2150690157.jpg?t=st=1744383789~exp=1744387389~hmac=a2b93024d8a2e08467ce27cdd4a112e69ea0b2a195d2fb2e1d331f11548e26c5&w=1800"
+                  // src="https://img.freepik.com/free-vector/cartoon-working-day-illustration_23-2148957047.jpg?t=st=1742664050~exp=1742667650~hmac=02ee70feee0252908460f36c19d158835a78b7633203586799c26ed6fc99d4d0&w=1800"
                   alt="Global opportunities"
                   className="w-full h-full object-cover"
                 />
