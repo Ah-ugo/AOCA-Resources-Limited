@@ -325,7 +325,7 @@ function BlogPost() {
                     <div>
                       {prevPost ? (
                         <Link
-                          to={`/blog/${prevPost.slug}`}
+                          to={`/blog/${prevPost._id}`}
                           className="flex flex-col p-4 border rounded-lg hover:bg-gray-50"
                         >
                           <span className="text-sm text-gray-500 flex items-center">
@@ -341,7 +341,7 @@ function BlogPost() {
                     <div>
                       {nextPost ? (
                         <Link
-                          to={`/blog/${nextPost.slug}`}
+                          to={`/blog/${nextPost._id}`}
                           className="flex flex-col p-4 border rounded-lg hover:bg-gray-50 text-right"
                         >
                           <span className="text-sm text-gray-500 flex items-center justify-end">
@@ -401,31 +401,7 @@ function BlogPost() {
                     {/* Sample static comments - can be removed or kept based on preference */}
                     {post.comments && post.comments.length === 0 && (
                       <>
-                        <div className="flex gap-4">
-                          <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
-                            <img
-                              src="https://via.placeholder.com/40x40"
-                              alt="Commenter"
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <h4 className="font-medium">John Doe</h4>
-                              <span className="text-xs text-gray-500">
-                                2 days ago
-                              </span>
-                            </div>
-                            <p className="text-gray-600">
-                              This article was very helpful! I'm planning to
-                              apply for the nursing pathway and this gave me a
-                              clear understanding of the process.
-                            </p>
-                            <button className="text-sm text-primary mt-2">
-                              Reply
-                            </button>
-                          </div>
-                        </div>
+                        <h4 className="font-medium">No comment available</h4>
                       </>
                     )}
                   </div>
@@ -565,7 +541,7 @@ function BlogPost() {
                           </div>
                           <div>
                             <h4 className="font-medium text-sm hover:text-primary transition-colors">
-                              <Link to={`/blog/${relatedPost.slug}`}>
+                              <Link to={`/blog/${relatedPost._id}`}>
                                 {relatedPost.title}
                               </Link>
                             </h4>
