@@ -599,7 +599,10 @@ function HomePage() {
                     <p className="text-muted-foreground mb-6 flex-grow">
                       {pathway.description}
                     </p>
-                    <button className="border border-input bg-background px-4 py-2 rounded-md w-full flex justify-between items-center group hover:bg-accent hover:text-accent-foreground transition-colors">
+                    <button
+                      onClick={() => navigate("/faq")}
+                      className="border border-input bg-background px-4 py-2 rounded-md w-full flex justify-between items-center group hover:bg-accent hover:text-accent-foreground transition-colors"
+                    >
                       Learn More
                       <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                     </button>
