@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -9,6 +11,8 @@ import {
   FiClock,
   FiUsers,
   FiMapPin,
+  FiUserPlus,
+  FiUserX,
 } from "react-icons/fi";
 import AdminLayout from "../../../components/admin/AdminLayout";
 import { adminService } from "../../../services/admin-service";
@@ -22,6 +26,10 @@ const CourseDetail = () => {
   const [error, setError] = useState(null);
   const [enrolledStudents, setEnrolledStudents] = useState([]);
   const [loadingStudents, setLoadingStudents] = useState(false);
+  const [showEnrollModal, setShowEnrollModal] = useState(false);
+  const [availableUsers, setAvailableUsers] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState("");
+  const [enrollingUser, setEnrollingUser] = useState(false);
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -49,13 +57,12 @@ const CourseDetail = () => {
     try {
       setLoadingStudents(true);
       // This endpoint might need to be implemented in your API
-      // const data = await adminService.getCourseStudents(id)
-      // setEnrolledStudents(data.students || [])
-
-      // Placeholder for demo
-      setEnrolledStudents([]);
+      const data = await adminService.getCourseStudents(id);
+      setEnrolledStudents(data.students || []);
     } catch (err) {
       console.error("Error fetching enrolled students:", err);
+      // Provide mock data if the API endpoint doesn't exist
+      setEnrolledStudents([]);
     } finally {
       setLoadingStudents(false);
     }
@@ -73,6 +80,64 @@ const CourseDetail = () => {
       } catch (err) {
         console.error("Error deleting course:", err);
         alert("Failed to delete course. Please try again.");
+      }
+    }
+  };
+
+  const openEnrollModal = async () => {
+    try {
+      // Fetch users who can be enrolled
+      const response = await adminService.getUsers({ role: "student" });
+      setAvailableUsers(response.users || []);
+      setShowEnrollModal(true);
+    } catch (err) {
+      console.error("Error fetching available users:", err);
+      alert("Failed to load available users. Please try again.");
+    }
+  };
+
+  const handleEnrollUser = async () => {
+    if (!selectedUserId) {
+      alert("Please select a user to enroll");
+      return;
+    }
+
+    try {
+      setEnrollingUser(true);
+      await adminService.enrollUserInCourse(id, selectedUserId);
+
+      // Refresh the enrolled students list
+      fetchEnrolledStudents();
+
+      // Close the modal and reset selection
+      setShowEnrollModal(false);
+      setSelectedUserId("");
+      alert("User enrolled successfully");
+    } catch (err) {
+      console.error("Error enrolling user:", err);
+      alert("Failed to enroll user. Please try again.");
+    } finally {
+      setEnrollingUser(false);
+    }
+  };
+
+  const handleRemoveUser = async (userId) => {
+    if (
+      window.confirm(
+        "Are you sure you want to remove this user from the course?"
+      )
+    ) {
+      try {
+        await adminService.removeUserFromCourse(id, userId);
+
+        // Update the enrolled students list
+        setEnrolledStudents(
+          enrolledStudents.filter((student) => student._id !== userId)
+        );
+        alert("User removed from course successfully");
+      } catch (err) {
+        console.error("Error removing user:", err);
+        alert("Failed to remove user. Please try again.");
       }
     }
   };
@@ -255,9 +320,18 @@ const CourseDetail = () => {
               <h2 className="text-xl font-semibold text-gray-800">
                 Enrolled Students
               </h2>
-              <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
-                {course.students_count || 0} / {course.max_students || "∞"}
-              </span>
+              <div className="flex items-center">
+                <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold mr-2">
+                  {course.students_count || 0} / {course.max_students || "∞"}
+                </span>
+                <button
+                  onClick={openEnrollModal}
+                  className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md flex items-center text-sm"
+                >
+                  <FiUserPlus className="mr-1" />
+                  Enroll Student
+                </button>
+              </div>
             </div>
 
             {loadingStudents ? (
@@ -280,6 +354,9 @@ const CourseDetail = () => {
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Progress
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
                       </th>
                     </tr>
                   </thead>
@@ -328,6 +405,16 @@ const CourseDetail = () => {
                           <span className="text-xs text-gray-500">
                             {student.progress || 0}%
                           </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button
+                            onClick={() => handleRemoveUser(student._id)}
+                            className="text-red-600 hover:text-red-900 flex items-center"
+                            title="Remove from course"
+                          >
+                            <FiUserX className="h-5 w-5 mr-1" />
+                            Remove
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -381,7 +468,7 @@ const CourseDetail = () => {
               <h3 className="text-sm font-medium text-gray-500 mb-1">Price</h3>
               <div className="flex items-center text-gray-900">
                 <FiDollarSign className="mr-1 h-4 w-4 text-gray-500" />
-                {course.price ? `$${course.price.toFixed(2)}` : "Free"}
+                {course.price ? `${course.price.toFixed(2)}` : "Free"}
               </div>
             </div>
 
@@ -460,6 +547,69 @@ const CourseDetail = () => {
           </div>
         </div>
       </div>
+
+      {/* Enroll User Modal */}
+      {showEnrollModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+              Enroll Student
+            </h2>
+
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="user-select"
+              >
+                Select Student
+              </label>
+              <select
+                id="user-select"
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                value={selectedUserId}
+                onChange={(e) => setSelectedUserId(e.target.value)}
+              >
+                <option value="">Select a student</option>
+                {availableUsers.map((user) => (
+                  <option key={user._id} value={user._id}>
+                    {user.first_name} {user.last_name} ({user.email})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={() => setShowEnrollModal(false)}
+                className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleEnrollUser}
+                disabled={enrollingUser || !selectedUserId}
+                className={`bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center ${
+                  enrollingUser || !selectedUserId
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
+              >
+                {enrollingUser ? (
+                  <>
+                    <span className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></span>
+                    Enrolling...
+                  </>
+                ) : (
+                  <>
+                    <FiUserPlus className="mr-2" />
+                    Enroll
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -55,7 +55,7 @@ import ApplicationsList from "./pages/admin/careers/ApplicationsList";
 import AdminLayout from "./components/admin/AdminLayout";
 import Header from "./components/Header";
 import { getBlogPosts } from "./services/blogService";
-import ClassesList from "./pages/admin/classes/ClassesList";
+// import ClassesList from "./pages/admin/classes/ClassesList";
 import CategoriesList from "./pages/admin/blog/CategoriesList";
 import BlogForm from "./pages/admin/blog/BlogForm";
 import BlogsList from "./pages/admin/blog/BlogsList";
@@ -67,6 +67,10 @@ import CourseForm from "./pages/admin/courses/CourseForm";
 import CourseDetail from "./pages/admin/courses/CourseDetail";
 import LessonForm from "./pages/admin/lessons/LessonForm";
 import LessonDetail from "./pages/admin/lessons/LessonDetail";
+import ClassesList from "./pages/admin/lessons/ClassesList";
+import ClassCreate from "./pages/admin/lessons/ClassCreate";
+import ClassPreview from "./pages/admin/lessons/ClassPreview";
+import ClassEdit from "./pages/admin/lessons/ClassEdit";
 
 function App() {
   return (
@@ -150,7 +154,10 @@ function App() {
                     <Route path="classes" element={<ClassesList />} />
 
                     {/* Course Lessons Management */}
-                    <Route path="lessons" element={<LessonsList />} />
+                    <Route path="lessons" element={<ClassesList />} />
+                    <Route path="classes/new" element={<ClassCreate />} />
+                    <Route path="classes/:id" element={<ClassPreview />} />
+                    <Route path="classes/:id/edit" element={<ClassEdit />} />
                     <Route
                       path="courses/:courseId/lessons"
                       element={<LessonsList />}
