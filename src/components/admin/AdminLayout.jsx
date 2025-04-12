@@ -36,7 +36,7 @@ function AdminLayout({ children }) {
     {
       title: "Blog",
       icon: <FileText className="w-5 h-5" />,
-      path: "/admin/blog/posts",
+      path: "/admin/blogs",
     },
     {
       title: "Courses",

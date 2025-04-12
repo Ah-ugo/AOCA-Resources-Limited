@@ -25,7 +25,8 @@ const UsersList = () => {
   const fetchUsers = async (page = 1, role = "", search = "") => {
     try {
       setLoading(true);
-      const response = await getUsers(page, role, search);
+      const response = await getUsers({ page, role, search });
+      console.log(response, "resp===");
       setUsers(response.users);
       setTotalPages(response.totalPages);
       setCurrentPage(response.currentPage);
@@ -215,7 +216,7 @@ const UsersList = () => {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {users.length > 0 ? (
                     users.map((user) => (
-                      <tr key={user.id} className="hover:bg-gray-50">
+                      <tr key={user._id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
@@ -275,7 +276,7 @@ const UsersList = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex justify-end space-x-2">
                             <Link
-                              to={`/admin/users/${user.id}`}
+                              to={`/admin/users/${user._id}`}
                               className="text-indigo-600 hover:text-indigo-900"
                             >
                               <Edit className="h-5 w-5" />

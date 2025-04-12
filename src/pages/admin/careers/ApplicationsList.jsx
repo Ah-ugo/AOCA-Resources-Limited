@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Search, Filter, Eye, Download } from "lucide-react";
 import {
   getApplications,
-  updateApplicationStatus,
+  updateApplication,
 } from "../../../services/admin-service";
 import { formatDate } from "../../../utils/formatters";
 
@@ -47,7 +47,7 @@ const ApplicationsList = () => {
 
   const handleStatusChange = async (applicationId, newStatus) => {
     try {
-      await updateApplicationStatus(applicationId, newStatus);
+      await updateApplication(applicationId, newStatus);
       setApplications(
         applications.map((app) =>
           app.id === applicationId ? { ...app, status: newStatus } : app

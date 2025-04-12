@@ -55,6 +55,18 @@ import ApplicationsList from "./pages/admin/careers/ApplicationsList";
 import AdminLayout from "./components/admin/AdminLayout";
 import Header from "./components/Header";
 import { getBlogPosts } from "./services/blogService";
+import ClassesList from "./pages/admin/classes/ClassesList";
+import CategoriesList from "./pages/admin/blog/CategoriesList";
+import BlogForm from "./pages/admin/blog/BlogForm";
+import BlogsList from "./pages/admin/blog/BlogsList";
+import JobCategoriesList from "./pages/admin/careers/CategoriesList";
+import JobForm from "./pages/admin/careers/JobForm";
+import UserForm from "./pages/admin/users/UserForm";
+import UserDetail from "./pages/admin/users/UserDetail";
+import CourseForm from "./pages/admin/courses/CourseForm";
+import CourseDetail from "./pages/admin/courses/CourseDetail";
+import LessonForm from "./pages/admin/lessons/LessonForm";
+import LessonDetail from "./pages/admin/lessons/LessonDetail";
 
 function App() {
   return (
@@ -91,7 +103,7 @@ function App() {
               <AdminRoute>
                 <AdminLayout>
                   <Routes>
-                    <Route path="dashboard" element={<AdminDashboard />} />
+                    {/* <Route path="dashboard" element={<AdminDashboard />} />
                     <Route path="users" element={<UsersList />} />
                     <Route path="blog/posts" element={<BlogPosts />} />
                     <Route path="courses" element={<CoursesList />} />
@@ -100,7 +112,62 @@ function App() {
                     <Route
                       path="careers/applications"
                       element={<ApplicationsList />}
+                    /> */}
+                    <Route path="dashboard" element={<AdminDashboard />} />
+
+                    <Route path="users" element={<UsersList />} />
+                    <Route path="users/new" element={<UserForm />} />
+                    <Route path="users/:id" element={<UserDetail />} />
+                    <Route path="users/:id/edit" element={<UserForm />} />
+
+                    <Route path="careers/jobs" element={<JobsList />} />
+                    <Route path="careers/jobs/new" element={<JobForm />} />
+                    <Route path="careers/jobs/:id/edit" element={<JobForm />} />
+
+                    <Route
+                      path="careers/applications"
+                      element={<ApplicationsList />}
                     />
+                    <Route
+                      path="careers/categories"
+                      element={<JobCategoriesList />}
+                    />
+
+                    {/* Blog Management */}
+                    <Route path="blogs" element={<BlogsList />} />
+                    <Route path="blogs/new" element={<BlogForm />} />
+                    <Route path="blogs/:id/edit" element={<BlogForm />} />
+                    <Route
+                      path="blogs/categories"
+                      element={<CategoriesList />}
+                    />
+
+                    {/* Course Management */}
+                    <Route path="courses" element={<CoursesList />} />
+                    <Route path="courses/new" element={<CourseForm />} />
+                    <Route path="courses/:id" element={<CourseDetail />} />
+                    <Route path="courses/:id/edit" element={<CourseForm />} />
+                    <Route path="classes" element={<ClassesList />} />
+
+                    {/* Course Lessons Management */}
+                    <Route path="lessons" element={<LessonsList />} />
+                    <Route
+                      path="courses/:courseId/lessons"
+                      element={<LessonsList />}
+                    />
+                    <Route
+                      path="courses/:courseId/lessons/new"
+                      element={<LessonForm />}
+                    />
+                    <Route
+                      path="courses/:courseId/lessons/:lessonId"
+                      element={<LessonDetail />}
+                    />
+                    <Route
+                      path="courses/:courseId/lessons/:lessonId/edit"
+                      element={<LessonForm />}
+                    />
+
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </AdminLayout>
@@ -461,7 +528,8 @@ function HomePage() {
             >
               <div className="relative h-[400px] w-full rounded-2xl overflow-hidden shadow-2xl">
                 <img
-                  src="https://img.freepik.com/free-photo/people-office-work-day_23-2150690157.jpg?t=st=1744383789~exp=1744387389~hmac=a2b93024d8a2e08467ce27cdd4a112e69ea0b2a195d2fb2e1d331f11548e26c5&w=1800"
+                  src="https://res.cloudinary.com/dejeplzpv/image/upload/v1744418391/m5tgp0rr8ihaqinxyoxd.jpg"
+                  // src="https://img.freepik.com/free-photo/people-office-work-day_23-2150690157.jpg?t=st=1744383789~exp=1744387389~hmac=a2b93024d8a2e08467ce27cdd4a112e69ea0b2a195d2fb2e1d331f11548e26c5&w=1800"
                   // src="https://img.freepik.com/free-vector/cartoon-working-day-illustration_23-2148957047.jpg?t=st=1742664050~exp=1742667650~hmac=02ee70feee0252908460f36c19d158835a78b7633203586799c26ed6fc99d4d0&w=1800"
                   alt="Global opportunities"
                   className="w-full h-full object-cover"

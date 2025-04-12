@@ -1,338 +1,269 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
-  Edit,
-  Trash2,
-  Plus,
-  Filter,
-  BookOpen,
-  Calendar,
-  Clock,
-} from "lucide-react";
+  FiEdit,
+  FiEye,
+  FiTrash2,
+  FiPlus,
+  FiArrowLeft,
+  FiBook,
+  FiClock,
+  FiVideo,
+  FiFileText,
+} from "react-icons/fi";
 import AdminLayout from "../../../components/admin/AdminLayout";
 import { adminService } from "../../../services/admin-service";
+import { formatDate } from "../../../utils/formatters";
 
 const LessonsList = () => {
-  const [classes, setClasses] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { courseId } = useParams();
+  const navigate = useNavigate();
+  const [lessons, setLessons] = useState([]);
+  const [course, setCourse] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [courses, setCourses] = useState([]);
-  const [selectedCourse, setSelectedCourse] = useState("");
-  const [upcoming, setUpcoming] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalClasses, setTotalClasses] = useState(0);
-  const classesPerPage = 10;
 
   useEffect(() => {
-    fetchCourses();
-    fetchClasses();
-  }, [currentPage, selectedCourse, upcoming]);
-
-  const fetchCourses = async () => {
-    try {
-      const data = await adminService.getCourses({ limit: 100 });
-      setCourses(data.courses || []);
-    } catch (err) {
-      console.error("Error fetching courses:", err);
-    }
-  };
-
-  const fetchClasses = async () => {
-    try {
-      setIsLoading(true);
-      const skip = (currentPage - 1) * classesPerPage;
-      const params = {
-        skip,
-        limit: classesPerPage,
-        course_id: selectedCourse || undefined,
-        upcoming: upcoming,
-      };
-
-      const data = await adminService.getClasses(params);
-      setClasses(data.classes || []);
-      setTotalClasses(data.total || 0);
-    } catch (err) {
-      setError("Failed to load classes");
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setCurrentPage(1);
-    fetchClasses();
-  };
-
-  const handleDelete = async (classId) => {
-    if (window.confirm("Are you sure you want to delete this class?")) {
+    const fetchData = async () => {
       try {
-        await adminService.deleteClass(classId);
-        fetchClasses();
+        setLoading(true);
+        // Fetch course details and lessons in parallel
+        const [courseData, lessonsData] = await Promise.all([
+          adminService.getCourseById(courseId),
+          adminService.getLessons(),
+        ]);
+
+        setCourse(courseData);
+        setLessons(lessonsData.lessons || []);
       } catch (err) {
-        setError("Failed to delete class");
-        console.error(err);
+        console.error("Error fetching data:", err);
+        setError("Failed to load lessons. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [courseId]);
+
+  const handleDelete = async (lessonId) => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this lesson? This action cannot be undone."
+      )
+    ) {
+      try {
+        await adminService.deleteLesson(courseId, lessonId);
+        setLessons(lessons.filter((lesson) => lesson._id !== lessonId));
+        alert("Lesson deleted successfully");
+      } catch (err) {
+        console.error("Error deleting lesson:", err);
+        alert("Failed to delete lesson. Please try again.");
       }
     }
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+  const getLessonTypeIcon = (type) => {
+    switch (type?.toLowerCase()) {
+      case "video":
+        return <FiVideo className="h-5 w-5 text-blue-500" />;
+      case "quiz":
+        return <FiFileText className="h-5 w-5 text-purple-500" />;
+      case "assignment":
+        return <FiFileText className="h-5 w-5 text-orange-500" />;
+      default:
+        return <FiBook className="h-5 w-5 text-green-500" />;
+    }
   };
 
-  const formatTime = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  const formatDuration = (duration) => {
+    if (!duration) return "N/A";
+
+    // If duration is in minutes
+    if (typeof duration === "number") {
+      const hours = Math.floor(duration / 60);
+      const minutes = duration % 60;
+
+      if (hours > 0) {
+        return `${hours}h ${minutes > 0 ? `${minutes}m` : ""}`;
+      } else {
+        return `${minutes}m`;
+      }
+    }
+
+    // If duration is already formatted
+    return duration;
   };
 
-  const totalPages = Math.ceil(totalClasses / classesPerPage);
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-6">
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-6">
+        <div
+          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+          role="alert"
+        >
+          <strong className="font-bold">Error!</strong>
+          <span className="block sm:inline"> {error}</span>
+        </div>
+        <button
+          onClick={() => navigate("/admin/courses")}
+          className="mt-4 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md flex items-center"
+        >
+          <FiArrowLeft className="mr-2" />
+          Back to Courses
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6">
+    <div className="container mx-auto px-4 py-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Classes & Lessons</h1>
-        <Link
-          to="/admin/lessons/new"
-          className="bg-primary text-white px-4 py-2 rounded-md flex items-center"
-        >
-          <Plus className="h-5 w-5 mr-2" />
-          New Class
-        </Link>
-      </div>
-
-      {/* Search and Filter */}
-      <div className="bg-white rounded-lg shadow mb-6">
-        <div className="p-4">
-          <form
-            onSubmit={handleSearch}
-            className="flex flex-col md:flex-row gap-4"
+        <div className="flex items-center">
+          <button
+            onClick={() => navigate(`/admin/courses/${courseId}`)}
+            className="mr-4 text-gray-600 hover:text-gray-900"
           >
-            <div className="w-full md:w-64">
-              <select
-                className="w-full border rounded-md px-4 py-2"
-                value={selectedCourse}
-                onChange={(e) => {
-                  setSelectedCourse(e.target.value);
-                  setCurrentPage(1);
-                }}
-              >
-                <option value="">All Courses</option>
-                {courses.map((course) => (
-                  <option key={course._id} value={course._id}>
-                    {course.name} ({course.level})
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="w-full md:w-48">
-              <select
-                className="w-full border rounded-md px-4 py-2"
-                value={upcoming.toString()}
-                onChange={(e) => {
-                  setUpcoming(e.target.value === "true");
-                  setCurrentPage(1);
-                }}
-              >
-                <option value="true">Upcoming Classes</option>
-                <option value="false">Past Classes</option>
-              </select>
-            </div>
-            <button
-              type="submit"
-              className="bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-md flex items-center"
-            >
-              <Filter className="h-5 w-5 mr-2" />
-              Filter
-            </button>
-          </form>
+            <FiArrowLeft className="h-6 w-6" />
+          </button>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800">Course Lessons</h1>
+            {course && (
+              <p className="text-gray-600">
+                {course.title} {course.code && `(${course.code})`}
+              </p>
+            )}
+          </div>
         </div>
+        <button
+          onClick={() => navigate(`/admin/courses/${courseId}/lessons/new`)}
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center"
+        >
+          <FiPlus className="mr-2" />
+          Add New Lesson
+        </button>
       </div>
 
-      {/* Error Message */}
-      {error && (
-        <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg
-                className="h-5 w-5 text-red-400"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <p className="text-sm text-red-700">{error}</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Classes Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        {isLoading ? (
-          <div className="p-6 flex justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-          </div>
-        ) : classes.length > 0 ? (
+      {/* Lessons List */}
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        {lessons.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Class Title
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Order
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Course
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Lesson
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Date & Time
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Type
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Duration
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Location
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Created
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {classes.map((classItem) => (
-                  <tr key={classItem._id} className="hover:bg-gray-50">
+                {lessons.map((lesson) => (
+                  <tr key={lesson._id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {lesson.order || "-"}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center">
-                          <BookOpen className="h-5 w-5 text-primary" />
-                        </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">
-                            {classItem.title}
+                            {lesson.title}
                           </div>
-                          <div className="text-sm text-gray-500">
-                            {classItem.description?.substring(0, 50)}...
-                          </div>
+                          {lesson.description && (
+                            <div className="text-sm text-gray-500 truncate max-w-xs">
+                              {lesson.description}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {classItem.course?.name || "Unknown Course"}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        Level: {classItem.course?.level || "N/A"}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <Calendar className="h-4 w-4 text-gray-400 mr-2" />
-                        <span className="text-sm text-gray-900">
-                          {formatDate(classItem.date)}
-                        </span>
-                      </div>
-                      <div className="flex items-center mt-1">
-                        <Clock className="h-4 w-4 text-gray-400 mr-2" />
-                        <span className="text-sm text-gray-500">
-                          {formatTime(classItem.date)}
+                        {getLessonTypeIcon(lesson.type)}
+                        <span className="ml-2 text-sm text-gray-900 capitalize">
+                          {lesson.type || "Content"}
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-900">
-                        {classItem.duration} minutes
-                      </span>
+                      <div className="flex items-center text-sm text-gray-500">
+                        <FiClock className="mr-1 h-4 w-4 text-gray-400" />
+                        {formatDuration(lesson.duration)}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`px-2 py-1 text-xs rounded-full ${
-                          classItem.is_online
+                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          lesson.is_published
                             ? "bg-green-100 text-green-800"
-                            : "bg-blue-100 text-blue-800"
+                            : "bg-yellow-100 text-yellow-800"
                         }`}
                       >
-                        {classItem.is_online
-                          ? "Online"
-                          : classItem.location || "In-person"}
+                        {lesson.is_published ? "Published" : "Draft"}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex justify-end space-x-2">
-                        <Link
-                          to={`/admin/lessons/${classItem._id}`}
-                          className="text-blue-600 hover:text-blue-900"
-                          title="View"
-                        >
-                          <svg
-                            className="h-5 w-5"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                            />
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                            />
-                          </svg>
-                        </Link>
-                        <Link
-                          to={`/admin/lessons/${classItem._id}/edit`}
-                          className="text-indigo-600 hover:text-indigo-900"
-                          title="Edit"
-                        >
-                          <Edit className="h-5 w-5" />
-                        </Link>
-                        <button
-                          onClick={() => handleDelete(classItem._id)}
-                          className="text-red-600 hover:text-red-900"
-                          title="Delete"
-                        >
-                          <Trash2 className="h-5 w-5" />
-                        </button>
-                      </div>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {formatDate(lesson.created_at)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button
+                        onClick={() =>
+                          navigate(
+                            `/admin/courses/${courseId}/lessons/${lesson._id}`
+                          )
+                        }
+                        className="text-green-600 hover:text-green-900 mr-3"
+                        title="View Lesson"
+                      >
+                        <FiEye className="h-5 w-5" />
+                      </button>
+                      <button
+                        onClick={() =>
+                          navigate(
+                            `/admin/courses/${courseId}/lessons/${lesson._id}/edit`
+                          )
+                        }
+                        className="text-blue-600 hover:text-blue-900 mr-3"
+                        title="Edit Lesson"
+                      >
+                        <FiEdit className="h-5 w-5" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(lesson._id)}
+                        className="text-red-600 hover:text-red-900"
+                        title="Delete Lesson"
+                      >
+                        <FiTrash2 className="h-5 w-5" />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -340,131 +271,21 @@ const LessonsList = () => {
             </table>
           </div>
         ) : (
-          <div className="p-6 text-center text-gray-500">
-            No classes found. Create your first class!
-          </div>
-        )}
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
-            <div className="flex-1 flex justify-between sm:hidden">
-              <button
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
-                  currentPage === 1
-                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                    : "bg-white text-gray-700 hover:bg-gray-50"
-                }`}
-              >
-                Previous
-              </button>
-              <button
-                onClick={() =>
-                  setCurrentPage(Math.min(totalPages, currentPage + 1))
-                }
-                disabled={currentPage === totalPages}
-                className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
-                  currentPage === totalPages
-                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                    : "bg-white text-gray-700 hover:bg-gray-50"
-                }`}
-              >
-                Next
-              </button>
-            </div>
-            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm text-gray-700">
-                  Showing{" "}
-                  <span className="font-medium">
-                    {Math.min(
-                      (currentPage - 1) * classesPerPage + 1,
-                      totalClasses
-                    )}
-                  </span>{" "}
-                  to{" "}
-                  <span className="font-medium">
-                    {Math.min(currentPage * classesPerPage, totalClasses)}
-                  </span>{" "}
-                  of <span className="font-medium">{totalClasses}</span> results
-                </p>
-              </div>
-              <div>
-                <nav
-                  className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
-                  aria-label="Pagination"
-                >
-                  <button
-                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                    disabled={currentPage === 1}
-                    className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
-                      currentPage === 1
-                        ? "text-gray-300 cursor-not-allowed"
-                        : "text-gray-500 hover:bg-gray-50"
-                    }`}
-                  >
-                    <span className="sr-only">Previous</span>
-                    <svg
-                      className="h-5 w-5"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </button>
-
-                  {/* Page numbers */}
-                  {[...Array(totalPages)].map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setCurrentPage(i + 1)}
-                      className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                        currentPage === i + 1
-                          ? "z-10 bg-primary text-white border-primary"
-                          : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
-                      }`}
-                    >
-                      {i + 1}
-                    </button>
-                  ))}
-
-                  <button
-                    onClick={() =>
-                      setCurrentPage(Math.min(totalPages, currentPage + 1))
-                    }
-                    disabled={currentPage === totalPages}
-                    className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
-                      currentPage === totalPages
-                        ? "text-gray-300 cursor-not-allowed"
-                        : "text-gray-500 hover:bg-gray-50"
-                    }`}
-                  >
-                    <span className="sr-only">Next</span>
-                    <svg
-                      className="h-5 w-5"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </button>
-                </nav>
-              </div>
-            </div>
+          <div className="flex flex-col items-center justify-center h-64">
+            <FiBook className="h-12 w-12 text-gray-400 mb-4" />
+            <p className="text-gray-500 text-lg">
+              No lessons found for this course
+            </p>
+            <p className="text-gray-400 mb-4">
+              Start by adding your first lesson
+            </p>
+            <button
+              onClick={() => navigate(`/admin/courses/${courseId}/lessons/new`)}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center"
+            >
+              <FiPlus className="mr-2" />
+              Add New Lesson
+            </button>
           </div>
         )}
       </div>

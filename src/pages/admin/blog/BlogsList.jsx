@@ -9,64 +9,78 @@ import {
   FiPlus,
   FiSearch,
   FiFilter,
-  FiBook,
-  FiUsers,
   FiCalendar,
+  FiUser,
 } from "react-icons/fi";
 import AdminLayout from "../../../components/admin/AdminLayout";
 import { adminService } from "../../../services/admin-service";
 import { formatDate } from "../../../utils/formatters";
 
-const CoursesList = () => {
-  const [courses, setCourses] = useState([]);
+const BlogsList = () => {
+  const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [categories, setCategories] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalCourses, setTotalCourses] = useState(0);
+  const [totalPosts, setTotalPosts] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchCourses();
-  }, [currentPage, statusFilter]);
+    fetchPosts();
+    fetchCategories();
+  }, [currentPage, categoryFilter]);
 
-  const fetchCourses = async () => {
+  const fetchPosts = async () => {
     try {
       setLoading(true);
-      const data = await adminService.getCourses();
-      setCourses(data.courses || []);
-      setTotalCourses(data.total || 0);
+      const data = await adminService.getBlogPosts({
+        currentPage,
+        categoryFilter,
+        searchTerm,
+      });
+      setPosts(data.posts || []);
+      setTotalPosts(data.total || 0);
       setTotalPages(data.totalPages || 1);
     } catch (err) {
-      console.error("Error fetching courses:", err);
-      setError("Failed to load courses. Please try again later.");
+      console.error("Error fetching blog posts:", err);
+      setError("Failed to load blog posts. Please try again later.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const data = await adminService.getBlogCategories();
+      setCategories(data.categories || []);
+    } catch (err) {
+      console.error("Error fetching blog categories:", err);
+      setCategories([]);
     }
   };
 
   const handleSearch = (e) => {
     e.preventDefault();
     setCurrentPage(1);
-    fetchCourses();
+    fetchPosts();
   };
 
-  const handleDelete = async (courseId) => {
+  const handleDelete = async (postId) => {
     if (
       window.confirm(
-        "Are you sure you want to delete this course? This action cannot be undone."
+        "Are you sure you want to delete this blog post? This action cannot be undone."
       )
     ) {
       try {
-        // Assuming there's a deleteCourse function in the adminService
-        // await adminService.deleteCourse(courseId)
-        setCourses(courses.filter((course) => course._id !== courseId));
-        alert("Course deleted successfully");
+        await adminService.deleteBlogPost(postId);
+        setPosts(posts.filter((post) => post._id !== postId));
+        alert("Blog post deleted successfully");
       } catch (err) {
-        console.error("Error deleting course:", err);
-        alert("Failed to delete course. Please try again.");
+        console.error("Error deleting blog post:", err);
+        alert("Failed to delete blog post. Please try again.");
       }
     }
   };
@@ -74,13 +88,13 @@ const CoursesList = () => {
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Courses</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Blog Posts</h1>
         <button
-          onClick={() => navigate("/admin/courses/new")}
+          onClick={() => navigate("/admin/blogs/new")}
           className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center"
         >
           <FiPlus className="mr-2" />
-          Add New Course
+          Add New Post
         </button>
       </div>
 
@@ -95,7 +109,7 @@ const CoursesList = () => {
               <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search courses..."
+                placeholder="Search blog posts..."
                 className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -107,14 +121,18 @@ const CoursesList = () => {
               <FiFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <select
                 className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 appearance-none"
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
               >
-                <option value="">All Status</option>
-                <option value="active">Active</option>
-                <option value="upcoming">Upcoming</option>
-                <option value="completed">Completed</option>
-                <option value="draft">Draft</option>
+                <option value="">All Categories</option>
+                {categories.map((category) => (
+                  <option
+                    key={category._id || category.id}
+                    value={category.name}
+                  >
+                    {category.name}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -138,32 +156,32 @@ const CoursesList = () => {
         </div>
       )}
 
-      {/* Courses table */}
+      {/* Blog posts table */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
           </div>
-        ) : courses.length > 0 ? (
+        ) : posts.length > 0 ? (
           <>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Course
+                      Title
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Instructor
+                      Author
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Category
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Students
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Start Date
+                      Published Date
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
@@ -171,82 +189,73 @@ const CoursesList = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {courses.map((course) => (
-                    <tr key={course._id} className="hover:bg-gray-50">
+                  {posts.map((post) => (
+                    <tr key={post._id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">
+                          {post.title}
+                        </div>
+                        <div className="text-sm text-gray-500 truncate max-w-xs">
+                          {post.excerpt || post.content?.substring(0, 100)}...
+                        </div>
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <div className="h-10 w-10 rounded-md bg-gray-200 flex items-center justify-center text-gray-500">
-                            <FiBook className="h-5 w-5" />
+                          <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                            <FiUser className="h-4 w-4" />
                           </div>
-                          <div className="ml-4">
+                          <div className="ml-3">
                             <div className="text-sm font-medium text-gray-900">
-                              {course.title}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              {course.code || "No code"}
+                              {post.author?.name || "Unknown"}
                             </div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {course.instructor?.name || "Unassigned"}
-                        </div>
+                        <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                          {post.category || "Uncategorized"}
+                        </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
                           className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            course.status === "active"
+                            post.is_published
                               ? "bg-green-100 text-green-800"
-                              : course.status === "upcoming"
-                              ? "bg-blue-100 text-blue-800"
-                              : course.status === "completed"
-                              ? "bg-gray-100 text-gray-800"
                               : "bg-yellow-100 text-yellow-800"
                           }`}
                         >
-                          {course.status || "Draft"}
+                          {post.is_published ? "Published" : "Draft"}
                         </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <FiUsers className="mr-1 h-4 w-4 text-gray-500" />
-                          <span className="text-sm text-gray-900">
-                            {course.students_count || 0}
-                          </span>
-                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <div className="flex items-center">
                           <FiCalendar className="mr-1 h-4 w-4 text-gray-400" />
-                          {course.start_date
-                            ? formatDate(course.start_date)
-                            : "Not scheduled"}
+                          {post.is_published && post.published_at
+                            ? formatDate(post.published_at)
+                            : "Not published"}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <button
-                          onClick={() =>
-                            navigate(`/admin/courses/${course._id}`)
-                          }
+                          onClick={() => navigate(`/blog/${post._id}`)}
                           className="text-green-600 hover:text-green-900 mr-3"
-                          title="View Course"
+                          title="View Post"
                         >
                           <FiEye className="h-5 w-5" />
                         </button>
                         <button
                           onClick={() =>
-                            navigate(`/admin/courses/${course._id}/edit`)
+                            navigate(`/admin/blogs/${post._id}/edit`)
                           }
                           className="text-blue-600 hover:text-blue-900 mr-3"
-                          title="Edit Course"
+                          title="Edit Post"
                         >
                           <FiEdit className="h-5 w-5" />
                         </button>
                         <button
-                          onClick={() => handleDelete(course._id)}
+                          onClick={() => handleDelete(post._id)}
                           className="text-red-600 hover:text-red-900"
-                          title="Delete Course"
+                          title="Delete Post"
                         >
                           <FiTrash2 className="h-5 w-5" />
                         </button>
@@ -264,9 +273,9 @@ const CoursesList = () => {
                   <p className="text-sm text-gray-700">
                     Showing page{" "}
                     <span className="font-medium">{currentPage}</span> of{" "}
-                    <span className="font-medium">{totalPages}</span> pages ({" "}
-                    <span className="font-medium">{totalCourses}</span> total
-                    courses)
+                    <span className="font-medium">{totalPages}</span> pages (
+                    <span className="font-medium">{totalPosts}</span> total
+                    posts)
                   </p>
                 </div>
                 <div>
@@ -328,16 +337,16 @@ const CoursesList = () => {
         ) : (
           <div className="flex flex-col items-center justify-center h-64">
             <FiSearch className="h-12 w-12 text-gray-400 mb-4" />
-            <p className="text-gray-500 text-lg">No courses found</p>
+            <p className="text-gray-500 text-lg">No blog posts found</p>
             <p className="text-gray-400">
               Try adjusting your search or filter criteria
             </p>
             <button
-              onClick={() => navigate("/admin/courses/new")}
+              onClick={() => navigate("/admin/blogs/new")}
               className="mt-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center"
             >
               <FiPlus className="mr-2" />
-              Add New Course
+              Add New Post
             </button>
           </div>
         )}
@@ -346,4 +355,4 @@ const CoursesList = () => {
   );
 };
 
-export default CoursesList;
+export default BlogsList;

@@ -68,6 +68,6 @@ export const authService = {
   },
 };
 
-export const getCurrentUser = authService.getCurrentUser();
-export const isAuthenticated = authService.isAuthenticated();
-export const logoutUser = authService.logout();
+export const getCurrentUser = authService.getCurrentUser;
+export const isAuthenticated = authService.isAuthenticated;
+export const logoutUser = authService.logout;

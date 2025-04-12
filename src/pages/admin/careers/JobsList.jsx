@@ -1,41 +1,54 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+"use client";
+
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
-  Edit,
-  Trash2,
-  Search,
-  Plus,
-  Filter,
-  Eye,
-  Download,
-} from "lucide-react";
-import {
-  getJobs,
-  deleteJob,
-  getJobCategories,
-} from "../../../services/admin-service";
+  FiEdit,
+  FiEye,
+  FiTrash2,
+  FiPlus,
+  FiSearch,
+  FiFilter,
+  FiUsers,
+} from "react-icons/fi";
+import AdminLayout from "../../../components/admin/AdminLayout";
+import { adminService } from "../../../services/admin-service";
 import { formatDate } from "../../../utils/formatters";
 
 const JobsList = () => {
   const [jobs, setJobs] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [publishedFilter, setPublishedFilter] = useState("");
+  const [categories, setCategories] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [jobToDelete, setJobToDelete] = useState(null);
+  const [totalJobs, setTotalJobs] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const navigate = useNavigate();
 
-  const fetchJobs = async (page = 1, category = "", search = "") => {
+  useEffect(() => {
+    fetchJobs();
+    fetchCategories();
+  }, [currentPage, categoryFilter, publishedFilter]);
+
+  const fetchJobs = async () => {
     try {
       setLoading(true);
-      const response = await getJobs(page, category, search);
-      setJobs(response.jobs);
-      setTotalPages(response.totalPages);
-      setCurrentPage(response.currentPage);
-    } catch (error) {
-      console.error("Error fetching jobs:", error);
+      const params = {
+        page: currentPage,
+        category: categoryFilter || undefined,
+        search: searchTerm || undefined,
+        is_published: publishedFilter || undefined,
+      };
+      const data = await adminService.getJobs(params);
+      setJobs(data.jobs || []);
+      setTotalJobs(data.total || 0);
+      setTotalPages(data.totalPages || 1);
+    } catch (err) {
+      console.error("Error fetching jobs:", err);
+      setError("Failed to load jobs. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -43,166 +56,130 @@ const JobsList = () => {
 
   const fetchCategories = async () => {
     try {
-      const categoriesData = await getJobCategories();
-      setCategories(categoriesData);
-    } catch (error) {
-      console.error("Error fetching job categories:", error);
+      const data = await adminService.getJobCategories();
+      setCategories(data.categories || []);
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+      // Set empty categories array to prevent further errors
+      setCategories([]);
     }
   };
-
-  useEffect(() => {
-    fetchJobs(currentPage, selectedCategory, searchTerm);
-    fetchCategories();
-  }, [currentPage, selectedCategory, searchTerm]);
 
   const handleSearch = (e) => {
     e.preventDefault();
     setCurrentPage(1);
-    fetchJobs(1, selectedCategory, searchTerm);
+    fetchJobs();
   };
 
-  const handleCategoryFilter = (category) => {
-    setSelectedCategory(category);
-    setCurrentPage(1);
-    fetchJobs(1, category, searchTerm);
-  };
-
-  const handleDeleteClick = (job) => {
-    setJobToDelete(job);
-    setShowDeleteModal(true);
-  };
-
-  const confirmDelete = async () => {
-    if (!jobToDelete) return;
-
-    try {
-      await deleteJob(jobToDelete.id);
-      setJobs(jobs.filter((job) => job.id !== jobToDelete.id));
-      setShowDeleteModal(false);
-    } catch (error) {
-      console.error("Error deleting job:", error);
+  const handleDelete = async (jobId) => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this job? This action cannot be undone."
+      )
+    ) {
+      try {
+        await adminService.deleteJob(jobId);
+        setJobs(jobs.filter((job) => job._id !== jobId));
+        alert("Job deleted successfully");
+      } catch (err) {
+        console.error("Error deleting job:", err);
+        alert("Failed to delete job. Please try again.");
+      }
     }
-  };
-
-  const exportJobs = () => {
-    // Implementation for exporting jobs to CSV
-    console.log("Exporting jobs...");
-  };
-
-  const renderPagination = () => {
-    const pages = [];
-    for (let i = 1; i <= totalPages; i++) {
-      pages.push(
-        <button
-          key={i}
-          onClick={() => setCurrentPage(i)}
-          className={`px-3 py-1 rounded-md ${
-            currentPage === i
-              ? "bg-primary text-white"
-              : "bg-white text-gray-700 hover:bg-gray-50"
-          }`}
-        >
-          {i}
-        </button>
-      );
-    }
-    return (
-      <div className="flex items-center justify-between mt-6">
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className="px-3 py-1 rounded-md bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-        >
-          Previous
-        </button>
-        <div className="flex space-x-1">{pages}</div>
-        <button
-          onClick={() =>
-            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-          }
-          disabled={currentPage === totalPages}
-          className="px-3 py-1 rounded-md bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
-    );
   };
 
   return (
-    <div className="p-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
-            Job Listings
-          </h1>
-          <p className="text-gray-600">Manage all job postings and vacancies</p>
-        </div>
-        <div className="mt-4 md:mt-0 flex flex-col sm:flex-row gap-3">
-          <button
-            onClick={exportJobs}
-            className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-          >
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </button>
-          <Link
-            to="/admin/careers/jobs/create"
-            className="flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Job
-          </Link>
-        </div>
+    <div className="container mx-auto px-4 py-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-gray-800">Job Listings</h1>
+        <button
+          onClick={() => navigate("/admin/careers/jobs/new")}
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center"
+        >
+          <FiPlus className="mr-2" />
+          Add New Job
+        </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="p-4 border-b">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <form onSubmit={handleSearch} className="flex-1">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search jobs..."
-                  className="w-full pl-10 pr-4 py-2 border rounded-md focus:ring-primary focus:border-primary"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-gray-400" />
-                </div>
-                <button
-                  type="submit"
-                  className="absolute inset-y-0 right-0 px-3 flex items-center bg-primary text-white rounded-r-md"
-                >
-                  Search
-                </button>
-              </div>
-            </form>
-            <div className="flex items-center gap-2">
-              <Filter className="h-5 w-5 text-gray-400" />
-              <span className="text-sm text-gray-600">Filter by category:</span>
+      {/* Filters */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <form
+          onSubmit={handleSearch}
+          className="flex flex-col md:flex-row gap-4"
+        >
+          <div className="flex-1">
+            <div className="relative">
+              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search jobs, companies, locations..."
+                className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="w-full md:w-48">
+            <div className="relative">
+              <FiFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <select
-                value={selectedCategory}
-                onChange={(e) => handleCategoryFilter(e.target.value)}
-                className="border rounded-md px-2 py-1 text-sm focus:ring-primary focus:border-primary"
+                className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 appearance-none"
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
               >
                 <option value="">All Categories</option>
                 {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
+                  <option
+                    key={category._id || category.id}
+                    value={category.name}
+                  >
                     {category.name}
                   </option>
                 ))}
               </select>
             </div>
           </div>
-        </div>
-
-        {loading ? (
-          <div className="flex justify-center items-center p-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+          <div className="w-full md:w-48">
+            <div className="relative">
+              <FiFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <select
+                className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 appearance-none"
+                value={publishedFilter}
+                onChange={(e) => setPublishedFilter(e.target.value)}
+              >
+                <option value="">All Status</option>
+                <option value="true">Published</option>
+                <option value="false">Draft</option>
+              </select>
+            </div>
           </div>
-        ) : (
+          <button
+            type="submit"
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md"
+          >
+            Search
+          </button>
+        </form>
+      </div>
+
+      {/* Error message */}
+      {error && (
+        <div
+          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6"
+          role="alert"
+        >
+          <strong className="font-bold">Error!</strong>
+          <span className="block sm:inline"> {error}</span>
+        </div>
+      )}
+
+      {/* Jobs table */}
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+          </div>
+        ) : jobs.length > 0 ? (
           <>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
@@ -212,159 +189,206 @@ const JobsList = () => {
                       Job Title
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Company
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Category
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Location
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Applications
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Posted
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {jobs.length > 0 ? (
-                    jobs.map((job) => (
-                      <tr key={job.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">
-                            {job.title}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {job.company}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {job.category}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {job.location}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {job.applications_count}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {jobs.map((job) => (
+                    <tr key={job._id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">
+                          {job.title}
+                        </div>
+                        <div className="text-sm text-gray-500">
                           {formatDate(job.created_at)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span
-                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                              job.status === "active"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-red-100 text-red-800"
-                            }`}
-                          >
-                            {job.status.charAt(0).toUpperCase() +
-                              job.status.slice(1)}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">
+                          {job.company}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">
+                          {job.category}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">
+                          {job.location?.city}, {job.location?.country}
+                          {job.location?.remote && (
+                            <span className="ml-1 text-green-600">
+                              (Remote)
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            job.is_published
+                              ? "bg-green-100 text-green-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}
+                        >
+                          {job.is_published ? "Published" : "Draft"}
+                        </span>
+                        {job.is_featured && (
+                          <span className="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                            Featured
                           </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex justify-end space-x-2">
-                            <Link
-                              to={`/admin/careers/jobs/${job.id}`}
-                              className="text-indigo-600 hover:text-indigo-900"
-                            >
-                              <Edit className="h-5 w-5" />
-                            </Link>
-                            <Link
-                              to={`/career/${job.id}`}
-                              className="text-blue-600 hover:text-blue-900"
-                              target="_blank"
-                            >
-                              <Eye className="h-5 w-5" />
-                            </Link>
-                            <button
-                              onClick={() => handleDeleteClick(job)}
-                              className="text-red-600 hover:text-red-900"
-                            >
-                              <Trash2 className="h-5 w-5" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan="7"
-                        className="px-6 py-4 text-center text-sm text-gray-500"
-                      >
-                        No jobs found
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <FiUsers className="mr-1 h-4 w-4 text-gray-500" />
+                          <span className="text-sm text-gray-900">
+                            {job.applications_count || 0}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button
+                          onClick={() => navigate(`/careers/jobs/${job._id}`)}
+                          className="text-green-600 hover:text-green-900 mr-3"
+                          title="View Job"
+                        >
+                          <FiEye className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() =>
+                            navigate(`/admin/careers/jobs/${job._id}/edit`)
+                          }
+                          className="text-blue-600 hover:text-blue-900 mr-3"
+                          title="Edit Job"
+                        >
+                          <FiEdit className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(job._id)}
+                          className="text-red-600 hover:text-red-900 mr-3"
+                          title="Delete Job"
+                        >
+                          <FiTrash2 className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() =>
+                            navigate(
+                              `/admin/careers/applications?job_id=${job._id}`
+                            )
+                          }
+                          className="text-purple-600 hover:text-purple-900"
+                          title="View Applications"
+                        >
+                          <FiUsers className="h-5 w-5" />
+                        </button>
                       </td>
                     </tr>
-                  )}
+                  ))}
                 </tbody>
               </table>
             </div>
-            {renderPagination()}
-          </>
-        )}
-      </div>
 
-      {/* Delete Confirmation Modal */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div
-              className="fixed inset-0 transition-opacity"
-              aria-hidden="true"
-            >
-              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
-            </div>
-            <span
-              className="hidden sm:inline-block sm:align-middle sm:h-screen"
-              aria-hidden="true"
-            >
-              &#8203;
-            </span>
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="sm:flex sm:items-start">
-                  <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                    <Trash2 className="h-6 w-6 text-red-600" />
-                  </div>
-                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">
-                      Delete Job
-                    </h3>
-                    <div className="mt-2">
-                      <p className="text-sm text-gray-500">
-                        Are you sure you want to delete "{jobToDelete?.title}"?
-                        This action cannot be undone.
-                      </p>
-                    </div>
-                  </div>
+            {/* Pagination */}
+            <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm text-gray-700">
+                    Showing page{" "}
+                    <span className="font-medium">{currentPage}</span> of{" "}
+                    <span className="font-medium">{totalPages}</span> pages ({" "}
+                    <span className="font-medium">{totalJobs}</span> total jobs)
+                  </p>
+                </div>
+                <div>
+                  <nav
+                    className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                    aria-label="Pagination"
+                  >
+                    <button
+                      onClick={() =>
+                        setCurrentPage(Math.max(1, currentPage - 1))
+                      }
+                      disabled={currentPage === 1}
+                      className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
+                        currentPage === 1
+                          ? "text-gray-300 cursor-not-allowed"
+                          : "text-gray-500 hover:bg-gray-50"
+                      }`}
+                    >
+                      Previous
+                    </button>
+                    {[...Array(Math.min(5, totalPages)).keys()].map((i) => {
+                      const pageNumber =
+                        currentPage > 3 ? currentPage - 3 + i + 1 : i + 1;
+                      if (pageNumber <= totalPages) {
+                        return (
+                          <button
+                            key={pageNumber}
+                            onClick={() => setCurrentPage(pageNumber)}
+                            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                              currentPage === pageNumber
+                                ? "z-10 bg-green-50 border-green-500 text-green-600"
+                                : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                            }`}
+                          >
+                            {pageNumber}
+                          </button>
+                        );
+                      }
+                      return null;
+                    })}
+                    <button
+                      onClick={() =>
+                        setCurrentPage(Math.min(totalPages, currentPage + 1))
+                      }
+                      disabled={currentPage === totalPages}
+                      className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
+                        currentPage === totalPages
+                          ? "text-gray-300 cursor-not-allowed"
+                          : "text-gray-500 hover:bg-gray-50"
+                      }`}
+                    >
+                      Next
+                    </button>
+                  </nav>
                 </div>
               </div>
-              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button
-                  type="button"
-                  onClick={confirmDelete}
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
-                >
-                  Delete
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowDeleteModal(false)}
-                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                >
-                  Cancel
-                </button>
-              </div>
             </div>
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-64">
+            <FiSearch className="h-12 w-12 text-gray-400 mb-4" />
+            <p className="text-gray-500 text-lg">No jobs found</p>
+            <p className="text-gray-400">
+              Try adjusting your search or filter criteria
+            </p>
+            <button
+              onClick={() => navigate("/admin/careers/jobs/new")}
+              className="mt-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center"
+            >
+              <FiPlus className="mr-2" />
+              Add New Job
+            </button>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

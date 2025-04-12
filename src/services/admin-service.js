@@ -1,57 +1,34 @@
 import apiClient from "./api-client";
 
 // Dashboard
-export const getAdminStats = async () => {
+export const getDashboardStats = async () => {
   try {
     const response = await apiClient.get("/admin/dashboard/stats");
     return response.data;
   } catch (error) {
-    console.error("Error fetching admin stats:", error);
+    console.error("Get dashboard stats error:", error);
     throw error;
   }
 };
 
-export const getRecentUsers = async (limit = 5) => {
+// User Management
+export const getUsers = async (params = {}) => {
   try {
-    const response = await apiClient.get(`/admin/users?limit=${limit}`);
+    const response = await apiClient.get("/admin/users", { params });
+    console.log(response.data, "users====");
     return response.data;
   } catch (error) {
-    console.error("Error fetching recent users:", error);
+    console.error("Get users error:", error);
     throw error;
   }
 };
 
-export const getRecentApplications = async (limit = 5) => {
+export const getUserById = async (userId) => {
   try {
-    const response = await apiClient.get(
-      `/admin/careers/applications?limit=${limit}`
-    );
+    const response = await apiClient.get(`/admin/users/${userId}`);
     return response.data;
   } catch (error) {
-    console.error("Error fetching recent applications:", error);
-    throw error;
-  }
-};
-
-// Users
-export const getUsers = async (page = 1, role = "", search = "") => {
-  try {
-    const response = await apiClient.get("/admin/users", {
-      params: { page, role, search },
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    throw error;
-  }
-};
-
-export const getUserById = async (id) => {
-  try {
-    const response = await apiClient.get(`/admin/users/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching user ${id}:`, error);
+    console.error("Get user by ID error:", error);
     throw error;
   }
 };
@@ -61,50 +38,48 @@ export const createUser = async (userData) => {
     const response = await apiClient.post("/admin/users", userData);
     return response.data;
   } catch (error) {
-    console.error("Error creating user:", error);
+    console.error("Create user error:", error);
     throw error;
   }
 };
 
-export const updateUser = async (id, userData) => {
+export const updateUser = async (userId, userData) => {
   try {
-    const response = await apiClient.put(`/admin/users/${id}`, userData);
+    const response = await apiClient.put(`/admin/users/${userId}`, userData);
     return response.data;
   } catch (error) {
-    console.error(`Error updating user ${id}:`, error);
+    console.error("Update user error:", error);
     throw error;
   }
 };
 
-export const deleteUser = async (id) => {
+export const deleteUser = async (userId) => {
   try {
-    const response = await apiClient.delete(`/admin/users/${id}`);
+    const response = await apiClient.delete(`/admin/users/${userId}`);
     return response.data;
   } catch (error) {
-    console.error(`Error deleting user ${id}:`, error);
+    console.error("Delete user error:", error);
     throw error;
   }
 };
 
-// Jobs
-export const getJobs = async (page = 1, category = "", search = "") => {
+// Job Management
+export const getJobs = async (params = {}) => {
   try {
-    const response = await apiClient.get("/admin/careers/jobs", {
-      params: { page, category, search },
-    });
+    const response = await apiClient.get("/admin/careers/jobs", { params });
     return response.data;
   } catch (error) {
-    console.error("Error fetching jobs:", error);
+    console.error("Get jobs error:", error);
     throw error;
   }
 };
 
-export const getJobById = async (id) => {
+export const getJobById = async (jobId) => {
   try {
-    const response = await apiClient.get(`/admin/careers/jobs/${id}`);
+    const response = await apiClient.get(`/admin/careers/jobs/${jobId}`);
     return response.data;
   } catch (error) {
-    console.error(`Error fetching job ${id}:`, error);
+    console.error("Get job by ID error:", error);
     throw error;
   }
 };
@@ -114,130 +89,68 @@ export const createJob = async (jobData) => {
     const response = await apiClient.post("/admin/careers/jobs", jobData);
     return response.data;
   } catch (error) {
-    console.error("Error creating job:", error);
+    console.error("Create job error:", error);
     throw error;
   }
 };
 
-export const updateJob = async (id, jobData) => {
+export const updateJob = async (jobId, jobData) => {
   try {
     const response = await apiClient.put(
-      `/api/admin/careers/jobs/${id}`,
+      `/admin/careers/jobs/${jobId}`,
       jobData
     );
     return response.data;
   } catch (error) {
-    console.error(`Error updating job ${id}:`, error);
+    console.error("Update job error:", error);
     throw error;
   }
 };
 
-export const deleteJob = async (id) => {
+export const deleteJob = async (jobId) => {
   try {
-    const response = await apiClient.delete(`/admin/careers/jobs/${id}`);
+    const response = await apiClient.delete(`/admin/careers/jobs/${jobId}`);
     return response.data;
   } catch (error) {
-    console.error(`Error deleting job ${id}:`, error);
+    console.error("Delete job error:", error);
     throw error;
   }
 };
 
-// Applications
-export const getApplications = async (page = 1, status = "", search = "") => {
+// Application Management
+export const getApplications = async (params = {}) => {
   try {
     const response = await apiClient.get("/admin/careers/applications", {
-      params: { page, status, search },
+      params,
     });
     return response.data;
   } catch (error) {
-    console.error("Error fetching applications:", error);
+    console.error("Get applications error:", error);
     throw error;
   }
 };
 
-export const getApplicationById = async (id) => {
+export const getApplicationById = async (applicationId) => {
   try {
-    const response = await apiClient.get(`/admin/careers/applications/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching application ${id}:`, error);
-    throw error;
-  }
-};
-
-export const updateApplicationStatus = async (id, status) => {
-  try {
-    const response = await apiClient.put(
-      `/admin/careers/applications/${id}/status`,
-      { status }
+    const response = await apiClient.get(
+      `/admin/careers/applications/${applicationId}`
     );
     return response.data;
   } catch (error) {
-    console.error(`Error updating application ${id} status:`, error);
+    console.error("Get application by ID error:", error);
     throw error;
   }
 };
 
-// Blog
-export const getBlogPosts = async (page = 1, category = "", search = "") => {
+export const updateApplication = async (applicationId, data) => {
   try {
-    const response = await apiClient.get("/blog/posts", {
-      params: { page, category, search },
-    });
+    const response = await apiClient.put(
+      `/admin/careers/applications/${applicationId}`,
+      data
+    );
     return response.data;
   } catch (error) {
-    console.error("Error fetching blog posts:", error);
-    throw error;
-  }
-};
-
-export const getBlogPostById = async (id) => {
-  try {
-    const response = await apiClient.get(`/admin/blog/posts/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching blog post ${id}:`, error);
-    throw error;
-  }
-};
-
-export const createBlogPost = async (postData) => {
-  try {
-    const response = await apiClient.post("/admin/blog/posts", postData);
-    return response.data;
-  } catch (error) {
-    console.error("Error creating blog post:", error);
-    throw error;
-  }
-};
-
-export const updateBlogPost = async (id, postData) => {
-  try {
-    const response = await apiClient.put(`/admin/blog/posts/${id}`, postData);
-    return response.data;
-  } catch (error) {
-    console.error(`Error updating blog post ${id}:`, error);
-    throw error;
-  }
-};
-
-export const deleteBlogPost = async (id) => {
-  try {
-    const response = await apiClient.delete(`/admin/blog/posts/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error(`Error deleting blog post ${id}:`, error);
-    throw error;
-  }
-};
-
-// Blog Categories
-export const getBlogCategories = async () => {
-  try {
-    const response = await apiClient.get("/admin/blog/categories");
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching blog categories:", error);
+    console.error("Update application error:", error);
     throw error;
   }
 };
@@ -248,57 +161,566 @@ export const getJobCategories = async () => {
     const response = await apiClient.get("/admin/careers/categories");
     return response.data;
   } catch (error) {
-    console.error("Error fetching job categories:", error);
+    console.error("Get job categories error:", error);
     throw error;
   }
 };
 
-export const getCourses = async () => {
+export const createJobCategory = async (categoryData) => {
   try {
-    const response = await apiClient.get("/admin/courses");
+    const response = await apiClient.post(
+      "/admin/careers/categories",
+      categoryData
+    );
     return response.data;
   } catch (error) {
-    console.error("Error fetching job categories:", error);
+    console.error("Create job category error:", error);
     throw error;
   }
 };
 
-export const getClasses = async () => {
+export const updateJobCategory = async (categoryId, categoryData) => {
   try {
-    const response = await apiClient.get("/admin/classes");
+    const response = await apiClient.put(
+      `/admin/careers/categories/${categoryId}`,
+      categoryData
+    );
     return response.data;
   } catch (error) {
-    console.error("Error fetching job categories:", error);
+    console.error("Update job category error:", error);
     throw error;
   }
 };
 
+export const deleteJobCategory = async (categoryId) => {
+  try {
+    const response = await apiClient.delete(
+      `/admin/careers/categories/${categoryId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Delete job category error:", error);
+    throw error;
+  }
+};
+
+// Blog Management
+export const getBlogs = async (params = {}) => {
+  try {
+    const response = await apiClient.get("/blog/posts", { params });
+    return response.data;
+  } catch (error) {
+    console.error("Get blogs error:", error);
+    throw error;
+  }
+};
+
+const getBlogPosts = getBlogs;
+
+export const getBlogById = async (blogId) => {
+  try {
+    const response = await apiClient.get(`/blog/posts/${blogId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Get blog by ID error:", error);
+    throw error;
+  }
+};
+
+export const getBlogPostById = getBlogById;
+
+export const createBlog = async (blogData) => {
+  try {
+    // Transform data to match backend expectations
+    const formattedData = {
+      title: blogData.title,
+      slug: blogData.title.toLowerCase().replace(/\s+/g, "-"), // Generate slug from title
+      excerpt: blogData.excerpt,
+      content: blogData.content.split("*")[0].trim(), // Clean up content
+      category: blogData.category,
+      tags: blogData.tags,
+      featured_image: blogData.featured_image,
+      is_published: blogData.status === "published", // Convert status to boolean
+    };
+
+    const response = await apiClient.post("/blog/posts", formattedData);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Create blog error:",
+      error.response?.data?.detail || error.message
+    );
+    throw error;
+  }
+};
+
+export const createBlogPost = createBlog;
+
+export const updateBlog = async (blogId, blogData) => {
+  try {
+    const response = await apiClient.put(`/blog/posts/${blogId}`, blogData);
+    return response.data;
+  } catch (error) {
+    console.error("Update blog error:", error);
+    throw error;
+  }
+};
+
+export const updateBlogPost = updateBlog;
+
+export const deleteBlog = async (blogId) => {
+  try {
+    const response = await apiClient.delete(`/admin/blogs/${blogId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Delete blog error:", error);
+    throw error;
+  }
+};
+
+// Blog Categories
+export const getBlogCategories = async () => {
+  try {
+    const response = await apiClient.get("/admin/blog/categories");
+    console.log(response.data, "blog category");
+    return response.data;
+  } catch (error) {
+    console.error("Get blog categories error:", error);
+    throw error;
+  }
+};
+
+export const createBlogCategory = async (categoryData) => {
+  try {
+    const response = await apiClient.post(
+      "/admin/blog/categories",
+      categoryData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Create blog category error:", error);
+    throw error;
+  }
+};
+
+export const updateBlogCategory = async (oldName, categoryData) => {
+  try {
+    const response = await apiClient.put(
+      `/admin/blog/categories/${oldName}`,
+      categoryData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Update blog category error:", error);
+    throw error;
+  }
+};
+
+export const deleteBlogCategory = async (name) => {
+  try {
+    const response = await apiClient.delete(`/admin/blog/categories/${name}`);
+    return response.data;
+  } catch (error) {
+    console.error("Delete blog category error:", error);
+    throw error;
+  }
+};
+
+// Course Management
+export const getCourses = async (params = {}) => {
+  try {
+    const response = await apiClient.get("/admin/courses", { params });
+    return response.data;
+  } catch (error) {
+    console.error("Get courses error:", error);
+    throw error;
+  }
+};
+
+export const getCourseById = async (courseId) => {
+  try {
+    const response = await apiClient.get(`/admin/courses/${courseId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Get course by ID error:", error);
+    throw error;
+  }
+};
+
+export const createCourse = async (courseData) => {
+  try {
+    const response = await apiClient.post("/admin/courses", courseData);
+    return response.data;
+  } catch (error) {
+    console.error("Create course error:", error);
+    throw error;
+  }
+};
+
+export const updateCourse = async (courseId, courseData) => {
+  try {
+    const response = await apiClient.put(
+      `/admin/courses/${courseId}`,
+      courseData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Update course error:", error);
+    throw error;
+  }
+};
+
+export const deleteCourse = async (courseId) => {
+  try {
+    const response = await apiClient.delete(`/admin/courses/${courseId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Delete course error:", error);
+    throw error;
+  }
+};
+
+export const enrollUserInCourse = async (courseId, userId) => {
+  try {
+    const response = await apiClient.post(
+      `/admin/courses/${courseId}/enroll/${userId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Enroll user in course error:", error);
+    throw error;
+  }
+};
+
+export const removeUserFromCourse = async (courseId, userId) => {
+  try {
+    const response = await apiClient.delete(
+      `/admin/courses/${courseId}/enroll/${userId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Remove user from course error:", error);
+    throw error;
+  }
+};
+
+// Class Management
+export const getClasses = async (params = {}) => {
+  try {
+    const response = await apiClient.get("/admin/classes", { params });
+    return response.data;
+  } catch (error) {
+    console.error("Get classes error:", error);
+    throw error;
+  }
+};
+
+export const getLessons = getClasses;
+
+export const getClassById = async (classId) => {
+  try {
+    const response = await apiClient.get(`/admin/classes/${classId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Get class by ID error:", error);
+    throw error;
+  }
+};
+
+export const createClass = async (classData) => {
+  try {
+    const response = await apiClient.post("/admin/classes", classData);
+    return response.data;
+  } catch (error) {
+    console.error("Create class error:", error);
+    throw error;
+  }
+};
+
+export const updateClass = async (classId, classData) => {
+  try {
+    const response = await apiClient.put(
+      `/admin/classes/${classId}`,
+      classData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Update class error:", error);
+    throw error;
+  }
+};
+
+export const deleteClass = async (classId) => {
+  try {
+    const response = await apiClient.delete(`/admin/classes/${classId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Delete class error:", error);
+    throw error;
+  }
+};
+
+// Assignment Management
+export const getAssignments = async (params = {}) => {
+  try {
+    const response = await apiClient.get("/admin/assignments", { params });
+    return response.data;
+  } catch (error) {
+    console.error("Get assignments error:", error);
+    throw error;
+  }
+};
+
+export const getAssignmentById = async (assignmentId) => {
+  try {
+    const response = await apiClient.get(`/admin/assignments/${assignmentId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Get assignment by ID error:", error);
+    throw error;
+  }
+};
+
+export const createAssignment = async (assignmentData) => {
+  try {
+    const response = await apiClient.post("/admin/assignments", assignmentData);
+    return response.data;
+  } catch (error) {
+    console.error("Create assignment error:", error);
+    throw error;
+  }
+};
+
+export const updateAssignment = async (assignmentId, assignmentData) => {
+  try {
+    const response = await apiClient.put(
+      `/admin/assignments/${assignmentId}`,
+      assignmentData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Update assignment error:", error);
+    throw error;
+  }
+};
+
+export const deleteAssignment = async (assignmentId) => {
+  try {
+    const response = await apiClient.delete(
+      `/admin/assignments/${assignmentId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Delete assignment error:", error);
+    throw error;
+  }
+};
+
+export const getAssignmentSubmissions = async (assignmentId) => {
+  try {
+    const response = await apiClient.get(
+      `/admin/assignments/${assignmentId}/submissions`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Get assignment submissions error:", error);
+    throw error;
+  }
+};
+
+export const gradeAssignmentSubmission = async (
+  assignmentId,
+  userId,
+  gradeData
+) => {
+  try {
+    const response = await apiClient.post(
+      `/admin/assignments/${assignmentId}/grade/${userId}`,
+      gradeData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Grade assignment submission error:", error);
+    throw error;
+  }
+};
+
+// Resource Management
+export const getResources = async (params = {}) => {
+  try {
+    const response = await apiClient.get("/admin/resources", { params });
+    return response.data;
+  } catch (error) {
+    console.error("Get resources error:", error);
+    throw error;
+  }
+};
+
+export const getResourceById = async (resourceId) => {
+  try {
+    const response = await apiClient.get(`/admin/resources/${resourceId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Get resource by ID error:", error);
+    throw error;
+  }
+};
+
+export const createResource = async (resourceData) => {
+  try {
+    const response = await apiClient.post("/admin/resources", resourceData);
+    return response.data;
+  } catch (error) {
+    console.error("Create resource error:", error);
+    throw error;
+  }
+};
+
+export const updateResource = async (resourceId, resourceData) => {
+  try {
+    const response = await apiClient.put(
+      `/admin/resources/${resourceId}`,
+      resourceData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Update resource error:", error);
+    throw error;
+  }
+};
+
+export const deleteResource = async (resourceId) => {
+  try {
+    const response = await apiClient.delete(`/admin/resources/${resourceId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Delete resource error:", error);
+    throw error;
+  }
+};
+
+// File Upload
+export const uploadImage = async (file) => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await apiClient.post("/upload/image", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Upload image error:", error);
+    throw error;
+  }
+};
+
+export const uploadResume = async (file) => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await apiClient.post("/careers/upload/resume", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Upload resume error:", error);
+    throw error;
+  }
+};
+const getAdminStats = getDashboardStats;
+
+// Export all services
 const adminService = {
+  // Dashboard
+  getDashboardStats,
   getAdminStats,
-  getRecentUsers,
-  getRecentApplications,
+
+  // User Management
   getUsers,
   getUserById,
   createUser,
   updateUser,
   deleteUser,
+
+  // Job Management
   getJobs,
   getJobById,
   createJob,
   updateJob,
   deleteJob,
+
+  // Application Management
   getApplications,
   getApplicationById,
-  updateApplicationStatus,
+  updateApplication,
+
+  // Job Categories
+  getJobCategories,
+  createJobCategory,
+  updateJobCategory,
+  deleteJobCategory,
+
+  // Blog Management
+  getBlogs,
+  getBlogById,
+  createBlog,
+  updateBlog,
+  deleteBlog,
   getBlogPosts,
   getBlogPostById,
-  createBlogPost,
   updateBlogPost,
-  deleteBlogPost,
+  createBlogPost,
+
+  // Blog Categories
   getBlogCategories,
-  getJobCategories,
+  createBlogCategory,
+  updateBlogCategory,
+  deleteBlogCategory,
+
+  // Course Management
   getCourses,
+  getCourseById,
+  createCourse,
+  updateCourse,
+  deleteCourse,
+  enrollUserInCourse,
+  removeUserFromCourse,
+
+  // Class Management
   getClasses,
+  getClassById,
+  createClass,
+  updateClass,
+  deleteClass,
+  getLessons,
+
+  // Assignment Management
+  getAssignments,
+  getAssignmentById,
+  createAssignment,
+  updateAssignment,
+  deleteAssignment,
+  getAssignmentSubmissions,
+  gradeAssignmentSubmission,
+
+  // Resource Management
+  getResources,
+  getResourceById,
+  createResource,
+  updateResource,
+  deleteResource,
+
+  // File Upload
+  uploadImage,
+  uploadResume,
 };
 
 export { adminService };
