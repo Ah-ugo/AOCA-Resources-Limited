@@ -57,14 +57,48 @@ export const getJobCategories = async () => {
 // Function to apply for a job
 export const applyForJob = async (jobId, applicationData) => {
   try {
-    // Fix the API endpoint URL
+    // Log the data being sent for debugging
+    console.log("API call - applying for job:", jobId);
+    console.log("Application data:", applicationData);
+
+    // Make sure we have all required fields
+    if (!applicationData.resume_url) {
+      throw new Error("Resume URL is required");
+    }
+
+    if (!applicationData.phone) {
+      throw new Error("Phone number is required");
+    }
+
+    // Make sure job_id is correctly set
+    const payload = {
+      ...applicationData,
+      job_id: jobId, // Ensure correct job ID
+    };
+
+    // Send the application
     const response = await apiClient.post(
       `/careers/jobs/${jobId}/apply`,
-      applicationData
+      payload
     );
+
+    console.log("Application submitted successfully:", response.data);
     return response.data;
   } catch (error) {
     console.error("Apply for job error:", error);
+
+    // Extract and log detailed error information
+    if (error.response) {
+      // The server responded with a status code outside the 2xx range
+      console.error("Server error response:", error.response.data);
+      console.error("Status code:", error.response.status);
+
+      // Return a more descriptive error message if available
+      if (error.response.data && error.response.data.message) {
+        throw new Error(`Server error: ${error.response.data.message}`);
+      }
+    }
+
     throw error;
   }
 };

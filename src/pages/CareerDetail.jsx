@@ -40,6 +40,7 @@ const CareerDetail = () => {
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [applicationSuccess, setApplicationSuccess] = useState(false);
   const [applicationData, setApplicationData] = useState({
+    job_id: id,
     cover_letter: "",
     resume_url: "",
     phone: "",
@@ -106,16 +107,28 @@ const CareerDetail = () => {
     setError(null);
 
     try {
+      // Create a complete application data object for submission
+      let submissionData = { ...applicationData };
+
       // First upload resume if provided
       if (resumeFile) {
         const uploadResult = await uploadResume(resumeFile);
-        applicationData.resume_url = uploadResult.url;
+        // Important: Update the submission data directly, don't change state yet
+        submissionData = {
+          ...submissionData,
+          resume_url: uploadResult.url,
+        };
       } else if (!applicationData.resume_url) {
         throw new Error("Please upload your resume");
       }
 
-      // Then submit application
-      await applyForJob(id, applicationData);
+      console.log("Submitting application with data:", submissionData);
+
+      // Then submit application with the updated submission data
+      await applyForJob(id, submissionData);
+
+      // After successful submission, update the state
+      setApplicationData(submissionData);
 
       // Show success message
       setApplicationSuccess(true);
@@ -503,7 +516,7 @@ const CareerDetail = () => {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {/**<label className="block text-sm font-medium text-gray-700 mb-1">
                           Full Name <span className="text-red-500">*</span>
                         </label>
                         <input
@@ -514,11 +527,11 @@ const CareerDetail = () => {
                           value={user?.name || ""}
                           disabled
                           required
-                        />
+                        />**/}
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {/**<label className="block text-sm font-medium text-gray-700 mb-1">
                           Email Address <span className="text-red-500">*</span>
                         </label>
                         <div className="relative">
@@ -534,7 +547,7 @@ const CareerDetail = () => {
                             disabled
                             required
                           />
-                        </div>
+                        </div>**/}
                       </div>
 
                       <div>
