@@ -82,7 +82,7 @@ const ClassEdit = () => {
 
   const fetchInstructors = async () => {
     try {
-      const data = await adminService.getUsers({ role: "instructor" });
+      const data = await adminService.getUsers({ role: "admin" });
       setInstructors(data.users || []);
     } catch (err) {
       console.error("Error fetching instructors:", err);
@@ -211,7 +211,7 @@ const ClassEdit = () => {
                   <option value="">Select a course</option>
                   {courses.map((course) => (
                     <option key={course._id} value={course._id}>
-                      {course.title}
+                      {course.name}
                     </option>
                   ))}
                 </select>

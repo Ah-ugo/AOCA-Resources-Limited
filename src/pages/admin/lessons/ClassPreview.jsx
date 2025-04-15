@@ -35,14 +35,14 @@ const ClassPreview = () => {
       const data = await adminService.getClassById(id);
 
       // Format the class data based on your API response
-      const formattedClass = {
-        ...data.class,
-        course: data.course || null,
-        instructor: data.instructor || null,
-        students_count: data.students_count || 0,
-      };
-
-      setClassData(formattedClass);
+      // const formattedClass = {
+      //   ...data.class,
+      //   course: data.course || null,
+      //   instructor: data.instructor || null,
+      //   students_count: data.students_count || 0,
+      // };
+      console.log(data, "class data");
+      setClassData(data);
     } catch (err) {
       console.error("Error fetching class:", err);
       setError("Failed to load class data. Please try again later.");
@@ -55,6 +55,7 @@ const ClassPreview = () => {
     try {
       // Assuming you have an endpoint to get students enrolled in a class
       const data = await adminService.getUsers({ enrolled_in: id });
+      console.log(data, "students");
       setStudents(data.users || []);
     } catch (err) {
       console.error("Error fetching students:", err);
@@ -146,10 +147,12 @@ const ClassPreview = () => {
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h1 className="text-2xl font-bold text-gray-800">
-                  {classData.name || "Unnamed Class"}
+                  {classData.class.title || "Unnamed Class"}
                 </h1>
-                {classData.section && (
-                  <p className="text-gray-600">Section: {classData.section}</p>
+                {classData.class.description && (
+                  <p className="text-gray-600">
+                    Section: {classData.class.description}
+                  </p>
                 )}
               </div>
               <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
@@ -165,12 +168,12 @@ const ClassPreview = () => {
                 <div className="space-y-2">
                   <p>
                     <span className="font-medium">Course:</span>{" "}
-                    {classData.course?.title || "Not assigned"}
+                    {classData.course?.name || "Not assigned"}
                   </p>
-                  {classData.description && (
+                  {classData.class.description && (
                     <p>
                       <span className="font-medium">Description:</span>{" "}
-                      {classData.description}
+                      {classData.class.description}
                     </p>
                   )}
                 </div>
@@ -225,7 +228,7 @@ const ClassPreview = () => {
                   </p>
                   <p>
                     <span className="font-medium">Enrolled:</span>{" "}
-                    {classData.students_count} students
+                    {classData?.students?.length} students
                   </p>
                 </div>
               </div>

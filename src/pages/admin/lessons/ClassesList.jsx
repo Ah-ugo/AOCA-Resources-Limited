@@ -46,20 +46,16 @@ const ClassesList = () => {
       // Format classes data to match your API response
       const formattedClasses = data.classes.map((cls) => ({
         ...cls,
-        course: cls.course_id
-          ? { _id: cls.course_id, title: cls.course_name }
-          : null,
-        instructor: cls.instructor_id
-          ? {
-              _id: cls.instructor_id,
-              name: cls.instructor_name,
-              email: cls.instructor_email,
-            }
-          : null,
+        course: { id: cls.id, title: cls.name },
+        instructor: {
+          _id: cls.id,
+          name: cls.name,
+          email: cls.email,
+        },
       }));
 
       // Filter classes by course if filter is applied
-      let filteredClasses = formattedClasses;
+      let filteredClasses = data.classes;
       if (courseFilter) {
         filteredClasses = formattedClasses.filter(
           (cls) => cls.course_id === courseFilter
@@ -167,8 +163,8 @@ const ClassesList = () => {
               >
                 <option value="">All Courses</option>
                 {courses.map((course) => (
-                  <option key={course._id} value={course._id}>
-                    {course.title}
+                  <option key={course?._id} value={course?._id}>
+                    {course?.title}
                   </option>
                 ))}
               </select>
@@ -225,7 +221,7 @@ const ClassesList = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {classes.map((cls) => (
-                    <tr key={cls._id} className="hover:bg-gray-50">
+                    <tr key={cls?._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="h-10 w-10 rounded-md bg-gray-200 flex items-center justify-center text-gray-500">
@@ -233,26 +229,26 @@ const ClassesList = () => {
                           </div>
                           <div className="ml-4">
                             <div className="text-sm font-medium text-gray-900">
-                              {cls.name || "Unnamed Class"}
+                              {cls?.title || "Unnamed Class"}
                             </div>
                             <div className="text-sm text-gray-500">
-                              {cls.section || "No section"}
+                              {cls?.description || "No section"}
                             </div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
-                          {cls.course?.title || "Unknown Course"}
+                          {cls?.course?.name || "Unknown Course"}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
-                          {cls.instructor?.name || "Unassigned"}
+                          {cls?.instructor?.name || "Unassigned"}
                         </div>
-                        {cls.instructor?.email && (
+                        {cls?.instructor?.email && (
                           <div className="text-sm text-gray-500">
-                            {cls.instructor.email}
+                            {cls?.instructor?.email}
                           </div>
                         )}
                       </td>
@@ -264,8 +260,8 @@ const ClassesList = () => {
                           </div>
                           <div className="flex items-center mt-1">
                             <FiClock className="mr-1 h-4 w-4 text-gray-400" />
-                            {formatTime(cls.start_time)} -{" "}
-                            {formatTime(cls.end_time)}
+                            {formatTime(cls.created_at)} -{" "}
+                            {formatTime(cls.date)}
                           </div>
                         </div>
                       </td>

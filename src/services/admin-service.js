@@ -120,9 +120,8 @@ export const deleteJob = async (jobId) => {
 // Application Management
 export const getApplications = async (params = {}) => {
   try {
-    const response = await apiClient.get("/admin/careers/applications", {
-      params,
-    });
+    const response = await apiClient.get("/admin/careers/applications");
+    console.log(response, "application");
     return response.data;
   } catch (error) {
     console.error("Get applications error:", error);
@@ -408,6 +407,7 @@ export const removeUserFromCourse = async (courseId, userId) => {
 export const getClasses = async (params = {}) => {
   try {
     const response = await apiClient.get("/admin/classes", { params });
+    console.log(response.data, "lessons");
     return response.data;
   } catch (error) {
     console.error("Get classes error:", error);

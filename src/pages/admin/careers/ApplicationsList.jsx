@@ -219,20 +219,20 @@ const ApplicationsList = () => {
                           <div className="flex items-center">
                             <div className="ml-4">
                               <div className="text-sm font-medium text-gray-900">
-                                {application.applicant_name}
+                                {application.user.name}
                               </div>
                               <div className="text-sm text-gray-500">
-                                {application.email}
+                                {application.user.email}
                               </div>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">
-                            {application.job_title}
+                            {application.job.title}
                           </div>
                           <div className="text-sm text-gray-500">
-                            {application.job_company}
+                            {application.job.company}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

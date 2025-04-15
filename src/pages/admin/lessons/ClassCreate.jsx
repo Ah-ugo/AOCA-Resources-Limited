@@ -41,6 +41,7 @@ const ClassCreate = () => {
   const fetchCourses = async () => {
     try {
       const data = await adminService.getCourses();
+      console.log(data.courses, "courses");
       setCourses(data.courses || []);
     } catch (err) {
       console.error("Error fetching courses:", err);
@@ -50,8 +51,9 @@ const ClassCreate = () => {
 
   const fetchInstructors = async () => {
     try {
-      const data = await adminService.getUsers({ role: "instructor" });
+      const data = await adminService.getUsers({ role: "admin" });
       setInstructors(data.users || []);
+      console.log(data, "instructor");
     } catch (err) {
       console.error("Error fetching instructors:", err);
       setError("Failed to load instructors. Please try again later.");
@@ -171,7 +173,7 @@ const ClassCreate = () => {
                   <option value="">Select a course</option>
                   {courses.map((course) => (
                     <option key={course._id} value={course._id}>
-                      {course.title}
+                      {course.name}
                     </option>
                   ))}
                 </select>
