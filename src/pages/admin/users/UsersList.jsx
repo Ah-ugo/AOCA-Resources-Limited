@@ -62,8 +62,8 @@ const UsersList = () => {
     if (!userToDelete) return;
 
     try {
-      await deleteUser(userToDelete.id);
-      setUsers(users.filter((user) => user.id !== userToDelete.id));
+      await deleteUser(userToDelete._id);
+      setUsers(users.filter((user) => user._id !== userToDelete._id));
       setShowDeleteModal(false);
     } catch (error) {
       console.error("Error deleting user:", error);

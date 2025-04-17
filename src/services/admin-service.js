@@ -306,13 +306,15 @@ export const updateBlogPost = updateBlog;
 
 export const deleteBlog = async (blogId) => {
   try {
-    const response = await apiClient.delete(`/admin/blogs/${blogId}`);
+    const response = await apiClient.delete(`/blog/posts/${blogId}`);
     return response.data;
   } catch (error) {
     console.error("Delete blog error:", error);
     throw error;
   }
 };
+
+export const deleteBlogPost = deleteBlog;
 
 // Blog Categories
 export const getBlogCategories = async () => {
@@ -729,6 +731,7 @@ const adminService = {
   createBlog,
   updateBlog,
   deleteBlog,
+  deleteBlogPost,
   getBlogPosts,
   getBlogPostById,
   updateBlogPost,
