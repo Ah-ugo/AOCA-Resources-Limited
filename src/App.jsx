@@ -72,6 +72,8 @@ import ClassCreate from "./pages/admin/lessons/ClassCreate";
 import ClassPreview from "./pages/admin/lessons/ClassPreview";
 import ClassEdit from "./pages/admin/lessons/ClassEdit";
 import AdminContactSubmissions from "./pages/admin/contact-forms/ContactMain";
+import ApplicationDetails from "./pages/admin/careers/ApplicationDetails";
+// import AdminDashboard from "./pages/admin/AdminDashboard";
 
 function App() {
   return (
@@ -133,6 +135,11 @@ function App() {
                       path="careers/applications"
                       element={<ApplicationsList />}
                     />
+                    <Route
+                      path="careers/applications/:id"
+                      element={<ApplicationDetails />}
+                    />
+
                     <Route
                       path="careers/categories"
                       element={<JobCategoriesList />}

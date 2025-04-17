@@ -50,6 +50,22 @@ const CourseDetail = () => {
       }
     };
 
+    const fetchEnrolledStudents = async () => {
+      try {
+        setLoadingStudents(true);
+        // This endpoint might need to be implemented in your API
+        const data = await adminService.getCourseStudents(id);
+        setEnrolledStudents(data.students || []);
+      } catch (err) {
+        console.error("Error fetching enrolled students:", err);
+        // Provide mock data if the API endpoint doesn't exist
+        setEnrolledStudents([]);
+      } finally {
+        setLoadingStudents(false);
+      }
+    };
+
+    fetchEnrolledStudents();
     fetchCourse();
   }, [id]);
 
@@ -75,7 +91,7 @@ const CourseDetail = () => {
       )
     ) {
       try {
-        await adminService.deleteCourse(id);
+        await adminService.removeUserFromCourse(id);
         navigate("/admin/courses");
       } catch (err) {
         console.error("Error deleting course:", err);
@@ -122,6 +138,7 @@ const CourseDetail = () => {
   };
 
   const handleRemoveUser = async (userId) => {
+    console.log(userId, " ", id, "user===");
     if (
       window.confirm(
         "Are you sure you want to remove this user from the course?"
@@ -408,7 +425,7 @@ const CourseDetail = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <button
-                            onClick={() => handleRemoveUser(student._id)}
+                            onClick={() => handleRemoveUser(student.id)}
                             className="text-red-600 hover:text-red-900 flex items-center"
                             title="Remove from course"
                           >

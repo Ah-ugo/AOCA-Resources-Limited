@@ -24,7 +24,8 @@ import {
 import {
   getAdminStats,
   getRecentUsers,
-  getRecentApplications,
+  // getRecentApplications,
+  getApplications,
 } from "../../services/admin-service";
 import { formatDate } from "../../utils/formatters";
 
@@ -46,11 +47,12 @@ const AdminDashboard = () => {
         setLoading(true);
         const statsData = await getAdminStats();
         const usersData = await getRecentUsers();
-        const applicationsData = await getRecentApplications();
+        const applicationsData = await getApplications();
+        console.log(applicationsData, "hello===");
 
         setStats(statsData);
         setRecentUsers(usersData);
-        setRecentApplications(applicationsData);
+        setRecentApplications(applicationsData.applications);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
       } finally {
@@ -304,7 +306,7 @@ const AdminDashboard = () => {
                   <tr key={application.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
-                        {application.applicant_name}
+                        {application.user.name}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

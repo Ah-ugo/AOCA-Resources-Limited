@@ -214,7 +214,7 @@ const ApplicationsList = () => {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {applications.length > 0 ? (
                     applications.map((application) => (
-                      <tr key={application.id} className="hover:bg-gray-50">
+                      <tr key={application._id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="ml-4">
@@ -257,7 +257,7 @@ const ApplicationsList = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <Link
-                            to={`/admin/careers/applications/${application.id}`}
+                            to={`/admin/careers/applications/${application._id}`}
                             className="text-indigo-600 hover:text-indigo-900"
                           >
                             <Eye className="h-5 w-5 inline" />

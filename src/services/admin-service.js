@@ -129,6 +129,17 @@ export const getApplications = async (params = {}) => {
   }
 };
 
+export const careerStats = async (params = {}) => {
+  try {
+    const response = await apiClient.get("/admin/careers/stats");
+    console.log(response, "application stats");
+    return response.data;
+  } catch (error) {
+    console.error("Get applications error:", error);
+    throw error;
+  }
+};
+
 export const getApplicationById = async (applicationId) => {
   try {
     const response = await apiClient.get(
@@ -153,6 +164,32 @@ export const updateApplication = async (applicationId, data) => {
     throw error;
   }
 };
+
+// services/admin-service.js
+// export const getApplicationById = async (id) => {
+//   const response = await fetch(`https://aoca-resources-backend.onrender.com/admin/careers/applications/${id}`, {
+//     headers: {
+//       'Authorization': `Bearer ${localStorage.getItem('token')}`,
+//       'accept': 'application/json'
+//     }
+//   });
+//   if (!response.ok) throw new Error('Failed to fetch application');
+//   return await response.json();
+// };
+
+// export const updateApplication = async (id, data) => {
+//   const response = await fetch(`https://aoca-resources-backend.onrender.com/admin/careers/applications/${id}`, {
+//     method: 'PATCH',
+//     headers: {
+//       'Authorization': `Bearer ${localStorage.getItem('token')}`,
+//       'Content-Type': 'application/json',
+//       'accept': 'application/json'
+//     },
+//     body: JSON.stringify(data)
+//   });
+//   if (!response.ok) throw new Error('Failed to update application');
+//   return await response.json();
+// };
 
 // Job Categories
 export const getJobCategories = async () => {
@@ -396,11 +433,27 @@ export const removeUserFromCourse = async (courseId, userId) => {
     const response = await apiClient.delete(
       `/admin/courses/${courseId}/enroll/${userId}`
     );
+    console.log(response, "remove user", userId, " ", courseId);
     return response.data;
   } catch (error) {
     console.error("Remove user from course error:", error);
     throw error;
   }
+};
+
+// services/admin-service.js
+export const getCourseStudents = async (courseId, skip = 0, limit = 100) => {
+  const response = await fetch(
+    `https://aoca-resources-backend.onrender.com/admin/courses/${courseId}/students?skip=${skip}&limit=${limit}`,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        accept: "application/json",
+      },
+    }
+  );
+  if (!response.ok) throw new Error("Failed to fetch course students");
+  return await response.json();
 };
 
 // Class Management
@@ -635,7 +688,8 @@ export const uploadResume = async (file) => {
     throw error;
   }
 };
-const getAdminStats = getDashboardStats;
+export const getAdminStats = getDashboardStats;
+export const getRecentUsers = getUsers;
 
 // Export all services
 const adminService = {
@@ -661,6 +715,7 @@ const adminService = {
   getApplications,
   getApplicationById,
   updateApplication,
+  careerStats,
 
   // Job Categories
   getJobCategories,
@@ -693,6 +748,7 @@ const adminService = {
   deleteCourse,
   enrollUserInCourse,
   removeUserFromCourse,
+  getCourseStudents,
 
   // Class Management
   getClasses,

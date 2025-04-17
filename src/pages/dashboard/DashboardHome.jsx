@@ -222,7 +222,7 @@ function DashboardHome() {
                     )}
                   </div>
                   <a
-                    href={classItem.meetLink || classItem.link || "#"}
+                    href={classItem.meet_link || classItem.link || "#"}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="bg-primary text-white px-4 py-2 rounded-md text-sm hover:bg-primary/90 transition-colors inline-flex items-center gap-2"

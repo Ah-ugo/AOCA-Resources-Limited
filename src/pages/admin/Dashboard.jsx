@@ -22,12 +22,15 @@ const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [application, setApplications] = useState(null);
 
   useEffect(() => {
     const fetchDashboardStats = async () => {
       try {
         setIsLoading(true);
         const data = await adminService.getAdminStats();
+        const getAllApplications = await adminService.careerStats();
+        setApplications(getAllApplications);
         setStats(data);
       } catch (err) {
         setError("Failed to load dashboard statistics");
@@ -192,14 +195,14 @@ const Dashboard = () => {
             <div className="ml-4">
               <p className="text-gray-500 text-sm">Job Listings</p>
               <p className="text-2xl font-semibold">
-                {stats?.job_stats?.total || 0}
+                {application?.job_stats?.total || 0}
               </p>
             </div>
           </div>
           <div className="mt-4">
             <p className="text-yellow-600 text-sm">
               <span className="font-medium">
-                {stats?.application_stats?.total || 0}
+                {application?.application_stats?.total || 0}
               </span>{" "}
               applications
             </p>
@@ -303,7 +306,7 @@ const Dashboard = () => {
             <h2 className="text-lg font-semibold">Recent Job Applications</h2>
           </div>
           <div className="divide-y">
-            {stats?.recent_activity?.applications
+            {application?.recent_activity?.applications
               ?.slice(0, 5)
               .map((application, index) => (
                 <div key={index} className="px-6 py-4">
@@ -341,8 +344,8 @@ const Dashboard = () => {
                   </div>
                 </div>
               ))}
-            {(!stats?.recent_activity?.applications ||
-              stats.recent_activity.applications.length === 0) && (
+            {(!application?.recent_activity?.applications ||
+              application.recent_activity.applications.length === 0) && (
               <div className="px-6 py-4 text-center text-gray-500">
                 No recent job applications
               </div>
