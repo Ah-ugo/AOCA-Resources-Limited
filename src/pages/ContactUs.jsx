@@ -11,13 +11,14 @@ import {
   Mail,
   Send,
   CheckCircle,
+  AlertCircle,
 } from "lucide-react";
 import Header from "../components/Header";
 
 function ContactUs() {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
+    first_name: "",
+    last_name: "",
     email: "",
     phone: "",
     service: "",
@@ -26,6 +27,7 @@ function ContactUs() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,87 +37,55 @@ function ContactUs() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
 
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const response = await fetch(
+        "https://aoca-resources-backend.onrender.com/contact",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            accept: "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to submit form");
+      }
+
+      const data = await response.json();
       setIsSuccess(true);
 
       // Reset form after 3 seconds
       setTimeout(() => {
         setIsSuccess(false);
         setFormData({
-          firstName: "",
-          lastName: "",
+          first_name: "",
+          last_name: "",
           email: "",
           phone: "",
           service: "",
           message: "",
         });
       }, 3000);
-    }, 1500);
+    } catch (err) {
+      setError(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      {/* <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-2">
-            <Globe className="h-8 w-8 text-primary" />
-            <span className="font-bold text-xl">AOCA Resources Limited</span>
-          </Link>
-
-           Desktop Navigation 
-          <nav className="hidden md:flex items-center gap-6">
-            <Link
-              to="/#pathways"
-              className="text-foreground/80 hover:text-primary transition-colors"
-            >
-              Pathways
-            </Link>
-            <Link
-              to="/#courses"
-              className="text-foreground/80 hover:text-primary transition-colors"
-            >
-              Courses
-            </Link>
-            <Link
-              to="/#blog"
-              className="text-foreground/80 hover:text-primary transition-colors"
-            >
-              Blog
-            </Link>
-            <Link
-              to="/about"
-              className="text-foreground/80 hover:text-primary transition-colors"
-            >
-              About Us
-            </Link>
-            <Link to="/contact" className="text-primary font-medium">
-              Contact
-            </Link>
-            <Link
-              to="/login"
-              className="text-foreground/80 hover:text-primary transition-colors"
-            >
-              Login
-            </Link>
-            <Link
-              to="/register"
-              className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
-            >
-              Register
-            </Link>
-          </nav>
-        </div>
-      </header> */}
       <Header />
 
-      {/* Page Content */}
       <main className="pt-24 pb-16">
         {/* Hero Section */}
         <section className="bg-primary/10 py-16">
@@ -245,19 +215,63 @@ function ContactUs() {
                         </p>
                       </div>
                     ) : (
-                      <form className="space-y-4" onSubmit={handleSubmit}>
-                        <div className="grid grid-cols-2 gap-4">
+                      <>
+                        {error && (
+                          <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4 text-center">
+                            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-3" />
+                            <h4 className="text-lg font-medium text-red-800 mb-1">
+                              Error
+                            </h4>
+                            <p className="text-red-600">{error}</p>
+                          </div>
+                        )}
+                        <form className="space-y-4" onSubmit={handleSubmit}>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <label
+                                htmlFor="first_name"
+                                className="text-sm font-medium"
+                              >
+                                First Name
+                              </label>
+                              <input
+                                id="first_name"
+                                name="first_name"
+                                value={formData.first_name}
+                                onChange={handleChange}
+                                required
+                                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <label
+                                htmlFor="last_name"
+                                className="text-sm font-medium"
+                              >
+                                Last Name
+                              </label>
+                              <input
+                                id="last_name"
+                                name="last_name"
+                                value={formData.last_name}
+                                onChange={handleChange}
+                                required
+                                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                              />
+                            </div>
+                          </div>
                           <div className="space-y-2">
                             <label
-                              htmlFor="firstName"
+                              htmlFor="email"
                               className="text-sm font-medium"
                             >
-                              First Name
+                              Email
                             </label>
                             <input
-                              id="firstName"
-                              name="firstName"
-                              value={formData.firstName}
+                              id="email"
+                              name="email"
+                              type="email"
+                              value={formData.email}
                               onChange={handleChange}
                               required
                               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
@@ -265,116 +279,83 @@ function ContactUs() {
                           </div>
                           <div className="space-y-2">
                             <label
-                              htmlFor="lastName"
+                              htmlFor="phone"
                               className="text-sm font-medium"
                             >
-                              Last Name
+                              Phone
                             </label>
                             <input
-                              id="lastName"
-                              name="lastName"
-                              value={formData.lastName}
+                              id="phone"
+                              name="phone"
+                              value={formData.phone}
                               onChange={handleChange}
                               required
                               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                             />
                           </div>
-                        </div>
-                        <div className="space-y-2">
-                          <label
-                            htmlFor="email"
-                            className="text-sm font-medium"
+                          <div className="space-y-2">
+                            <label
+                              htmlFor="service"
+                              className="text-sm font-medium"
+                            >
+                              Service Interested In
+                            </label>
+                            <select
+                              id="service"
+                              name="service"
+                              value={formData.service}
+                              onChange={handleChange}
+                              required
+                              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                            >
+                              <option value="">Select a service</option>
+                              <option value="language">
+                                German Language Course
+                              </option>
+                              <option value="nursing">
+                                Nursing Work Contract
+                              </option>
+                              <option value="ausbildung">
+                                Ausbildung Training
+                              </option>
+                              <option value="study">Study Pathway</option>
+                              <option value="job">Job Seeker Pathway</option>
+                              <option value="other">Other</option>
+                            </select>
+                          </div>
+                          <div className="space-y-2">
+                            <label
+                              htmlFor="message"
+                              className="text-sm font-medium"
+                            >
+                              Message
+                            </label>
+                            <textarea
+                              id="message"
+                              name="message"
+                              rows={4}
+                              value={formData.message}
+                              onChange={handleChange}
+                              required
+                              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                            ></textarea>
+                          </div>
+                          <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="w-full bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
                           >
-                            Email
-                          </label>
-                          <input
-                            id="email"
-                            name="email"
-                            type="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <label
-                            htmlFor="phone"
-                            className="text-sm font-medium"
-                          >
-                            Phone
-                          </label>
-                          <input
-                            id="phone"
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleChange}
-                            required
-                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <label
-                            htmlFor="service"
-                            className="text-sm font-medium"
-                          >
-                            Service Interested In
-                          </label>
-                          <select
-                            id="service"
-                            name="service"
-                            value={formData.service}
-                            onChange={handleChange}
-                            required
-                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                          >
-                            <option value="">Select a service</option>
-                            <option value="language">
-                              German Language Course
-                            </option>
-                            <option value="nursing">
-                              Nursing Work Contract
-                            </option>
-                            <option value="ausbildung">
-                              Ausbildung Training
-                            </option>
-                            <option value="study">Study Pathway</option>
-                            <option value="job">Job Seeker Pathway</option>
-                            <option value="other">Other</option>
-                          </select>
-                        </div>
-                        <div className="space-y-2">
-                          <label
-                            htmlFor="message"
-                            className="text-sm font-medium"
-                          >
-                            Message
-                          </label>
-                          <textarea
-                            id="message"
-                            name="message"
-                            rows={4}
-                            value={formData.message}
-                            onChange={handleChange}
-                            required
-                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                          ></textarea>
-                        </div>
-                        <button
-                          type="submit"
-                          disabled={isSubmitting}
-                          className="w-full bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
-                        >
-                          {isSubmitting ? (
-                            "Sending..."
-                          ) : (
-                            <>
-                              <Send className="h-4 w-4" />
-                              Send Message
-                            </>
-                          )}
-                        </button>
-                      </form>
+                            {isSubmitting ? (
+                              "Sending..."
+                            ) : (
+                              <>
+                                <Send className="h-4 w-4" />
+                                Send Message
+                              </>
+                            )}
+                          </button>
+                        </form>
+                      </>
                     )}
                   </div>
                 </div>
@@ -422,8 +403,7 @@ function ContactUs() {
                 </div>
                 <div className="h-64">
                   <iframe
-                    src="https://www.google
-.com/maps/embed?pb=!1m18!1m12!1m3!1d3975.5741!2d7.0498!3d4.8156!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNMKwNDgnNTYuMiJOIDfCsDAyJzU5LjMiRQ!5e0!3m2!1sen!2sng!4v1616603763408!5m2!1sen!2sng"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3975.5741!2d7.0498!3d4.8156!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNMKwNDgnNTYuMiJOIDfCsDAyJzU5LjMiRQ!5e0!3m2!1sen!2sng!4v1616603763408!5m2!1sen!2sng"
                     width="100%"
                     height="100%"
                     style={{ border: 0 }}

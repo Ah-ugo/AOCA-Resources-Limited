@@ -71,6 +71,7 @@ import ClassesList from "./pages/admin/lessons/ClassesList";
 import ClassCreate from "./pages/admin/lessons/ClassCreate";
 import ClassPreview from "./pages/admin/lessons/ClassPreview";
 import ClassEdit from "./pages/admin/lessons/ClassEdit";
+import AdminContactSubmissions from "./pages/admin/contact-forms/ContactMain";
 
 function App() {
   return (
@@ -173,6 +174,11 @@ function App() {
                     <Route
                       path="courses/:courseId/lessons/:lessonId/edit"
                       element={<LessonForm />}
+                    />
+
+                    <Route
+                      path="messages"
+                      element={<AdminContactSubmissions />}
                     />
 
                     <Route path="*" element={<NotFound />} />

@@ -7,6 +7,7 @@ import {
   FileText,
   Home,
   LogOut,
+  MessageCircle,
   Settings,
   Users,
 } from "lucide-react";
@@ -57,6 +58,11 @@ function AdminLayout({ children }) {
       title: "Applications",
       icon: <FileText className="w-5 h-5" />,
       path: "/admin/careers/applications",
+    },
+    {
+      title: "Messages",
+      icon: <MessageCircle className="w-5 h-5" />,
+      path: "/admin/messages",
     },
     {
       title: "Settings",
