@@ -133,7 +133,7 @@ const UsersList = () => {
             Export
           </button>
           <Link
-            to="/admin/users/create"
+            to="/admin/users/new"
             className="flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90"
           >
             <Plus className="h-4 w-4 mr-2" />

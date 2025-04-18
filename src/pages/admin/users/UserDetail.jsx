@@ -25,6 +25,7 @@ const UserDetail = () => {
 
   useEffect(() => {
     const fetchUserDetails = async () => {
+      console.log(id, "user id")
       try {
         setLoading(true);
         const data = await adminService.getUserById(id);
