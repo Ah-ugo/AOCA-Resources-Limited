@@ -7,6 +7,8 @@ import {
   FiDollarSign,
   FiClock,
   FiUsers,
+  FiPlus,
+  FiTrash2,
 } from "react-icons/fi";
 import AdminLayout from "../../../components/admin/AdminLayout";
 import { adminService } from "../../../services/admin-service";
@@ -20,8 +22,10 @@ const CourseForm = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [instructors, setInstructors] = useState([]);
+  const [syllabusItems, setSyllabusItems] = useState([""]); // Start with one empty item
 
   const [formData, setFormData] = useState({
+    name: "", // Added missing field
     title: "",
     code: "",
     description: "",
@@ -36,7 +40,7 @@ const CourseForm = () => {
     schedule: "",
     location: "online",
     prerequisites: "",
-    syllabus: "",
+    syllabus: [],
     image_url: "",
     category: "",
     level: "beginner",
@@ -63,9 +67,19 @@ const CourseForm = () => {
           setLoading(true);
           const courseData = await adminService.getCourseById(id);
 
+          // Initialize syllabus items array
+          const syllabusArray = Array.isArray(courseData.syllabus) 
+            ? courseData.syllabus 
+            : courseData.syllabus 
+              ? [courseData.syllabus] 
+              : [""];
+
+          setSyllabusItems(syllabusArray);
+
           // Format dates for form inputs
           const formattedCourse = {
             ...courseData,
+            name: courseData.name || courseData.title || "", // Use name if available, fallback to title
             start_date: courseData.start_date
               ? new Date(courseData.start_date).toISOString().split("T")[0]
               : "",
@@ -77,6 +91,7 @@ const CourseForm = () => {
             duration: courseData.duration?.toString() || "",
             instructor_id:
               courseData.instructor?._id || courseData.instructor_id || "",
+            syllabus: syllabusArray, // Set as array
           };
 
           setFormData(formattedCourse);
@@ -100,16 +115,46 @@ const CourseForm = () => {
     }));
   };
 
+  const handleSyllabusChange = (index, value) => {
+    const updatedItems = [...syllabusItems];
+    updatedItems[index] = value;
+    setSyllabusItems(updatedItems);
+    
+    // Update formData syllabus as well
+    setFormData(prev => ({
+      ...prev,
+      syllabus: updatedItems.filter(item => item.trim() !== "") // Remove empty items
+    }));
+  };
+
+  const addSyllabusItem = () => {
+    setSyllabusItems([...syllabusItems, ""]);
+  };
+
+  const removeSyllabusItem = (index) => {
+    if (syllabusItems.length > 1) {
+      const updatedItems = syllabusItems.filter((_, i) => i !== index);
+      setSyllabusItems(updatedItems);
+      setFormData(prev => ({
+        ...prev,
+        syllabus: updatedItems.filter(item => item.trim() !== "")
+      }));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       setSaving(true);
 
-      // Convert string values to appropriate types
+      // Filter out empty syllabus items
+      const filteredSyllabus = syllabusItems.filter(item => item.trim() !== "");
+
+      // Convert string values to appropriate types and prepare data
       const courseData = {
         ...formData,
-        name: formData.title,
+        name: formData.name || formData.title, // Ensure name is sent (fallback to title)
         price: formData.price ? Number.parseFloat(formData.price) : undefined,
         max_students: formData.max_students
           ? Number.parseInt(formData.max_students)
@@ -117,6 +162,9 @@ const CourseForm = () => {
         duration: formData.duration
           ? Number.parseInt(formData.duration)
           : undefined,
+        syllabus: filteredSyllabus, // Send as array
+        // Ensure prerequisites is a string (not array unless your API expects array)
+        prerequisites: formData.prerequisites || "",
       };
 
       if (isEditMode) {
@@ -196,6 +244,24 @@ const CourseForm = () => {
               <div>
                 <label
                   className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="name"
+                >
+                  Course Name*
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Internal name for the course"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                />
+              </div>
+              <div>
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
                   htmlFor="title"
                 >
                   Course Title*
@@ -207,6 +273,7 @@ const CourseForm = () => {
                   required
                   value={formData.title}
                   onChange={handleChange}
+                  placeholder="Display title for students"
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 />
               </div>
@@ -534,24 +601,43 @@ const CourseForm = () => {
             ></textarea>
           </div>
 
-          {/* Syllabus */}
+          {/* Syllabus - Now as multiple inputs */}
           <div className="md:col-span-2">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="syllabus"
-            >
+            <label className="block text-gray-700 text-sm font-bold mb-2">
               Syllabus
             </label>
-            <textarea
-              id="syllabus"
-              name="syllabus"
-              value={formData.syllabus}
-              onChange={handleChange}
-              rows={6}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            ></textarea>
+            <div className="space-y-2">
+              {syllabusItems.map((item, index) => (
+                <div key={index} className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    value={item}
+                    onChange={(e) => handleSyllabusChange(index, e.target.value)}
+                    placeholder={`Syllabus item ${index + 1} (e.g., Introduction to topic)`}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  />
+                  {syllabusItems.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeSyllabusItem(index)}
+                      className="bg-red-500 hover:bg-red-600 text-white p-2 rounded"
+                    >
+                      <FiTrash2 />
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={addSyllabusItem}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-md flex items-center text-sm"
+              >
+                <FiPlus className="mr-1" />
+                Add Syllabus Item
+              </button>
+            </div>
             <p className="text-sm text-gray-500 mt-1">
-              You can use markdown formatting for the syllabus content.
+              Add multiple syllabus items. Empty items will be ignored.
             </p>
           </div>
         </div>
