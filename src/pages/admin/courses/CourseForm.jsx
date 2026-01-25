@@ -109,6 +109,7 @@ const CourseForm = () => {
       // Convert string values to appropriate types
       const courseData = {
         ...formData,
+        name: formData.title,
         price: formData.price ? Number.parseFloat(formData.price) : undefined,
         max_students: formData.max_students
           ? Number.parseInt(formData.max_students)
