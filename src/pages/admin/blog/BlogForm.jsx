@@ -100,7 +100,7 @@ const BlogForm = () => {
 
     if (!formData.title.trim()) errors.title = "Title is required";
     if (!formData.content.trim()) errors.content = "Content is required";
-    if (!formData.category) errors.category = "Category is required";
+    // if (!formData.category) errors.category = "Category is required";
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
