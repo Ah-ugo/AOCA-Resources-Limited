@@ -1,9 +1,9 @@
 /** @format */
 
 import { Link } from 'react-router-dom';
-import { MapPin, MessageSquare, Phone } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 
-function Footer() {
+function Footer2() {
   return (
     <footer className='bg-gray-900 text-white py-12'>
       <div className='container mx-auto px-4'>
@@ -26,7 +26,7 @@ function Footer() {
             <ul className='space-y-2'>
               <li>
                 <Link
-                  to='/application-process'
+                  to='/#pathways'
                   className='text-gray-400 hover:text-white transition-colors'
                 >
                   Pathways
@@ -34,7 +34,7 @@ function Footer() {
               </li>
               <li>
                 <Link
-                  to='/pricing'
+                  to='/#courses'
                   className='text-gray-400 hover:text-white transition-colors'
                 >
                   Courses
@@ -46,30 +46,6 @@ function Footer() {
                   className='text-gray-400 hover:text-white transition-colors'
                 >
                   Blog
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to='/events'
-                  className='text-gray-400 hover:text-white transition-colors'
-                >
-                  Events
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to='/success-stories'
-                  className='text-gray-400 hover:text-white transition-colors'
-                >
-                  Success Stories
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to='/faq'
-                  className='text-gray-400 hover:text-white transition-colors'
-                >
-                  FAQ
                 </Link>
               </li>
               <li>
@@ -110,21 +86,6 @@ function Footer() {
                     7 Salvation Avenue, Off Igbo Etche Road, Rumukwurusi, Port
                     Harcourt
                   </p>
-                </div>
-              </li>
-              <li className='flex items-center gap-2'>
-                <Phone className='h-5 w-5' />
-                <span className='text-gray-400'>08038867495, 08036714612</span>
-              </li>
-              <li className='flex items-center gap-2'>
-                <MessageSquare className='h-5 w-5' />
-                <span className='text-gray-400'>WhatsApp: 08038865466</span>
-              </li>
-              <li className='flex items-start gap-2'>
-                <MessageSquare className='h-5 w-5 mt-0.5' />
-                <div>
-                  <p className='text-gray-400'>info@aocaresorcesltd.com</p>
-                  <p className='text-gray-400'>aocaresources@gmail.com</p>
                 </div>
               </li>
             </ul>
@@ -175,13 +136,6 @@ function Footer() {
                 </svg>
               </a>
             </div>
-            <h3 className='font-bold text-lg mb-4'>Student Portal</h3>
-            <Link
-              to='/login'
-              className='bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors inline-block'
-            >
-              Login to Dashboard
-            </Link>
           </div>
         </div>
         <div className='border-t border-gray-800 mt-8 pt-8 text-center'>
@@ -195,4 +149,4 @@ function Footer() {
   );
 }
 
-export default Footer;
+export default Footer2;

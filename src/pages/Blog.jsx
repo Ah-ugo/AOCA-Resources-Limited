@@ -1,8 +1,10 @@
-"use client";
+/** @format */
 
-import { useState, useEffect } from "react";
-import { Link, useSearchParams } from "react-router-dom";
-import { motion } from "framer-motion";
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import {
   Globe,
   Search,
@@ -12,28 +14,29 @@ import {
   ChevronRight,
   ChevronLeft,
   Clock,
-} from "lucide-react";
+} from 'lucide-react';
 // import { blogPosts } from "../data/blogData";
-import Header from "../components/Header";
-import { getBlogPosts } from "../services/blogService";
+import Header from '../components/Header';
+import { getBlogPosts } from '../services/blogService';
+import Footer from '../components/Footer';
 // import { getBlogPost } from "../services/blogService";
 
 function Blog() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [posts, setPosts] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState('');
   const postsPerPage = 6;
 
   // Get category from URL if present
   useEffect(() => {
-    const category = searchParams.get("category");
+    const category = searchParams.get('category');
     if (category) {
       setSelectedCategory(category);
     } else {
-      setSelectedCategory("");
+      setSelectedCategory('');
     }
     setCurrentPage(1);
   }, [searchParams]);
@@ -58,7 +61,7 @@ function Blog() {
         (post) =>
           post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          post.content.toLowerCase().includes(searchQuery.toLowerCase())
+          post.content.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
 
@@ -94,7 +97,7 @@ function Blog() {
     if (category === selectedCategory) {
       // If clicking the already selected category, clear the filter
       setSearchParams({});
-      setSelectedCategory("");
+      setSelectedCategory('');
     } else {
       setSearchParams({ category });
       setSelectedCategory(category);
@@ -113,27 +116,27 @@ function Blog() {
   // }
 
   const formatDate = (dateString) => {
-    if (!dateString) return "";
+    if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
     });
   };
 
   const formatCreatedAt = (dateString) => {
-    if (!dateString) return "";
+    if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
     });
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className='min-h-screen bg-background'>
       {/* Header */}
       {/* <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -190,13 +193,13 @@ function Blog() {
       <Header />
 
       {/* Page Content */}
-      <main className="pt-24 pb-16">
+      <main className='pt-24 pb-16'>
         {/* Hero Section */}
-        <section className="bg-primary/10 py-16">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto text-center">
-              <h1 className="text-4xl md:text-5xl font-bold mb-6">Our Blog</h1>
-              <p className="text-xl text-gray-600">
+        <section className='bg-primary/10 py-16'>
+          <div className='container mx-auto px-4'>
+            <div className='max-w-3xl mx-auto text-center'>
+              <h1 className='text-4xl md:text-5xl font-bold mb-6'>Our Blog</h1>
+              <p className='text-xl text-gray-600'>
                 Insights, guides, and news about German visa applications,
                 language learning, and international opportunities
               </p>
@@ -205,33 +208,33 @@ function Blog() {
         </section>
 
         {/* Blog Content */}
-        <section className="py-16">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-col lg:flex-row gap-8">
+        <section className='py-16'>
+          <div className='container mx-auto px-4'>
+            <div className='flex flex-col lg:flex-row gap-8'>
               {/* Main Content */}
-              <div className="lg:w-3/4">
+              <div className='lg:w-3/4'>
                 {/* Search and Filter Bar */}
-                <div className="mb-8 flex flex-col md:flex-row gap-4">
-                  <form onSubmit={handleSearch} className="flex-1">
-                    <div className="relative">
+                <div className='mb-8 flex flex-col md:flex-row gap-4'>
+                  <form onSubmit={handleSearch} className='flex-1'>
+                    <div className='relative'>
                       <input
-                        type="text"
-                        placeholder="Search articles..."
-                        className="w-full px-4 py-2 pl-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                        type='text'
+                        placeholder='Search articles...'
+                        className='w-full px-4 py-2 pl-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary'
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                       />
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400' />
                     </div>
                   </form>
 
-                  <div className="flex flex-wrap gap-2">
+                  <div className='flex flex-wrap gap-2'>
                     <button
-                      onClick={() => handleCategoryFilter("")}
+                      onClick={() => handleCategoryFilter('')}
                       className={`px-3 py-1 text-sm rounded-md ${
-                        selectedCategory === ""
-                          ? "bg-primary text-white"
-                          : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                        selectedCategory === ''
+                          ? 'bg-primary text-white'
+                          : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                       }`}
                     >
                       All
@@ -242,8 +245,8 @@ function Blog() {
                         onClick={() => handleCategoryFilter(category)}
                         className={`px-3 py-1 text-sm rounded-md ${
                           selectedCategory === category
-                            ? "bg-primary text-white"
-                            : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                            ? 'bg-primary text-white'
+                            : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                         }`}
                       >
                         {category}
@@ -254,54 +257,54 @@ function Blog() {
 
                 {/* Blog Posts */}
                 {currentPosts.length === 0 ? (
-                  <div className="text-center py-12">
-                    <h3 className="text-xl font-medium mb-2">No posts found</h3>
-                    <p className="text-gray-600">
+                  <div className='text-center py-12'>
+                    <h3 className='text-xl font-medium mb-2'>No posts found</h3>
+                    <p className='text-gray-600'>
                       Try adjusting your search or filter to find what you're
                       looking for.
                     </p>
                   </div>
                 ) : (
-                  <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
+                  <div className='grid md:grid-cols-2 lg:grid-cols-2 gap-8'>
                     {currentPosts.map((post, index) => (
                       <motion.div
                         key={post.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, delay: index * 0.1 }}
-                        className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+                        className='bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow'
                       >
-                        <div className="relative h-48 w-full overflow-hidden">
+                        <div className='relative h-48 w-full overflow-hidden'>
                           <img
-                            src={post.featured_image || "/placeholder.svg"}
+                            src={post.featured_image || '/placeholder.svg'}
                             alt={post.title}
-                            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                            className='w-full h-full object-cover transition-transform duration-500 hover:scale-105'
                           />
-                          <div className="absolute top-4 left-4 bg-primary text-white text-xs font-semibold px-2 py-1 rounded">
+                          <div className='absolute top-4 left-4 bg-primary text-white text-xs font-semibold px-2 py-1 rounded'>
                             {post.category}
                           </div>
                         </div>
-                        <div className="p-6">
-                          <h3 className="text-xl font-bold mb-2 hover:text-primary transition-colors">
+                        <div className='p-6'>
+                          <h3 className='text-xl font-bold mb-2 hover:text-primary transition-colors'>
                             <Link to={`/blog/${post._id}`}>{post.title}</Link>
                           </h3>
-                          <p className="text-gray-600 mb-4">{post.excerpt}</p>
-                          <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                            <div className="flex items-center gap-1">
-                              <User className="h-4 w-4" />
+                          <p className='text-gray-600 mb-4'>{post.excerpt}</p>
+                          <div className='flex items-center justify-between text-sm text-gray-500 mb-4'>
+                            <div className='flex items-center gap-1'>
+                              <User className='h-4 w-4' />
                               <span>{post.author.name}</span>
                             </div>
-                            <div className="flex items-center gap-1">
-                              <Calendar className="h-4 w-4" />
+                            <div className='flex items-center gap-1'>
+                              <Calendar className='h-4 w-4' />
                               <span>{formatDate(post.created_at)}</span>
                             </div>
                           </div>
                           <Link
                             to={`/blog/${post._id}`}
-                            className="inline-flex items-center text-primary font-medium hover:underline"
+                            className='inline-flex items-center text-primary font-medium hover:underline'
                           >
                             Read More
-                            <ChevronRight className="h-4 w-4 ml-1" />
+                            <ChevronRight className='h-4 w-4 ml-1' />
                           </Link>
                         </div>
                       </motion.div>
@@ -311,14 +314,14 @@ function Blog() {
 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                  <div className="mt-12 flex justify-center">
-                    <nav className="flex items-center gap-2">
+                  <div className='mt-12 flex justify-center'>
+                    <nav className='flex items-center gap-2'>
                       <button
                         onClick={() => paginate(Math.max(1, currentPage - 1))}
                         disabled={currentPage === 1}
-                        className="p-2 rounded-md border hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className='p-2 rounded-md border hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed'
                       >
-                        <ChevronLeft className="h-5 w-5" />
+                        <ChevronLeft className='h-5 w-5' />
                       </button>
 
                       {[...Array(totalPages)].map((_, index) => (
@@ -327,8 +330,8 @@ function Blog() {
                           onClick={() => paginate(index + 1)}
                           className={`w-10 h-10 rounded-md ${
                             currentPage === index + 1
-                              ? "bg-primary text-white"
-                              : "border hover:bg-gray-100"
+                              ? 'bg-primary text-white'
+                              : 'border hover:bg-gray-100'
                           }`}
                         >
                           {index + 1}
@@ -340,9 +343,9 @@ function Blog() {
                           paginate(Math.min(totalPages, currentPage + 1))
                         }
                         disabled={currentPage === totalPages}
-                        className="p-2 rounded-md border hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className='p-2 rounded-md border hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed'
                       >
-                        <ChevronRight className="h-5 w-5" />
+                        <ChevronRight className='h-5 w-5' />
                       </button>
                     </nav>
                   </div>
@@ -350,30 +353,30 @@ function Blog() {
               </div>
 
               {/* Sidebar */}
-              <div className="lg:w-1/4">
+              <div className='lg:w-1/4'>
                 {/* Categories */}
-                <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                  <h3 className="text-lg font-bold mb-4">Categories</h3>
-                  <ul className="space-y-2">
+                <div className='bg-white rounded-lg shadow-md p-6 mb-6'>
+                  <h3 className='text-lg font-bold mb-4'>Categories</h3>
+                  <ul className='space-y-2'>
                     <li>
                       <button
-                        onClick={() => handleCategoryFilter("")}
+                        onClick={() => handleCategoryFilter('')}
                         className={`flex items-center gap-2 w-full text-left ${
-                          selectedCategory === ""
-                            ? "text-primary font-medium"
-                            : "text-gray-700"
+                          selectedCategory === ''
+                            ? 'text-primary font-medium'
+                            : 'text-gray-700'
                         }`}
                       >
-                        <Tag className="h-4 w-4" />
+                        <Tag className='h-4 w-4' />
                         <span>All Categories</span>
-                        <span className="ml-auto bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">
+                        <span className='ml-auto bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full'>
                           {posts.length}
                         </span>
                       </button>
                     </li>
                     {categories.map((category) => {
                       const count = posts.filter(
-                        (post) => post.category === category
+                        (post) => post.category === category,
                       ).length;
                       return (
                         <li key={category}>
@@ -381,13 +384,13 @@ function Blog() {
                             onClick={() => handleCategoryFilter(category)}
                             className={`flex items-center gap-2 w-full text-left ${
                               selectedCategory === category
-                                ? "text-primary font-medium"
-                                : "text-gray-700"
+                                ? 'text-primary font-medium'
+                                : 'text-gray-700'
                             }`}
                           >
-                            <Tag className="h-4 w-4" />
+                            <Tag className='h-4 w-4' />
                             <span>{category}</span>
-                            <span className="ml-auto bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">
+                            <span className='ml-auto bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full'>
                               {count}
                             </span>
                           </button>
@@ -398,24 +401,24 @@ function Blog() {
                 </div>
 
                 {/* Recent Posts */}
-                <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                  <h3 className="text-lg font-bold mb-4">Recent Posts</h3>
-                  <div className="space-y-4">
+                <div className='bg-white rounded-lg shadow-md p-6 mb-6'>
+                  <h3 className='text-lg font-bold mb-4'>Recent Posts</h3>
+                  <div className='space-y-4'>
                     {posts.slice(0, 5).map((post) => (
-                      <div key={post.id} className="flex gap-3">
-                        <div className="w-16 h-16 rounded-md overflow-hidden flex-shrink-0">
+                      <div key={post.id} className='flex gap-3'>
+                        <div className='w-16 h-16 rounded-md overflow-hidden flex-shrink-0'>
                           <img
-                            src={post.featured_image || "/placeholder.svg"}
+                            src={post.featured_image || '/placeholder.svg'}
                             alt={post.title}
-                            className="w-full h-full object-cover"
+                            className='w-full h-full object-cover'
                           />
                         </div>
                         <div>
-                          <h4 className="font-medium text-sm hover:text-primary transition-colors">
+                          <h4 className='font-medium text-sm hover:text-primary transition-colors'>
                             <Link to={`/blog/${post._id}`}>{post.title}</Link>
                           </h4>
-                          <div className="flex items-center gap-1 mt-1 text-xs text-gray-500">
-                            <Clock className="h-3 w-3" />
+                          <div className='flex items-center gap-1 mt-1 text-xs text-gray-500'>
+                            <Clock className='h-3 w-3' />
                             <span>{formatCreatedAt(post.created_at)}</span>
                           </div>
                         </div>
@@ -425,17 +428,17 @@ function Blog() {
                 </div>
 
                 {/* Call to Action */}
-                <div className="bg-primary/10 rounded-lg p-6">
-                  <h3 className="text-lg font-bold mb-3">
+                <div className='bg-primary/10 rounded-lg p-6'>
+                  <h3 className='text-lg font-bold mb-3'>
                     Ready to Start Your Journey?
                   </h3>
-                  <p className="text-gray-600 mb-4">
+                  <p className='text-gray-600 mb-4'>
                     Join our language courses and take the first step toward
                     your future in Germany.
                   </p>
                   <Link
-                    to="/register"
-                    className="block w-full bg-primary text-white text-center px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
+                    to='/register'
+                    className='block w-full bg-primary text-white text-center px-4 py-2 rounded-md hover:bg-primary/90 transition-colors'
                   >
                     Register Now
                   </Link>
@@ -447,7 +450,7 @@ function Blog() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      {/* <footer className="bg-gray-900 text-white py-12">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
@@ -586,7 +589,8 @@ function Blog() {
             </p>
           </div>
         </div>
-      </footer>
+      </footer> */}
+      <Footer />
     </div>
   );
 }
