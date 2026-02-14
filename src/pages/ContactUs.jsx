@@ -145,8 +145,7 @@ function ContactUs() {
                         Port Harcourt Office
                       </h3>
                       <p className='text-gray-600'>
-                        7 Salvation Avenue, Off Igbo Etche Road, Rumukwurusi,
-                        Port Harcourt
+                        No 70 Eliogbolo Road, Rumuodumaya, Port Harcourt
                       </p>
                     </div>
                   </div>
@@ -157,7 +156,9 @@ function ContactUs() {
                     </div>
                     <div>
                       <h3 className='font-bold text-lg'>Call Us</h3>
-                      <p className='text-gray-600'>08038867495, 08036714612</p>
+                      <p className='text-gray-600'>
+                        08038865466, +49 1522 1688675
+                      </p>
                     </div>
                   </div>
 
@@ -417,8 +418,7 @@ function ContactUs() {
                 </div>
                 <div className='p-4'>
                   <p className='text-gray-600'>
-                    7 Salvation Avenue, Off Igbo Etche Road, Rumukwurusi, Port
-                    Harcourt
+                    No 70 Eliogbolo Road, Rumuodumaya, Port Harcourt
                   </p>
                 </div>
               </div>

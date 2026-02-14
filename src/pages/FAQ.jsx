@@ -34,12 +34,12 @@ function FAQ() {
       {
         question: 'Where are your offices located?',
         answer:
-          'We have two main offices in Nigeria. Our Lagos office is located at 8 Bayo Adetuna Street off Sangotedo, Lagos. Our Port Harcourt office is at 7 Salvation Avenue, Off Igbo Etche Road, Rumukwurusi, Port Harcourt. You can visit either location during our business hours or contact us via phone or email to schedule an appointment.',
+          'We have two main offices in Nigeria. Our Lagos office is located at 8 Bayo Adetuna Street off Sangotedo, Lagos. Our Port Harcourt office is at 70 Eliogbolo Road, Rumuodumaya, Port Harcourt. You can visit either location during our business hours or contact us via phone or email to schedule an appointment.',
       },
       {
         question: 'How can I contact AOCA Resources for more information?',
         answer:
-          'You can contact us through multiple channels: Phone: 08038867495, 08036714612; WhatsApp: 08038865466; Email: info@aocaresorcesltd.com or aocaresources@gmail.com. You can also visit our offices in Lagos or Port Harcourt, or use the contact form on our website.',
+          'You can contact us through multiple channels: Phone: 08038865466, +49 1522 1688675; WhatsApp: 08038865466; Email: info@aocaresorcesltd.com or aocaresources@gmail.com. You can also visit our offices in Lagos or Port Harcourt, or use the contact form on our website.',
       },
       {
         question: 'What is the success rate of your programs?',
@@ -434,7 +434,7 @@ function FAQ() {
                 Contact Us
               </Link>
               <a
-                href='tel:08038867495'
+                href='tel:08038865466'
                 className='border border-primary text-primary px-6 py-3 rounded-md hover:bg-primary/10 transition-colors'
               >
                 Call Us

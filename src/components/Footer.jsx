@@ -113,7 +113,9 @@ function Footer() {
               </li>
               <li className='flex items-center gap-2'>
                 <Phone className='h-5 w-5' />
-                <span className='text-gray-400'>08038867495, 08036714612</span>
+                <span className='text-gray-400'>
+                  08038865466, +49 1522 1688675
+                </span>
               </li>
               <li className='flex items-center gap-2'>
                 <MessageSquare className='h-5 w-5' />
