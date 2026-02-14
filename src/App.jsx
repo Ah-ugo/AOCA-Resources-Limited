@@ -19,6 +19,12 @@ import {
   User,
   Video,
   X,
+  BookOpen,
+  Code,
+  BarChart,
+  Shield,
+  Briefcase,
+  Award,
 } from 'lucide-react';
 import {
   BrowserRouter as Router,
@@ -57,7 +63,6 @@ import ApplicationsList from './pages/admin/careers/ApplicationsList';
 import AdminLayout from './components/admin/AdminLayout';
 import Header from './components/Header';
 import { getBlogPosts } from './services/blogService';
-// import ClassesList from "./pages/admin/classes/ClassesList";
 import CategoriesList from './pages/admin/blog/CategoriesList';
 import BlogForm from './pages/admin/blog/BlogForm';
 import BlogsList from './pages/admin/blog/BlogsList';
@@ -75,7 +80,6 @@ import ClassPreview from './pages/admin/lessons/ClassPreview';
 import ClassEdit from './pages/admin/lessons/ClassEdit';
 import AdminContactSubmissions from './pages/admin/contact-forms/ContactMain';
 import ApplicationDetails from './pages/admin/careers/ApplicationDetails';
-// import AdminDashboard from "./pages/admin/AdminDashboard";
 
 function App() {
   return (
@@ -112,16 +116,6 @@ function App() {
               <AdminRoute>
                 <AdminLayout>
                   <Routes>
-                    {/* <Route path="dashboard" element={<AdminDashboard />} />
-                    <Route path="users" element={<UsersList />} />
-                    <Route path="blog/posts" element={<BlogPosts />} />
-                    <Route path="courses" element={<CoursesList />} />
-                    <Route path="lessons" element={<LessonsList />} />
-                    <Route path="careers/jobs" element={<JobsList />} />
-                    <Route
-                      path="careers/applications"
-                      element={<ApplicationsList />}
-                    /> */}
                     <Route path='dashboard' element={<AdminDashboard />} />
 
                     <Route path='users' element={<UsersList />} />
@@ -232,6 +226,7 @@ function AdminRoute({ children }) {
 
   return children;
 }
+
 function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { scrollYProgress } = useScroll();
@@ -240,6 +235,7 @@ function HomePage() {
   const targetRef = useRef(null);
   const pathwaysRef = useRef(null);
   const coursesRef = useRef(null);
+  const servicesRef = useRef(null);
   const navigate = useNavigate();
   const [blogPosts, setPosts] = useState([]);
 
@@ -250,21 +246,9 @@ function HomePage() {
     setPosts(blogPosts);
   };
 
-  // Initialize posts
   useEffect(() => {
     getBlogPostss();
   }, []);
-
-  // function formatCreatedAt(createdAt) {
-  //   const dateObj = new Date(createdAt);
-  //   const year = dateObj.getFullYear();
-  //   const month = String(dateObj.getMonth() + 1).padStart(2, "0");
-  //   const day = String(dateObj.getDate()).padStart(2, "0");
-  //   const hours = String(dateObj.getHours()).padStart(2, "0");
-  //   const minutes = String(dateObj.getMinutes()).padStart(2, "0");
-
-  //   return `${year}-${month}-${day} ${hours}:${minutes}`;
-  // }
 
   const formatCreatedAt = (dateString) => {
     if (!dateString) return '';
@@ -275,6 +259,7 @@ function HomePage() {
       day: 'numeric',
     });
   };
+
   const pathways = [
     {
       title: 'Nursing Work Contract',
@@ -299,6 +284,51 @@ function HomePage() {
       description:
         'Pathway for qualified professionals seeking employment opportunities in the German job market.',
       icon: <Laptop className='h-10 w-10 text-primary' />,
+    },
+  ];
+
+  const services = [
+    {
+      title: 'Professional Exam Prep',
+      description:
+        'Comprehensive preparation for IELTS, GMAT, SAT, GRE, GCSE, and TOEFL exams with experienced instructors.',
+      icon: <Award className='h-10 w-10 text-primary' />,
+      topics: ['IELTS', 'GMAT', 'SAT', 'GRE', 'GCSE', 'TOEFL'],
+    },
+    {
+      title: 'Computer Programming',
+      description:
+        'Learn programming from scratch with Python and other languages to build real-world applications.',
+      icon: <Code className='h-10 w-10 text-primary' />,
+      topics: ['Scratch', 'Python', 'Web Development'],
+    },
+    {
+      title: 'Data Analysis',
+      description:
+        'Master data analysis tools and techniques to extract insights and make data-driven decisions.',
+      icon: <BarChart className='h-10 w-10 text-primary' />,
+      topics: ['Excel', 'SQL', 'Python', 'Visualization'],
+    },
+    {
+      title: 'Cyber Security',
+      description:
+        'Gain essential skills in cyber security to protect systems and networks from digital threats.',
+      icon: <Shield className='h-10 w-10 text-primary' />,
+      topics: ['Network Security', 'Ethical Hacking', 'Risk Management'],
+    },
+    {
+      title: 'Project Management',
+      description:
+        'Learn professional project planning, scheduling, and management methodologies for successful delivery.',
+      icon: <Briefcase className='h-10 w-10 text-primary' />,
+      topics: ['Planning', 'Scheduling', 'Agile', 'Risk Management'],
+    },
+    {
+      title: 'German Language',
+      description:
+        'Professional German language training from beginner to advanced levels with certification prep.',
+      icon: <BookOpen className='h-10 w-10 text-primary' />,
+      topics: ['A1-A2', 'B1-B2', 'TestDaF', 'Goethe Exam'],
     },
   ];
 
@@ -340,157 +370,19 @@ function HomePage() {
     },
     {
       name: 'Blessing M.',
-      role: 'Healthcare Worker',
-      text: "From language training to visa application, they handled everything professionally. Now I'm working as a nurse in Germany.",
+      role: 'Data Analyst',
+      text: "The Data Analysis course gave me practical skills that landed me a role at a leading analytics firm. AOCA's training is world-class!",
       image: 'https://via.placeholder.com/80x80',
     },
   ];
 
   return (
     <div className='min-h-screen bg-background'>
-      {/* Header */}
-      {/* <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-2">
-            <Globe className="h-8 w-8 text-primary" />
-            <span className="font-bold text-xl">AOCA Resources Limited</span>
-          </Link>
-
-           Desktop Navigation 
-          <nav className="hidden md:flex items-center gap-6">
-            <a
-              href="#pathways"
-              className="text-foreground/80 hover:text-primary transition-colors"
-            >
-              Pathways
-            </a>
-            <a
-              href="#courses"
-              className="text-foreground/80 hover:text-primary transition-colors"
-            >
-              Courses
-            </a>
-            <a
-              href="/blogs"
-              className="text-foreground/80 hover:text-primary transition-colors"
-            >
-              Blog
-            </a>
-            <Link
-              to="/about"
-              className="text-foreground/80 hover:text-primary transition-colors"
-            >
-              About Us
-            </Link>
-            <Link
-              to="/contact"
-              className="text-foreground/80 hover:text-primary transition-colors"
-            >
-              Contact
-            </Link>
-            <Link
-              to="/login"
-              className="text-foreground/80 hover:text-primary transition-colors"
-            >
-              Login
-            </Link>
-            <Link
-              to="/register"
-              className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
-            >
-              Register
-            </Link>
-          </nav>
-
-         Mobile Menu Button 
-          <button
-            className="md:hidden p-2 rounded-md hover:bg-muted/50 transition-colors"
-            onClick={toggleMenu}
-          >
-            <Menu className="h-6 w-6" />
-          </button>
-        </div>
-
-        Mobile Navigation 
-        {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, x: "100%" }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: "100%" }}
-            className="fixed inset-0 bg-white z-50 md:hidden"
-          >
-            <div className="flex flex-col h-full bg-white">
-              <div className="flex justify-between items-center p-4 border-b bg-white">
-                <Link to="/" className="flex items-center gap-2">
-                  <Globe className="h-8 w-8 text-primary" />
-                  <span className="font-bold text-xl">
-                    AOCA Resources Limited
-                  </span>
-                </Link>
-                <button
-                  className="p-2 rounded-md hover:bg-muted/50 transition-colors"
-                  onClick={toggleMenu}
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-              <nav className="flex flex-col gap-4 p-6 bg-white">
-                <a
-                  href="#pathways"
-                  className="text-lg font-medium py-2 hover:text-primary transition-colors"
-                  onClick={toggleMenu}
-                >
-                  Pathways
-                </a>
-                <a
-                  href="#courses"
-                  className="text-lg font-medium py-2 hover:text-primary transition-colors"
-                  onClick={toggleMenu}
-                >
-                  Courses
-                </a>
-                <a
-                  href="/blogs"
-                  className="text-lg font-medium py-2 hover:text-primary transition-colors"
-                  onClick={toggleMenu}
-                >
-                  Blog
-                </a>
-                <Link
-                  to="/about"
-                  className="text-lg font-medium py-2 hover:text-primary transition-colors"
-                  onClick={toggleMenu}
-                >
-                  About Us
-                </Link>
-                <Link
-                  to="/contact"
-                  className="text-lg font-medium py-2 hover:text-primary transition-colors"
-                  onClick={toggleMenu}
-                >
-                  Contact
-                </Link>
-                <Link
-                  to="/login"
-                  className="text-lg font-medium py-2 hover:text-primary transition-colors"
-                  onClick={toggleMenu}
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/register"
-                  className="mt-4 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
-                  onClick={toggleMenu}
-                >
-                  Register
-                </Link>
-              </nav>
-            </div>
-          </motion.div>
-        )}
-      </header> */}
-
-      <Header pathwaysRef={pathwaysRef} coursesRef={coursesRef} />
+      <Header
+        pathwaysRef={pathwaysRef}
+        coursesRef={coursesRef}
+        servicesRef={servicesRef}
+      />
 
       {/* Hero Section */}
       <section className='pt-32 pb-20 md:pt-40 md:pb-32 relative overflow-hidden'>
@@ -508,8 +400,8 @@ function HomePage() {
                 transition={{ duration: 0.5 }}
               >
                 <h1 className='text-4xl md:text-5xl lg:text-6xl font-bold leading-tight'>
-                  Your Gateway to <span className='text-primary'>German</span>{' '}
-                  Opportunities
+                  Your Gateway to{' '}
+                  <span className='text-primary'>Global Success</span>
                 </h1>
               </motion.div>
               <motion.p
@@ -518,9 +410,10 @@ function HomePage() {
                 transition={{ duration: 0.5, delay: 0.2 }}
                 className='text-xl text-muted-foreground'
               >
-                Professional German language training, visa consultancy, and
-                recruitment services to help Nigerians achieve their
-                international dreams.
+                Professional training in German language, exam preparation,
+                programming, data analysis, cyber security, and project
+                management. Plus visa consultancy and recruitment services to
+                help Nigerians achieve their international dreams.
               </motion.p>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -551,8 +444,6 @@ function HomePage() {
               <div className='relative h-[400px] w-full rounded-2xl overflow-hidden shadow-2xl'>
                 <img
                   src='https://res.cloudinary.com/dejeplzpv/image/upload/v1744418391/m5tgp0rr8ihaqinxyoxd.jpg'
-                  // src="https://img.freepik.com/free-photo/people-office-work-day_23-2150690157.jpg?t=st=1744383789~exp=1744387389~hmac=a2b93024d8a2e08467ce27cdd4a112e69ea0b2a195d2fb2e1d331f11548e26c5&w=1800"
-                  // src="https://img.freepik.com/free-vector/cartoon-working-day-illustration_23-2148957047.jpg?t=st=1742664050~exp=1742667650~hmac=02ee70feee0252908460f36c19d158835a78b7633203586799c26ed6fc99d4d0&w=1800"
                   alt='Global opportunities'
                   className='w-full h-full object-cover'
                 />
@@ -573,8 +464,76 @@ function HomePage() {
         </motion.div>
       </section>
 
+      {/* Professional Services Section */}
+      <section id='services' className='py-20 bg-muted/50' ref={servicesRef}>
+        <div className='container mx-auto px-4'>
+          <div className='text-center mb-16'>
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className='text-3xl md:text-4xl font-bold mb-4'
+            >
+              Professional Training & Development
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className='text-xl text-muted-foreground max-w-2xl mx-auto'
+            >
+              Comprehensive training programs to enhance your skills and advance
+              your career
+            </motion.p>
+          </div>
+
+          <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8'>
+            {services.map((service, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                <div className='bg-white rounded-lg shadow-md h-full hover:shadow-lg transition-shadow'>
+                  <div className='p-6 flex flex-col h-full'>
+                    <div className='mb-4'>{service.icon}</div>
+                    <h3 className='text-xl font-bold mb-2'>{service.title}</h3>
+                    <p className='text-muted-foreground mb-4 flex-grow'>
+                      {service.description}
+                    </p>
+                    <div className='mb-4'>
+                      <div className='flex flex-wrap gap-2'>
+                        {service.topics.map((topic, i) => (
+                          <span
+                            key={i}
+                            className='text-xs bg-primary/10 text-primary px-2 py-1 rounded-full'
+                          >
+                            {topic}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => navigate('/contact')}
+                      className='border border-input bg-background px-4 py-2 rounded-md w-full flex justify-between items-center group hover:bg-accent hover:text-accent-foreground transition-colors'
+                    >
+                      Learn More
+                      <ChevronRight className='h-4 w-4 group-hover:translate-x-1 transition-transform' />
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Germany Travel Pathways Section */}
-      <section id='pathways' className='py-20 bg-muted/50' ref={pathwaysRef}>
+      <section id='pathways' className='py-20' ref={pathwaysRef}>
         <div className='container mx-auto px-4'>
           <div className='text-center mb-16'>
             <motion.h2
@@ -630,7 +589,7 @@ function HomePage() {
       </section>
 
       {/* German Courses Section */}
-      <section id='courses' className='py-20' ref={coursesRef}>
+      <section id='courses' className='py-20 bg-muted/50' ref={coursesRef}>
         <div className='container mx-auto px-4'>
           <div className='text-center mb-16'>
             <motion.h2
@@ -640,7 +599,7 @@ function HomePage() {
               transition={{ duration: 0.5 }}
               className='text-3xl md:text-4xl font-bold mb-4'
             >
-              German Courses
+              German Language Courses
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -717,7 +676,7 @@ function HomePage() {
       </section>
 
       {/* Blog Section */}
-      <section id='blog' className='py-20 bg-muted/50'>
+      <section id='blog' className='py-20'>
         <div className='container mx-auto px-4'>
           <div className='text-center mb-16'>
             <motion.h2
@@ -736,8 +695,8 @@ function HomePage() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className='text-xl text-muted-foreground max-w-2xl mx-auto'
             >
-              Insights, guides, and news about German visa applications,
-              language learning, and international opportunities
+              Insights, guides, and news about career development, language
+              learning, and international opportunities
             </motion.p>
           </div>
 
@@ -776,6 +735,7 @@ function HomePage() {
                       <span>{formatCreatedAt(post.created_at)}</span>
                     </div>
                   </div>
+
                   <a
                     href={`/blog/${post._id}`}
                     className='inline-flex items-center text-primary font-medium hover:underline'
@@ -804,7 +764,7 @@ function HomePage() {
       </section>
 
       {/* Testimonials Section */}
-      <section id='testimonials' className='py-20'>
+      <section id='testimonials' className='py-20 bg-muted/50'>
         <div className='container mx-auto px-4'>
           <div className='text-center mb-16'>
             <motion.h2
@@ -823,8 +783,8 @@ function HomePage() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className='text-xl text-muted-foreground max-w-2xl mx-auto'
             >
-              Hear from our clients who have successfully achieved their German
-              immigration goals
+              Hear from our clients who have successfully achieved their career
+              and immigration goals
             </motion.p>
           </div>
 
@@ -878,7 +838,7 @@ function HomePage() {
               transition={{ duration: 0.5 }}
               className='text-3xl md:text-4xl font-bold mb-6'
             >
-              Ready to Start Your German Journey?
+              Ready to Start Your Journey to Success?
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -887,8 +847,9 @@ function HomePage() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className='text-xl mb-8 text-white/90'
             >
-              Join our language courses, explore visa pathways, and take the
-              first step toward your future in Germany.
+              Explore our professional training programs, language courses, and
+              visa pathways. Take the first step toward advancing your career
+              and achieving your international goals.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -915,6 +876,7 @@ function HomePage() {
       </section>
 
       {/* Footer */}
+      {/* Footer */}
       <footer className='bg-gray-900 text-white py-12'>
         <div className='container mx-auto px-4'>
           <div className='grid md:grid-cols-4 gap-8'>
@@ -927,13 +889,21 @@ function HomePage() {
                 />
               </Link>
               <p className='text-gray-400 mb-4'>
-                Your trusted partner for German language training, visa
-                consultancy, and recruitment services.
+                Your trusted partner for professional training, German language
+                courses, visa consultancy, and recruitment services.
               </p>
             </div>
             <div>
               <h3 className='font-bold text-lg mb-4'>Quick Links</h3>
               <ul className='space-y-2'>
+                <li>
+                  <a
+                    href='#services'
+                    className='text-gray-400 hover:text-white transition-colors'
+                  >
+                    Services
+                  </a>
+                </li>
                 <li>
                   <a
                     href='#pathways'
@@ -993,8 +963,7 @@ function HomePage() {
                   <div>
                     <p className='font-medium'>Port Harcourt Office:</p>
                     <p className='text-gray-400'>
-                      7 Salvation Avenue, Off Igbo Etche Road, Rumukwurusi, Port
-                      Harcourt
+                      No 70 Eliogbolo Road, Rumuodumaya, Port Harcourt
                     </p>
                   </div>
                 </li>

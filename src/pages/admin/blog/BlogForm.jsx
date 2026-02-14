@@ -12,6 +12,7 @@ import {
   FiCalendar,
 } from 'react-icons/fi';
 import AdminLayout from '../../../components/admin/AdminLayout';
+import { Loader } from 'lucide-react';
 import { adminService } from '../../../services/admin-service';
 
 const BlogForm = () => {
@@ -149,7 +150,7 @@ const BlogForm = () => {
   if (loading) {
     return (
       <div className='flex items-center justify-center h-full'>
-        <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500'></div>
+        <Loader className='h-12 w-12 text-primary animate-spin' />
       </div>
     );
   }

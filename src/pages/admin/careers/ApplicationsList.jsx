@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Filter, Eye, Download } from 'lucide-react';
+import { Search, Filter, Eye, Download, Loader } from 'lucide-react';
 import {
   getApplications,
   updateApplication,
@@ -295,7 +295,7 @@ const ApplicationsList = () => {
 
         {loading ? (
           <div className='flex justify-center items-center p-8'>
-            <div className='animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary'></div>
+            <Loader className='h-8 w-8 text-primary animate-spin' />
           </div>
         ) : (
           <>

@@ -83,8 +83,7 @@ function Footer2() {
                 <div>
                   <p className='font-medium'>Port Harcourt Office:</p>
                   <p className='text-gray-400'>
-                    7 Salvation Avenue, Off Igbo Etche Road, Rumukwurusi, Port
-                    Harcourt
+                    No 70 Eliogbolo Road, Rumuodumaya, Port Harcourt
                   </p>
                 </div>
               </li>

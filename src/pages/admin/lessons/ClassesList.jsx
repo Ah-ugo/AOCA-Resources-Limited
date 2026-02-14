@@ -1,7 +1,9 @@
-"use client";
+/** @format */
 
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   FiEdit,
   FiEye,
@@ -14,16 +16,17 @@ import {
   FiClock,
   FiCalendar,
   FiAlertCircle,
-} from "react-icons/fi";
-import AdminLayout from "../../../components/admin/AdminLayout";
-import { adminService } from "../../../services/admin-service";
+} from 'react-icons/fi';
+import AdminLayout from '../../../components/admin/AdminLayout';
+import { Loader } from 'lucide-react';
+import { adminService } from '../../../services/admin-service';
 
 const ClassesList = () => {
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [courseFilter, setCourseFilter] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [courseFilter, setCourseFilter] = useState('');
   const [courses, setCourses] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalClasses, setTotalClasses] = useState(0);
@@ -58,7 +61,7 @@ const ClassesList = () => {
       let filteredClasses = data.classes;
       if (courseFilter) {
         filteredClasses = formattedClasses.filter(
-          (cls) => cls.course_id === courseFilter
+          (cls) => cls.course_id === courseFilter,
         );
       }
 
@@ -66,8 +69,8 @@ const ClassesList = () => {
       setTotalClasses(data.total || 0);
       setTotalPages(data.totalPages || 1);
     } catch (err) {
-      console.error("Error fetching classes:", err);
-      setError("Failed to load classes. Please try again later.");
+      console.error('Error fetching classes:', err);
+      setError('Failed to load classes. Please try again later.');
       setClasses([]);
       setTotalClasses(0);
       setTotalPages(1);
@@ -81,7 +84,7 @@ const ClassesList = () => {
       const data = await adminService.getCourses();
       setCourses(data.courses || []);
     } catch (err) {
-      console.error("Error fetching courses:", err);
+      console.error('Error fetching courses:', err);
       setCourses([]);
     }
   };
@@ -95,26 +98,26 @@ const ClassesList = () => {
   const handleDelete = async (classId) => {
     if (
       window.confirm(
-        "Are you sure you want to delete this class? This action cannot be undone."
+        'Are you sure you want to delete this class? This action cannot be undone.',
       )
     ) {
       try {
         await adminService.deleteClass(classId);
         setClasses(classes.filter((cls) => cls._id !== classId));
-        alert("Class deleted successfully");
+        alert('Class deleted successfully');
       } catch (err) {
-        console.error("Error deleting class:", err);
-        alert("Failed to delete class. Please try again.");
+        console.error('Error deleting class:', err);
+        alert('Failed to delete class. Please try again.');
       }
     }
   };
 
   const formatTime = (time) => {
-    if (!time) return "N/A";
+    if (!time) return 'N/A';
     try {
-      const [hours, minutes] = time.split(":");
+      const [hours, minutes] = time.split(':');
       const hour = parseInt(hours, 10);
-      const period = hour >= 12 ? "PM" : "AM";
+      const period = hour >= 12 ? 'PM' : 'AM';
       const formattedHour = hour % 12 || 12;
       return `${formattedHour}:${minutes} ${period}`;
     } catch (err) {
@@ -123,45 +126,45 @@ const ClassesList = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Classes</h1>
+    <div className='container mx-auto px-4 py-6'>
+      <div className='flex justify-between items-center mb-6'>
+        <h1 className='text-3xl font-bold text-gray-800'>Classes</h1>
         <button
-          onClick={() => navigate("/admin/classes/new")}
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center"
+          onClick={() => navigate('/admin/classes/new')}
+          className='bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center'
         >
-          <FiPlus className="mr-2" />
+          <FiPlus className='mr-2' />
           Add New Class
         </button>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+      <div className='bg-white rounded-lg shadow-md p-6 mb-6'>
         <form
           onSubmit={handleSearch}
-          className="flex flex-col md:flex-row gap-4"
+          className='flex flex-col md:flex-row gap-4'
         >
-          <div className="flex-1">
-            <div className="relative">
-              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <div className='flex-1'>
+            <div className='relative'>
+              <FiSearch className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' />
               <input
-                type="text"
-                placeholder="Search classes..."
-                className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                type='text'
+                placeholder='Search classes...'
+                className='w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500'
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
           </div>
-          <div className="w-full md:w-48">
-            <div className="relative">
-              <FiFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <div className='w-full md:w-48'>
+            <div className='relative'>
+              <FiFilter className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' />
               <select
-                className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 appearance-none"
+                className='w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 appearance-none'
                 value={courseFilter}
                 onChange={(e) => setCourseFilter(e.target.value)}
               >
-                <option value="">All Courses</option>
+                <option value=''>All Courses</option>
                 {courses.map((course) => (
                   <option key={course?._id} value={course?._id}>
                     {course?.title}
@@ -171,8 +174,8 @@ const ClassesList = () => {
             </div>
           </div>
           <button
-            type="submit"
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md"
+            type='submit'
+            className='bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md'
           >
             Search
           </button>
@@ -182,112 +185,112 @@ const ClassesList = () => {
       {/* Error message */}
       {error && (
         <div
-          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6"
-          role="alert"
+          className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6'
+          role='alert'
         >
-          <strong className="font-bold">Error!</strong>
-          <span className="block sm:inline"> {error}</span>
+          <strong className='font-bold'>Error!</strong>
+          <span className='block sm:inline'> {error}</span>
         </div>
       )}
 
       {/* Classes table */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      <div className='bg-white rounded-lg shadow-md overflow-hidden'>
         {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+          <div className='flex justify-center items-center h-64'>
+            <Loader className='h-12 w-12 text-primary animate-spin' />
           </div>
         ) : classes.length > 0 ? (
           <>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+            <div className='overflow-x-auto'>
+              <table className='min-w-full divide-y divide-gray-200'>
+                <thead className='bg-gray-50'>
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Class
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Course
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Instructor
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Schedule
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className='bg-white divide-y divide-gray-200'>
                   {classes.map((cls) => (
-                    <tr key={cls?._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="h-10 w-10 rounded-md bg-gray-200 flex items-center justify-center text-gray-500">
-                            <FiBook className="h-5 w-5" />
+                    <tr key={cls?._id} className='hover:bg-gray-50'>
+                      <td className='px-6 py-4 whitespace-nowrap'>
+                        <div className='flex items-center'>
+                          <div className='h-10 w-10 rounded-md bg-gray-200 flex items-center justify-center text-gray-500'>
+                            <FiBook className='h-5 w-5' />
                           </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">
-                              {cls?.title || "Unnamed Class"}
+                          <div className='ml-4'>
+                            <div className='text-sm font-medium text-gray-900'>
+                              {cls?.title || 'Unnamed Class'}
                             </div>
-                            <div className="text-sm text-gray-500">
-                              {cls?.description || "No section"}
+                            <div className='text-sm text-gray-500'>
+                              {cls?.description || 'No section'}
                             </div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {cls?.course?.name || "Unknown Course"}
+                      <td className='px-6 py-4 whitespace-nowrap'>
+                        <div className='text-sm text-gray-900'>
+                          {cls?.course?.name || 'Unknown Course'}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {cls?.instructor?.name || "Unassigned"}
+                      <td className='px-6 py-4 whitespace-nowrap'>
+                        <div className='text-sm text-gray-900'>
+                          {cls?.instructor?.name || 'Unassigned'}
                         </div>
                         {cls?.instructor?.email && (
-                          <div className="text-sm text-gray-500">
+                          <div className='text-sm text-gray-500'>
                             {cls?.instructor?.email}
                           </div>
                         )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          <div className="flex items-center">
-                            <FiCalendar className="mr-1 h-4 w-4 text-gray-400" />
-                            {cls.days?.join(", ") || "N/A"}
+                      <td className='px-6 py-4 whitespace-nowrap'>
+                        <div className='text-sm text-gray-900'>
+                          <div className='flex items-center'>
+                            <FiCalendar className='mr-1 h-4 w-4 text-gray-400' />
+                            {cls.days?.join(', ') || 'N/A'}
                           </div>
-                          <div className="flex items-center mt-1">
-                            <FiClock className="mr-1 h-4 w-4 text-gray-400" />
-                            {formatTime(cls.created_at)} -{" "}
+                          <div className='flex items-center mt-1'>
+                            <FiClock className='mr-1 h-4 w-4 text-gray-400' />
+                            {formatTime(cls.created_at)} -{' '}
                             {formatTime(cls.date)}
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <td className='px-6 py-4 whitespace-nowrap text-sm font-medium'>
                         <button
                           onClick={() => navigate(`/admin/classes/${cls._id}`)}
-                          className="text-green-600 hover:text-green-900 mr-3"
-                          title="View Class"
+                          className='text-green-600 hover:text-green-900 mr-3'
+                          title='View Class'
                         >
-                          <FiEye className="h-5 w-5" />
+                          <FiEye className='h-5 w-5' />
                         </button>
                         <button
                           onClick={() =>
                             navigate(`/admin/classes/${cls._id}/edit`)
                           }
-                          className="text-blue-600 hover:text-blue-900 mr-3"
-                          title="Edit Class"
+                          className='text-blue-600 hover:text-blue-900 mr-3'
+                          title='Edit Class'
                         >
-                          <FiEdit className="h-5 w-5" />
+                          <FiEdit className='h-5 w-5' />
                         </button>
                         <button
                           onClick={() => handleDelete(cls._id)}
-                          className="text-red-600 hover:text-red-900"
-                          title="Delete Class"
+                          className='text-red-600 hover:text-red-900'
+                          title='Delete Class'
                         >
-                          <FiTrash2 className="h-5 w-5" />
+                          <FiTrash2 className='h-5 w-5' />
                         </button>
                       </td>
                     </tr>
@@ -297,21 +300,21 @@ const ClassesList = () => {
             </div>
 
             {/* Pagination */}
-            <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div className='bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6'>
+              <div className='hidden sm:flex-1 sm:flex sm:items-center sm:justify-between'>
                 <div>
-                  <p className="text-sm text-gray-700">
-                    Showing page{" "}
-                    <span className="font-medium">{currentPage}</span> of{" "}
-                    <span className="font-medium">{totalPages}</span> pages ({" "}
-                    <span className="font-medium">{totalClasses}</span> total
+                  <p className='text-sm text-gray-700'>
+                    Showing page{' '}
+                    <span className='font-medium'>{currentPage}</span> of{' '}
+                    <span className='font-medium'>{totalPages}</span> pages ({' '}
+                    <span className='font-medium'>{totalClasses}</span> total
                     classes)
                   </p>
                 </div>
                 <div>
                   <nav
-                    className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
-                    aria-label="Pagination"
+                    className='relative z-0 inline-flex rounded-md shadow-sm -space-x-px'
+                    aria-label='Pagination'
                   >
                     <button
                       onClick={() =>
@@ -320,8 +323,8 @@ const ClassesList = () => {
                       disabled={currentPage === 1}
                       className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
                         currentPage === 1
-                          ? "text-gray-300 cursor-not-allowed"
-                          : "text-gray-500 hover:bg-gray-50"
+                          ? 'text-gray-300 cursor-not-allowed'
+                          : 'text-gray-500 hover:bg-gray-50'
                       }`}
                     >
                       Previous
@@ -336,8 +339,8 @@ const ClassesList = () => {
                             onClick={() => setCurrentPage(pageNumber)}
                             className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                               currentPage === pageNumber
-                                ? "z-10 bg-green-50 border-green-500 text-green-600"
-                                : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                                ? 'z-10 bg-green-50 border-green-500 text-green-600'
+                                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
                             }`}
                           >
                             {pageNumber}
@@ -353,8 +356,8 @@ const ClassesList = () => {
                       disabled={currentPage === totalPages}
                       className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
                         currentPage === totalPages
-                          ? "text-gray-300 cursor-not-allowed"
-                          : "text-gray-500 hover:bg-gray-50"
+                          ? 'text-gray-300 cursor-not-allowed'
+                          : 'text-gray-500 hover:bg-gray-50'
                       }`}
                     >
                       Next
@@ -365,17 +368,17 @@ const ClassesList = () => {
             </div>
           </>
         ) : (
-          <div className="flex flex-col items-center justify-center h-64">
-            <FiSearch className="h-12 w-12 text-gray-400 mb-4" />
-            <p className="text-gray-500 text-lg">No classes found</p>
-            <p className="text-gray-400">
+          <div className='flex flex-col items-center justify-center h-64'>
+            <FiSearch className='h-12 w-12 text-gray-400 mb-4' />
+            <p className='text-gray-500 text-lg'>No classes found</p>
+            <p className='text-gray-400'>
               Try adjusting your search or filter criteria
             </p>
             <button
-              onClick={() => navigate("/admin/classes/new")}
-              className="mt-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center"
+              onClick={() => navigate('/admin/classes/new')}
+              className='mt-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center'
             >
-              <FiPlus className="mr-2" />
+              <FiPlus className='mr-2' />
               Add New Class
             </button>
           </div>
