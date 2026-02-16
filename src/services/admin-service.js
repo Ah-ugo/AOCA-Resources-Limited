@@ -1,12 +1,14 @@
-import apiClient from "./api-client";
+/** @format */
+
+import apiClient from './api-client';
 
 // Dashboard
 export const getDashboardStats = async () => {
   try {
-    const response = await apiClient.get("/admin/dashboard/stats");
+    const response = await apiClient.get('/admin/dashboard/stats');
     return response.data;
   } catch (error) {
-    console.error("Get dashboard stats error:", error);
+    console.error('Get dashboard stats error:', error);
     throw error;
   }
 };
@@ -14,11 +16,11 @@ export const getDashboardStats = async () => {
 // User Management
 export const getUsers = async (params = {}) => {
   try {
-    const response = await apiClient.get("/admin/users", { params });
-    console.log(response.data, "users====");
+    const response = await apiClient.get('/admin/users', { params });
+    console.log(response.data, 'users====');
     return response.data;
   } catch (error) {
-    console.error("Get users error:", error);
+    console.error('Get users error:', error);
     throw error;
   }
 };
@@ -28,17 +30,17 @@ export const getUserById = async (userId) => {
     const response = await apiClient.get(`/admin/users/${userId}`);
     return response.data;
   } catch (error) {
-    console.error("Get user by ID error:", error);
+    console.error('Get user by ID error:', error);
     throw error;
   }
 };
 
 export const createUser = async (userData) => {
   try {
-    const response = await apiClient.post("/admin/users", userData);
+    const response = await apiClient.post('/admin/users', userData);
     return response.data;
   } catch (error) {
-    console.error("Create user error:", error);
+    console.error('Create user error:', error);
     throw error;
   }
 };
@@ -48,7 +50,7 @@ export const updateUser = async (userId, userData) => {
     const response = await apiClient.put(`/admin/users/${userId}`, userData);
     return response.data;
   } catch (error) {
-    console.error("Update user error:", error);
+    console.error('Update user error:', error);
     throw error;
   }
 };
@@ -58,7 +60,7 @@ export const deleteUser = async (userId) => {
     const response = await apiClient.delete(`/admin/users/${userId}`);
     return response.data;
   } catch (error) {
-    console.error("Delete user error:", error);
+    console.error('Delete user error:', error);
     throw error;
   }
 };
@@ -66,30 +68,30 @@ export const deleteUser = async (userId) => {
 // Job Management
 export const getJobs = async (params = {}) => {
   try {
-    const response = await apiClient.get("/admin/careers/jobs", { params });
+    const response = await apiClient.get('/admin/careers/jobs', { params });
     return response.data;
   } catch (error) {
-    console.error("Get jobs error:", error);
+    console.error('Get jobs error:', error);
     throw error;
   }
 };
 
 export const getJobById = async (jobId) => {
   try {
-    const response = await apiClient.get(`/admin/careers/jobs/${jobId}`);
+    const response = await apiClient.get(`/careers/jobs/${jobId}`);
     return response.data;
   } catch (error) {
-    console.error("Get job by ID error:", error);
+    console.error('Get job by ID error:', error);
     throw error;
   }
 };
 
 export const createJob = async (jobData) => {
   try {
-    const response = await apiClient.post("/admin/careers/jobs", jobData);
+    const response = await apiClient.post('/admin/careers/jobs', jobData);
     return response.data;
   } catch (error) {
-    console.error("Create job error:", error);
+    console.error('Create job error:', error);
     throw error;
   }
 };
@@ -98,11 +100,11 @@ export const updateJob = async (jobId, jobData) => {
   try {
     const response = await apiClient.put(
       `/admin/careers/jobs/${jobId}`,
-      jobData
+      jobData,
     );
     return response.data;
   } catch (error) {
-    console.error("Update job error:", error);
+    console.error('Update job error:', error);
     throw error;
   }
 };
@@ -112,7 +114,7 @@ export const deleteJob = async (jobId) => {
     const response = await apiClient.delete(`/admin/careers/jobs/${jobId}`);
     return response.data;
   } catch (error) {
-    console.error("Delete job error:", error);
+    console.error('Delete job error:', error);
     throw error;
   }
 };
@@ -120,22 +122,22 @@ export const deleteJob = async (jobId) => {
 // Application Management
 export const getApplications = async (params = {}) => {
   try {
-    const response = await apiClient.get("/admin/careers/applications");
-    console.log(response, "application");
+    const response = await apiClient.get('/admin/careers/applications');
+    console.log(response, 'application');
     return response.data;
   } catch (error) {
-    console.error("Get applications error:", error);
+    console.error('Get applications error:', error);
     throw error;
   }
 };
 
 export const careerStats = async (params = {}) => {
   try {
-    const response = await apiClient.get("/admin/careers/stats");
-    console.log(response, "application stats");
+    const response = await apiClient.get('/admin/careers/stats');
+    console.log(response, 'application stats');
     return response.data;
   } catch (error) {
-    console.error("Get applications error:", error);
+    console.error('Get applications error:', error);
     throw error;
   }
 };
@@ -143,11 +145,11 @@ export const careerStats = async (params = {}) => {
 export const getApplicationById = async (applicationId) => {
   try {
     const response = await apiClient.get(
-      `/admin/careers/applications/${applicationId}`
+      `/admin/careers/applications/${applicationId}`,
     );
     return response.data;
   } catch (error) {
-    console.error("Get application by ID error:", error);
+    console.error('Get application by ID error:', error);
     throw error;
   }
 };
@@ -156,11 +158,11 @@ export const updateApplication = async (applicationId, data) => {
   try {
     const response = await apiClient.put(
       `/admin/careers/applications/${applicationId}`,
-      data
+      data,
     );
     return response.data;
   } catch (error) {
-    console.error("Update application error:", error);
+    console.error('Update application error:', error);
     throw error;
   }
 };
@@ -194,10 +196,10 @@ export const updateApplication = async (applicationId, data) => {
 // Job Categories
 export const getJobCategories = async () => {
   try {
-    const response = await apiClient.get("/admin/careers/categories");
+    const response = await apiClient.get('/careers/categories');
     return response.data;
   } catch (error) {
-    console.error("Get job categories error:", error);
+    console.error('Get job categories error:', error);
     throw error;
   }
 };
@@ -205,12 +207,12 @@ export const getJobCategories = async () => {
 export const createJobCategory = async (categoryData) => {
   try {
     const response = await apiClient.post(
-      "/admin/careers/categories",
-      categoryData
+      '/admin/careers/categories',
+      categoryData,
     );
     return response.data;
   } catch (error) {
-    console.error("Create job category error:", error);
+    console.error('Create job category error:', error);
     throw error;
   }
 };
@@ -219,11 +221,11 @@ export const updateJobCategory = async (categoryId, categoryData) => {
   try {
     const response = await apiClient.put(
       `/admin/careers/categories/${categoryId}`,
-      categoryData
+      categoryData,
     );
     return response.data;
   } catch (error) {
-    console.error("Update job category error:", error);
+    console.error('Update job category error:', error);
     throw error;
   }
 };
@@ -231,11 +233,11 @@ export const updateJobCategory = async (categoryId, categoryData) => {
 export const deleteJobCategory = async (categoryId) => {
   try {
     const response = await apiClient.delete(
-      `/admin/careers/categories/${categoryId}`
+      `/admin/careers/categories/${categoryId}`,
     );
     return response.data;
   } catch (error) {
-    console.error("Delete job category error:", error);
+    console.error('Delete job category error:', error);
     throw error;
   }
 };
@@ -243,10 +245,10 @@ export const deleteJobCategory = async (categoryId) => {
 // Blog Management
 export const getBlogs = async (params = {}) => {
   try {
-    const response = await apiClient.get("/blog/posts", { params });
+    const response = await apiClient.get('/blog/posts', { params });
     return response.data;
   } catch (error) {
-    console.error("Get blogs error:", error);
+    console.error('Get blogs error:', error);
     throw error;
   }
 };
@@ -258,7 +260,7 @@ export const getBlogById = async (blogId) => {
     const response = await apiClient.get(`/blog/posts/${blogId}`);
     return response.data;
   } catch (error) {
-    console.error("Get blog by ID error:", error);
+    console.error('Get blog by ID error:', error);
     throw error;
   }
 };
@@ -270,21 +272,21 @@ export const createBlog = async (blogData) => {
     // Transform data to match backend expectations
     const formattedData = {
       title: blogData.title,
-      slug: blogData.title.toLowerCase().replace(/\s+/g, "-"), // Generate slug from title
+      slug: blogData.title.toLowerCase().replace(/\s+/g, '-'), // Generate slug from title
       excerpt: blogData.excerpt,
-      content: blogData.content.split("*")[0].trim(), // Clean up content
+      content: blogData.content.split('*')[0].trim(), // Clean up content
       category: blogData.category,
       tags: blogData.tags,
       featured_image: blogData.featured_image,
-      is_published: blogData.status === "published", // Convert status to boolean
+      is_published: blogData.status === 'published', // Convert status to boolean
     };
 
-    const response = await apiClient.post("/blog/posts", formattedData);
+    const response = await apiClient.post('/blog/posts', formattedData);
     return response.data;
   } catch (error) {
     console.error(
-      "Create blog error:",
-      error.response?.data?.detail || error.message
+      'Create blog error:',
+      error.response?.data?.detail || error.message,
     );
     throw error;
   }
@@ -297,7 +299,7 @@ export const updateBlog = async (blogId, blogData) => {
     const response = await apiClient.put(`/blog/posts/${blogId}`, blogData);
     return response.data;
   } catch (error) {
-    console.error("Update blog error:", error);
+    console.error('Update blog error:', error);
     throw error;
   }
 };
@@ -309,7 +311,7 @@ export const deleteBlog = async (blogId) => {
     const response = await apiClient.delete(`/blog/posts/${blogId}`);
     return response.data;
   } catch (error) {
-    console.error("Delete blog error:", error);
+    console.error('Delete blog error:', error);
     throw error;
   }
 };
@@ -319,11 +321,11 @@ export const deleteBlogPost = deleteBlog;
 // Blog Categories
 export const getBlogCategories = async () => {
   try {
-    const response = await apiClient.get("/admin/blog/categories");
-    console.log(response.data, "blog category");
+    const response = await apiClient.get('/admin/blog/categories');
+    console.log(response.data, 'blog category');
     return response.data;
   } catch (error) {
-    console.error("Get blog categories error:", error);
+    console.error('Get blog categories error:', error);
     throw error;
   }
 };
@@ -331,12 +333,12 @@ export const getBlogCategories = async () => {
 export const createBlogCategory = async (categoryData) => {
   try {
     const response = await apiClient.post(
-      "/admin/blog/categories",
-      categoryData
+      '/admin/blog/categories',
+      categoryData,
     );
     return response.data;
   } catch (error) {
-    console.error("Create blog category error:", error);
+    console.error('Create blog category error:', error);
     throw error;
   }
 };
@@ -345,11 +347,11 @@ export const updateBlogCategory = async (oldName, categoryData) => {
   try {
     const response = await apiClient.put(
       `/admin/blog/categories/${oldName}`,
-      categoryData
+      categoryData,
     );
     return response.data;
   } catch (error) {
-    console.error("Update blog category error:", error);
+    console.error('Update blog category error:', error);
     throw error;
   }
 };
@@ -359,7 +361,7 @@ export const deleteBlogCategory = async (name) => {
     const response = await apiClient.delete(`/admin/blog/categories/${name}`);
     return response.data;
   } catch (error) {
-    console.error("Delete blog category error:", error);
+    console.error('Delete blog category error:', error);
     throw error;
   }
 };
@@ -367,10 +369,10 @@ export const deleteBlogCategory = async (name) => {
 // Course Management
 export const getCourses = async (params = {}) => {
   try {
-    const response = await apiClient.get("/admin/courses", { params });
+    const response = await apiClient.get('/admin/courses', { params });
     return response.data;
   } catch (error) {
-    console.error("Get courses error:", error);
+    console.error('Get courses error:', error);
     throw error;
   }
 };
@@ -380,17 +382,17 @@ export const getCourseById = async (courseId) => {
     const response = await apiClient.get(`/admin/courses/${courseId}`);
     return response.data;
   } catch (error) {
-    console.error("Get course by ID error:", error);
+    console.error('Get course by ID error:', error);
     throw error;
   }
 };
 
 export const createCourse = async (courseData) => {
   try {
-    const response = await apiClient.post("/admin/courses", courseData);
+    const response = await apiClient.post('/admin/courses', courseData);
     return response.data;
   } catch (error) {
-    console.error("Create course error:", error);
+    console.error('Create course error:', error);
     throw error;
   }
 };
@@ -399,11 +401,11 @@ export const updateCourse = async (courseId, courseData) => {
   try {
     const response = await apiClient.put(
       `/admin/courses/${courseId}`,
-      courseData
+      courseData,
     );
     return response.data;
   } catch (error) {
-    console.error("Update course error:", error);
+    console.error('Update course error:', error);
     throw error;
   }
 };
@@ -413,7 +415,7 @@ export const deleteCourse = async (courseId) => {
     const response = await apiClient.delete(`/admin/courses/${courseId}`);
     return response.data;
   } catch (error) {
-    console.error("Delete course error:", error);
+    console.error('Delete course error:', error);
     throw error;
   }
 };
@@ -421,11 +423,11 @@ export const deleteCourse = async (courseId) => {
 export const enrollUserInCourse = async (courseId, userId) => {
   try {
     const response = await apiClient.post(
-      `/admin/courses/${courseId}/enroll/${userId}`
+      `/admin/courses/${courseId}/enroll/${userId}`,
     );
     return response.data;
   } catch (error) {
-    console.error("Enroll user in course error:", error);
+    console.error('Enroll user in course error:', error);
     throw error;
   }
 };
@@ -433,12 +435,12 @@ export const enrollUserInCourse = async (courseId, userId) => {
 export const removeUserFromCourse = async (courseId, userId) => {
   try {
     const response = await apiClient.delete(
-      `/admin/courses/${courseId}/enroll/${userId}`
+      `/admin/courses/${courseId}/enroll/${userId}`,
     );
-    console.log(response, "remove user", userId, " ", courseId);
+    console.log(response, 'remove user', userId, ' ', courseId);
     return response.data;
   } catch (error) {
-    console.error("Remove user from course error:", error);
+    console.error('Remove user from course error:', error);
     throw error;
   }
 };
@@ -449,23 +451,23 @@ export const getCourseStudents = async (courseId, skip = 0, limit = 100) => {
     `https://aoca-resources-backend.onrender.com/admin/courses/${courseId}/students?skip=${skip}&limit=${limit}`,
     {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-        accept: "application/json",
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        accept: 'application/json',
       },
-    }
+    },
   );
-  if (!response.ok) throw new Error("Failed to fetch course students");
+  if (!response.ok) throw new Error('Failed to fetch course students');
   return await response.json();
 };
 
 // Class Management
 export const getClasses = async (params = {}) => {
   try {
-    const response = await apiClient.get("/admin/classes", { params });
-    console.log(response.data, "lessons");
+    const response = await apiClient.get('/admin/classes', { params });
+    console.log(response.data, 'lessons');
     return response.data;
   } catch (error) {
-    console.error("Get classes error:", error);
+    console.error('Get classes error:', error);
     throw error;
   }
 };
@@ -477,17 +479,17 @@ export const getClassById = async (classId) => {
     const response = await apiClient.get(`/admin/classes/${classId}`);
     return response.data;
   } catch (error) {
-    console.error("Get class by ID error:", error);
+    console.error('Get class by ID error:', error);
     throw error;
   }
 };
 
 export const createClass = async (classData) => {
   try {
-    const response = await apiClient.post("/admin/classes", classData);
+    const response = await apiClient.post('/admin/classes', classData);
     return response.data;
   } catch (error) {
-    console.error("Create class error:", error);
+    console.error('Create class error:', error);
     throw error;
   }
 };
@@ -496,11 +498,11 @@ export const updateClass = async (classId, classData) => {
   try {
     const response = await apiClient.put(
       `/admin/classes/${classId}`,
-      classData
+      classData,
     );
     return response.data;
   } catch (error) {
-    console.error("Update class error:", error);
+    console.error('Update class error:', error);
     throw error;
   }
 };
@@ -510,7 +512,7 @@ export const deleteClass = async (classId) => {
     const response = await apiClient.delete(`/admin/classes/${classId}`);
     return response.data;
   } catch (error) {
-    console.error("Delete class error:", error);
+    console.error('Delete class error:', error);
     throw error;
   }
 };
@@ -518,10 +520,10 @@ export const deleteClass = async (classId) => {
 // Assignment Management
 export const getAssignments = async (params = {}) => {
   try {
-    const response = await apiClient.get("/admin/assignments", { params });
+    const response = await apiClient.get('/admin/assignments', { params });
     return response.data;
   } catch (error) {
-    console.error("Get assignments error:", error);
+    console.error('Get assignments error:', error);
     throw error;
   }
 };
@@ -531,17 +533,17 @@ export const getAssignmentById = async (assignmentId) => {
     const response = await apiClient.get(`/admin/assignments/${assignmentId}`);
     return response.data;
   } catch (error) {
-    console.error("Get assignment by ID error:", error);
+    console.error('Get assignment by ID error:', error);
     throw error;
   }
 };
 
 export const createAssignment = async (assignmentData) => {
   try {
-    const response = await apiClient.post("/admin/assignments", assignmentData);
+    const response = await apiClient.post('/admin/assignments', assignmentData);
     return response.data;
   } catch (error) {
-    console.error("Create assignment error:", error);
+    console.error('Create assignment error:', error);
     throw error;
   }
 };
@@ -550,11 +552,11 @@ export const updateAssignment = async (assignmentId, assignmentData) => {
   try {
     const response = await apiClient.put(
       `/admin/assignments/${assignmentId}`,
-      assignmentData
+      assignmentData,
     );
     return response.data;
   } catch (error) {
-    console.error("Update assignment error:", error);
+    console.error('Update assignment error:', error);
     throw error;
   }
 };
@@ -562,11 +564,11 @@ export const updateAssignment = async (assignmentId, assignmentData) => {
 export const deleteAssignment = async (assignmentId) => {
   try {
     const response = await apiClient.delete(
-      `/admin/assignments/${assignmentId}`
+      `/admin/assignments/${assignmentId}`,
     );
     return response.data;
   } catch (error) {
-    console.error("Delete assignment error:", error);
+    console.error('Delete assignment error:', error);
     throw error;
   }
 };
@@ -574,11 +576,11 @@ export const deleteAssignment = async (assignmentId) => {
 export const getAssignmentSubmissions = async (assignmentId) => {
   try {
     const response = await apiClient.get(
-      `/admin/assignments/${assignmentId}/submissions`
+      `/admin/assignments/${assignmentId}/submissions`,
     );
     return response.data;
   } catch (error) {
-    console.error("Get assignment submissions error:", error);
+    console.error('Get assignment submissions error:', error);
     throw error;
   }
 };
@@ -586,16 +588,16 @@ export const getAssignmentSubmissions = async (assignmentId) => {
 export const gradeAssignmentSubmission = async (
   assignmentId,
   userId,
-  gradeData
+  gradeData,
 ) => {
   try {
     const response = await apiClient.post(
       `/admin/assignments/${assignmentId}/grade/${userId}`,
-      gradeData
+      gradeData,
     );
     return response.data;
   } catch (error) {
-    console.error("Grade assignment submission error:", error);
+    console.error('Grade assignment submission error:', error);
     throw error;
   }
 };
@@ -603,10 +605,10 @@ export const gradeAssignmentSubmission = async (
 // Resource Management
 export const getResources = async (params = {}) => {
   try {
-    const response = await apiClient.get("/admin/resources", { params });
+    const response = await apiClient.get('/admin/resources', { params });
     return response.data;
   } catch (error) {
-    console.error("Get resources error:", error);
+    console.error('Get resources error:', error);
     throw error;
   }
 };
@@ -616,17 +618,17 @@ export const getResourceById = async (resourceId) => {
     const response = await apiClient.get(`/admin/resources/${resourceId}`);
     return response.data;
   } catch (error) {
-    console.error("Get resource by ID error:", error);
+    console.error('Get resource by ID error:', error);
     throw error;
   }
 };
 
 export const createResource = async (resourceData) => {
   try {
-    const response = await apiClient.post("/admin/resources", resourceData);
+    const response = await apiClient.post('/admin/resources', resourceData);
     return response.data;
   } catch (error) {
-    console.error("Create resource error:", error);
+    console.error('Create resource error:', error);
     throw error;
   }
 };
@@ -635,11 +637,11 @@ export const updateResource = async (resourceId, resourceData) => {
   try {
     const response = await apiClient.put(
       `/admin/resources/${resourceId}`,
-      resourceData
+      resourceData,
     );
     return response.data;
   } catch (error) {
-    console.error("Update resource error:", error);
+    console.error('Update resource error:', error);
     throw error;
   }
 };
@@ -649,7 +651,7 @@ export const deleteResource = async (resourceId) => {
     const response = await apiClient.delete(`/admin/resources/${resourceId}`);
     return response.data;
   } catch (error) {
-    console.error("Delete resource error:", error);
+    console.error('Delete resource error:', error);
     throw error;
   }
 };
@@ -657,18 +659,32 @@ export const deleteResource = async (resourceId) => {
 // File Upload
 export const uploadImage = async (file) => {
   try {
+    // Create FormData inside the function
     const formData = new FormData();
-    formData.append("file", file);
 
-    const response = await apiClient.post("/upload/image", formData, {
+    // If file is already a FormData object, extract the file
+    if (file instanceof FormData) {
+      // Use it as is - but this might be the problem
+      // Better to recreate it
+      const fileObj = file.get('file');
+      formData.append('file', fileObj);
+    } else if (file instanceof File) {
+      // If it's a File object directly
+      formData.append('file', file);
+    } else {
+      // If it's some other type, throw error
+      throw new Error('Invalid file format');
+    }
+
+    const response = await apiClient.post('/upload/image', formData, {
       headers: {
-        "Content-Type": "multipart/form-data",
+        'Content-Type': 'multipart/form-data',
       },
     });
 
     return response.data;
   } catch (error) {
-    console.error("Upload image error:", error);
+    console.error('Upload image error:', error);
     throw error;
   }
 };
@@ -676,17 +692,17 @@ export const uploadImage = async (file) => {
 export const uploadResume = async (file) => {
   try {
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append('file', file);
 
-    const response = await apiClient.post("/careers/upload/resume", formData, {
+    const response = await apiClient.post('/careers/upload/resume', formData, {
       headers: {
-        "Content-Type": "multipart/form-data",
+        'Content-Type': 'multipart/form-data',
       },
     });
 
     return response.data;
   } catch (error) {
-    console.error("Upload resume error:", error);
+    console.error('Upload resume error:', error);
     throw error;
   }
 };
