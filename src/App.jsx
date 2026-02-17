@@ -980,7 +980,7 @@ function HomePage() {
                 <li className='flex items-start gap-2'>
                   <MessageSquare className='h-5 w-5 mt-0.5' />
                   <div>
-                    <p className='text-gray-400'>info@aocaresorcesltd.com</p>
+                    <p className='text-gray-400'>info@aocaresourcesltd.com</p>
                     <p className='text-gray-400'>aocaresources@gmail.com</p>
                   </div>
                 </li>

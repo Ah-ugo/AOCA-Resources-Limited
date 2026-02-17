@@ -178,7 +178,7 @@ function ContactUs() {
                     </div>
                     <div>
                       <h3 className='font-bold text-lg'>Email Us</h3>
-                      <p className='text-gray-600'>info@aocaresorcesltd.com</p>
+                      <p className='text-gray-600'>info@aocaresourcesltd.com</p>
                       <p className='text-gray-600'>aocaresources@gmail.com</p>
                     </div>
                   </div>
