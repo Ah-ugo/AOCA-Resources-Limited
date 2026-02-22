@@ -1,31 +1,39 @@
-import apiClient from "./api-client";
+/** @format */
+
+import axios from 'axios';
+import apiClient from './api-client';
+
+// Create a separate client for public endpoints (no auth)
+const publicClient = axios.create({
+  baseURL: 'https://aoca-resources-backend.onrender.com',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
 // Function to get job listings
 export const getJobListings = async (params = {}) => {
   try {
     const queryParams = new URLSearchParams();
-
-    if (params.skip) queryParams.append("skip", params.skip);
-    if (params.limit) queryParams.append("limit", params.limit);
-    if (params.category) queryParams.append("category", params.category);
-    if (params.location) queryParams.append("location", params.location);
+    if (params.skip) queryParams.append('skip', params.skip);
+    if (params.limit) queryParams.append('limit', params.limit);
+    if (params.category) queryParams.append('category', params.category);
+    if (params.location) queryParams.append('location', params.location);
     if (params.remote !== undefined)
-      queryParams.append("remote", params.remote);
+      queryParams.append('remote', params.remote);
     if (params.employment_type)
-      queryParams.append("employment_type", params.employment_type);
+      queryParams.append('employment_type', params.employment_type);
     if (params.experience_level)
-      queryParams.append("experience_level", params.experience_level);
-    if (params.search) queryParams.append("search", params.search);
-    if (params.sort_by) queryParams.append("sort_by", params.sort_by);
-    if (params.sort_order) queryParams.append("sort_order", params.sort_order);
+      queryParams.append('experience_level', params.experience_level);
+    if (params.search) queryParams.append('search', params.search);
+    if (params.sort_by) queryParams.append('sort_by', params.sort_by);
+    if (params.sort_order) queryParams.append('sort_order', params.sort_order);
 
-    // Fix the API endpoint URL
     const url = `/careers/jobs?${queryParams.toString()}`;
-    const response = await apiClient.get(url);
-
+    const response = await publicClient.get(url);
     return response.data;
   } catch (error) {
-    console.error("Get job listings error:", error);
+    console.error('Get job listings error:', error);
     throw error;
   }
 };
@@ -33,11 +41,10 @@ export const getJobListings = async (params = {}) => {
 // Function to get job details
 export const getJobDetails = async (jobId) => {
   try {
-    // Fix the API endpoint URL
-    const response = await apiClient.get(`/careers/jobs/${jobId}`);
+    const response = await publicClient.get(`/careers/jobs/${jobId}`);
     return response.data;
   } catch (error) {
-    console.error("Get job details error:", error);
+    console.error('Get job details error:', error);
     throw error;
   }
 };
@@ -45,11 +52,10 @@ export const getJobDetails = async (jobId) => {
 // Function to get job categories
 export const getJobCategories = async () => {
   try {
-    // Fix the API endpoint URL
-    const response = await apiClient.get("/careers/categories");
+    const response = await publicClient.get('/careers/categories');
     return response.data;
   } catch (error) {
-    console.error("Get job categories error:", error);
+    console.error('Get job categories error:', error);
     throw error;
   }
 };
@@ -57,95 +63,58 @@ export const getJobCategories = async () => {
 // Function to apply for a job
 export const applyForJob = async (jobId, applicationData) => {
   try {
-    // Log the data being sent for debugging
-    console.log("API call - applying for job:", jobId);
-    console.log("Application data:", applicationData);
+    // Validate required fields
+    const requiredFields = [
+      'first_name',
+      'last_name',
+      'email',
+      'phone',
+      'resume_url',
+    ];
+    const missingFields = requiredFields.filter(
+      (field) => !applicationData[field],
+    );
 
-    // Make sure we have all required fields
-    if (!applicationData.resume_url) {
-      throw new Error("Resume URL is required");
+    if (missingFields.length > 0) {
+      throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
     }
 
-    if (!applicationData.phone) {
-      throw new Error("Phone number is required");
-    }
+    console.log('Sending application data:', applicationData);
 
-    // Make sure job_id is correctly set
-    const payload = {
-      ...applicationData,
-      job_id: jobId, // Ensure correct job ID
-    };
-
-    // Send the application
-    const response = await apiClient.post(
+    const response = await publicClient.post(
       `/careers/jobs/${jobId}/apply`,
-      payload
+      applicationData, // This now includes job_id in the body
     );
 
-    console.log("Application submitted successfully:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Apply for job error:", error);
+    console.error('Apply for job error:', error);
 
-    // Extract and log detailed error information
-    if (error.response) {
-      // The server responded with a status code outside the 2xx range
-      console.error("Server error response:", error.response.data);
-      console.error("Status code:", error.response.status);
-
-      // Return a more descriptive error message if available
-      if (error.response.data && error.response.data.message) {
-        throw new Error(`Server error: ${error.response.data.message}`);
+    // Handle specific error messages
+    if (error.response?.data?.detail) {
+      if (Array.isArray(error.response.data.detail)) {
+        // Handle validation errors
+        const validationErrors = error.response.data.detail
+          .map((err) => {
+            if (err.msg === 'Field required') {
+              return `${err.loc[err.loc.length - 1]} is required`;
+            }
+            return err.msg;
+          })
+          .join(', ');
+        throw new Error(validationErrors);
+      } else if (typeof error.response.data.detail === 'string') {
+        // Handle string error messages
+        if (error.response.data.detail.includes('File too large')) {
+          throw new Error('File too large. Maximum size is 5MB');
+        }
+        throw new Error(error.response.data.detail);
       }
+    } else if (error.message) {
+      throw new Error(error.message);
     }
 
-    throw error;
-  }
-};
-
-// Function to get user applications
-export const getUserApplications = async (params = {}) => {
-  try {
-    const queryParams = new URLSearchParams();
-
-    if (params.skip) queryParams.append("skip", params.skip);
-    if (params.limit) queryParams.append("limit", params.limit);
-    if (params.status) queryParams.append("status", params.status);
-
-    // Fix the API endpoint URL
-    const url = `/careers/applications?${queryParams.toString()}`;
-    const response = await apiClient.get(url);
-
-    return response.data;
-  } catch (error) {
-    console.error("Get user applications error:", error);
-    throw error;
-  }
-};
-
-// Function to get application details
-export const getApplicationDetails = async (applicationId) => {
-  try {
-    // Fix the API endpoint URL
-    const response = await apiClient.get(
-      `/careers/applications/${applicationId}`
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Get application details error:", error);
-    throw error;
-  }
-};
-
-// Function to withdraw application
-export const withdrawApplication = async (applicationId) => {
-  try {
-    // Fix the API endpoint URL
-    await apiClient.delete(`/careers/applications/${applicationId}`);
-    return { success: true };
-  } catch (error) {
-    console.error("Withdraw application error:", error);
-    throw error;
+    throw new Error('Failed to submit application. Please try again.');
   }
 };
 
@@ -153,18 +122,68 @@ export const withdrawApplication = async (applicationId) => {
 export const uploadResume = async (file) => {
   try {
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append('file', file);
 
-    // Fix the API endpoint URL
-    const response = await apiClient.post("/careers/upload/resume", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
+    const response = await publicClient.post(
+      '/careers/upload/resume',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       },
-    });
+    );
 
     return response.data;
   } catch (error) {
-    console.error("Upload resume error:", error);
+    console.error('Upload resume error:', error);
+
+    // Handle file size error
+    if (error.response?.data?.detail?.includes('File too large')) {
+      throw new Error('File too large. Maximum size is 5MB');
+    }
+
+    throw new Error(error.response?.data?.detail || 'Failed to upload resume');
+  }
+};
+
+// Function to get user applications - REQUIRES AUTH
+export const getUserApplications = async (params = {}) => {
+  try {
+    const queryParams = new URLSearchParams();
+    if (params.skip) queryParams.append('skip', params.skip);
+    if (params.limit) queryParams.append('limit', params.limit);
+    if (params.status) queryParams.append('status', params.status);
+
+    const url = `/careers/applications?${queryParams.toString()}`;
+    const response = await apiClient.get(url);
+    return response.data;
+  } catch (error) {
+    console.error('Get user applications error:', error);
+    throw error;
+  }
+};
+
+// Function to get application details - REQUIRES AUTH
+export const getApplicationDetails = async (applicationId) => {
+  try {
+    const response = await apiClient.get(
+      `/careers/applications/${applicationId}`,
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Get application details error:', error);
+    throw error;
+  }
+};
+
+// Function to withdraw application - REQUIRES AUTH
+export const withdrawApplication = async (applicationId) => {
+  try {
+    await apiClient.delete(`/careers/applications/${applicationId}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Withdraw application error:', error);
     throw error;
   }
 };

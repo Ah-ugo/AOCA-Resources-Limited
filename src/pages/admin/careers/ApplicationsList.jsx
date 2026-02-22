@@ -2,11 +2,10 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Filter, Eye, Download, Loader } from 'lucide-react';
+import { Search, Filter, Eye, Download, Loader, User } from 'lucide-react';
 import {
   getApplications,
   updateApplication,
-  getUserById,
 } from '../../../services/admin-service';
 import { formatDate } from '../../../utils/formatters';
 
@@ -17,10 +16,7 @@ const ApplicationsList = () => {
   const [selectedStatus, setSelectedStatus] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [userDetails, setUserDetails] = useState({});
-  const [loadingUsers, setLoadingUsers] = useState({});
 
-  // Move getStatusBadgeClass function here, before renderApplicationRow
   const getStatusBadgeClass = (status) => {
     switch (status) {
       case 'applied':
@@ -38,44 +34,32 @@ const ApplicationsList = () => {
     }
   };
 
-  const fetchUserDetails = useCallback(
-    async (userId) => {
-      if (!userId || userDetails[userId]) return;
-
-      try {
-        setLoadingUsers((prev) => ({ ...prev, [userId]: true }));
-        const user = await getUserById(userId);
-        setUserDetails((prev) => ({ ...prev, [userId]: user }));
-      } catch (error) {
-        console.error(`Error fetching user ${userId}:`, error);
-        setUserDetails((prev) => ({
-          ...prev,
-          [userId]: {
-            name: 'User not found',
-            email: 'N/A',
-          },
-        }));
-      } finally {
-        setLoadingUsers((prev) => ({ ...prev, [userId]: false }));
-      }
-    },
-    [userDetails],
-  );
+  const getStatusDisplay = (status) => {
+    switch (status) {
+      case 'applied':
+        return 'Applied';
+      case 'reviewing':
+        return 'Reviewing';
+      case 'interview':
+        return 'Interview';
+      case 'accepted':
+        return 'Accepted';
+      case 'rejected':
+        return 'Rejected';
+      default:
+        return status;
+    }
+  };
 
   const fetchApplications = async (page = 1, status = '', search = '') => {
     try {
       setLoading(true);
       const response = await getApplications(page, status, search);
       const apps = response.applications || [];
+      console.log('Fetched applications:', apps); // Debug log
       setApplications(apps);
       setTotalPages(response.totalPages || 1);
       setCurrentPage(response.currentPage || 1);
-
-      apps.forEach((app) => {
-        if (app.user_id) {
-          fetchUserDetails(app.user_id);
-        }
-      });
     } catch (error) {
       console.error('Error fetching applications:', error);
     } finally {
@@ -101,7 +85,7 @@ const ApplicationsList = () => {
 
   const handleStatusChange = async (applicationId, newStatus) => {
     try {
-      await updateApplication(applicationId, newStatus);
+      await updateApplication(applicationId, { status: newStatus });
       setApplications(
         applications.map((app) =>
           app._id === applicationId ? { ...app, status: newStatus } : app,
@@ -113,7 +97,39 @@ const ApplicationsList = () => {
   };
 
   const exportApplications = () => {
-    console.log('Exporting applications...');
+    // Create CSV content
+    const headers = [
+      'Name',
+      'Email',
+      'Phone',
+      'Job Title',
+      'Company',
+      'Applied Date',
+      'Status',
+    ];
+    const csvContent = [
+      headers.join(','),
+      ...applications.map((app) =>
+        [
+          `"${app.first_name || ''} ${app.last_name || ''}"`,
+          `"${app.email || ''}"`,
+          `"${app.phone || ''}"`,
+          `"${app.job?.title || ''}"`,
+          `"${app.job?.company || ''}"`,
+          `"${formatDate(app.created_at) || ''}"`,
+          `"${app.status || ''}"`,
+        ].join(','),
+      ),
+    ].join('\n');
+
+    // Download CSV
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `applications_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
   };
 
   const renderPagination = () => {
@@ -125,7 +141,7 @@ const ApplicationsList = () => {
           onClick={() => setCurrentPage(i)}
           className={`px-3 py-1 rounded-md ${
             currentPage === i
-              ? 'bg-primary text-white'
+              ? 'bg-green-600 text-white'
               : 'bg-white text-gray-700 hover:bg-gray-50'
           }`}
         >
@@ -134,11 +150,11 @@ const ApplicationsList = () => {
       );
     }
     return (
-      <div className='flex items-center justify-between mt-6'>
+      <div className='flex items-center justify-between mt-6 px-4 pb-4'>
         <button
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           disabled={currentPage === 1}
-          className='px-3 py-1 rounded-md bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50'
+          className='px-3 py-1 rounded-md bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50 border border-gray-300'
         >
           Previous
         </button>
@@ -148,7 +164,7 @@ const ApplicationsList = () => {
             setCurrentPage((prev) => Math.min(prev + 1, totalPages))
           }
           disabled={currentPage === totalPages}
-          className='px-3 py-1 rounded-md bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50'
+          className='px-3 py-1 rounded-md bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50 border border-gray-300'
         >
           Next
         </button>
@@ -157,47 +173,44 @@ const ApplicationsList = () => {
   };
 
   const renderApplicationRow = (application) => {
-    const user = userDetails[application.user_id];
-    const isLoadingUser = loadingUsers[application.user_id];
+    const fullName =
+      application.first_name && application.last_name
+        ? `${application.first_name} ${application.last_name}`
+        : application.first_name ||
+          application.last_name ||
+          'Name not provided';
 
     return (
       <tr key={application._id} className='hover:bg-gray-50'>
         <td className='px-6 py-4 whitespace-nowrap'>
           <div className='flex items-center'>
+            <div className='flex-shrink-0 h-10 w-10 rounded-full bg-green-100 flex items-center justify-center'>
+              <User className='h-5 w-5 text-green-600' />
+            </div>
             <div className='ml-4'>
               <div className='text-sm font-medium text-gray-900'>
-                {isLoadingUser ? (
-                  <span className='text-gray-400'>Loading...</span>
-                ) : user?.name ? (
-                  user.name
-                ) : (
-                  <span className='text-gray-500'>
-                    User ID: {application.user_id}
-                  </span>
-                )}
+                {fullName}
               </div>
               <div className='text-sm text-gray-500'>
-                {isLoadingUser ? (
-                  <span className='text-gray-400'>Loading...</span>
-                ) : user?.email ? (
-                  user.email
-                ) : (
-                  'Email not available'
-                )}
+                {application.email || 'Email not provided'}
               </div>
             </div>
           </div>
         </td>
         <td className='px-6 py-4 whitespace-nowrap'>
-          <div className='text-sm text-gray-900'>
+          <div className='text-sm font-medium text-gray-900'>
             {application.job?.title || 'N/A'}
           </div>
           <div className='text-sm text-gray-500'>
             {application.job?.company || 'N/A'}
           </div>
         </td>
-        <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-          {formatDate(application.created_at)}
+        <td className='px-6 py-4 whitespace-nowrap'>
+          <div className='text-sm text-gray-500'>
+            {application.created_at
+              ? formatDate(application.created_at)
+              : 'N/A'}
+          </div>
         </td>
         <td className='px-6 py-4 whitespace-nowrap'>
           <select
@@ -205,9 +218,9 @@ const ApplicationsList = () => {
             onChange={(e) =>
               handleStatusChange(application._id, e.target.value)
             }
-            className={`text-xs font-semibold rounded px-2 py-1 ${getStatusBadgeClass(
+            className={`text-xs font-semibold rounded-full px-3 py-1 border-0 focus:ring-2 focus:ring-green-500 ${getStatusBadgeClass(
               application.status,
-            )} border-0 focus:ring-2 focus:ring-primary`}
+            )}`}
           >
             <option value='applied'>Applied</option>
             <option value='reviewing'>Reviewing</option>
@@ -219,10 +232,10 @@ const ApplicationsList = () => {
         <td className='px-6 py-4 whitespace-nowrap text-right text-sm font-medium'>
           <Link
             to={`/admin/careers/applications/${application._id}`}
-            className='text-indigo-600 hover:text-indigo-900'
+            className='text-green-600 hover:text-green-900 inline-flex items-center'
           >
-            <Eye className='h-5 w-5 inline' />
-            <span className='ml-1'>View Details</span>
+            <Eye className='h-4 w-4 mr-1' />
+            View Details
           </Link>
         </td>
       </tr>
@@ -258,8 +271,8 @@ const ApplicationsList = () => {
               <div className='relative'>
                 <input
                   type='text'
-                  placeholder='Search applications...'
-                  className='w-full pl-10 pr-4 py-2 border rounded-md focus:ring-primary focus:border-primary'
+                  placeholder='Search by name, email, or job title...'
+                  className='w-full pl-10 pr-24 py-2 border rounded-md focus:ring-green-500 focus:border-green-500'
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -268,7 +281,7 @@ const ApplicationsList = () => {
                 </div>
                 <button
                   type='submit'
-                  className='absolute inset-y-0 right-0 px-3 flex items-center bg-primary text-white rounded-r-md'
+                  className='absolute inset-y-0 right-0 px-4 flex items-center bg-green-600 text-white rounded-r-md hover:bg-green-700'
                 >
                   Search
                 </button>
@@ -280,7 +293,7 @@ const ApplicationsList = () => {
               <select
                 value={selectedStatus}
                 onChange={(e) => handleStatusFilter(e.target.value)}
-                className='border rounded-md px-2 py-1 text-sm focus:ring-primary focus:border-primary'
+                className='border rounded-md px-2 py-1 text-sm focus:ring-green-500 focus:border-green-500'
               >
                 <option value=''>All Statuses</option>
                 <option value='applied'>Applied</option>
@@ -294,8 +307,8 @@ const ApplicationsList = () => {
         </div>
 
         {loading ? (
-          <div className='flex justify-center items-center p-8'>
-            <Loader className='h-8 w-8 text-primary animate-spin' />
+          <div className='flex justify-center items-center p-12'>
+            <Loader className='h-8 w-8 text-green-600 animate-spin' />
           </div>
         ) : (
           <>
@@ -327,7 +340,7 @@ const ApplicationsList = () => {
                     <tr>
                       <td
                         colSpan='5'
-                        className='px-6 py-4 text-center text-sm text-gray-500'
+                        className='px-6 py-8 text-center text-sm text-gray-500'
                       >
                         No applications found
                       </td>
@@ -336,7 +349,7 @@ const ApplicationsList = () => {
                 </tbody>
               </table>
             </div>
-            {renderPagination()}
+            {totalPages > 1 && renderPagination()}
           </>
         )}
       </div>
