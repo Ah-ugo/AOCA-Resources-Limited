@@ -15,6 +15,8 @@ import {
   FileText,
   Send,
   X,
+  Edit,
+  Clock,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import {
@@ -39,6 +41,7 @@ const ApplicationDetails = () => {
   // State for interview email prompt
   const [showEmailPrompt, setShowEmailPrompt] = useState(false);
   const [previousInterviewDate, setPreviousInterviewDate] = useState('');
+  const [isEditingInterview, setIsEditingInterview] = useState(false);
 
   useEffect(() => {
     const fetchApplication = async () => {
@@ -73,9 +76,9 @@ const ApplicationDetails = () => {
   };
 
   const handleSaveChanges = async () => {
-    // Check if interview date is being set (changed from empty to value)
-    const isInterviewDateBeingSet =
-      formData.interview_date && !previousInterviewDate;
+    // Check if interview date is being set or changed
+    const isInterviewDateChanged =
+      formData.interview_date !== previousInterviewDate;
 
     try {
       setLoading(true);
@@ -86,12 +89,13 @@ const ApplicationDetails = () => {
       // Update previous interview date
       setPreviousInterviewDate(formData.interview_date);
 
-      // Show email prompt if interview date was set
-      if (isInterviewDateBeingSet) {
+      // Show email prompt if interview date was set or changed
+      if (isInterviewDateChanged && formData.interview_date) {
         setShowEmailPrompt(true);
       }
 
       setIsEditing(false);
+      setIsEditingInterview(false);
       toast.success('Application updated successfully');
     } catch (err) {
       toast.error('Failed to update application');
@@ -156,24 +160,67 @@ const ApplicationDetails = () => {
     });
   };
 
-  const openEmailClient = () => {
-    const subject = encodeURIComponent(
-      `Interview Invitation: ${application.job?.title} position`,
-    );
-    const body = encodeURIComponent(
-      `Dear ${application.first_name} ${application.last_name},\n\n` +
-        `We are pleased to invite you for an interview for the ${application.job?.title} position at ${application.job?.company}.\n\n` +
-        `Interview Details:\n` +
-        `Date: ${formatInterviewDate(formData.interview_date)}\n\n` +
-        `Please let us know if this time works for you. If you have any questions or need to reschedule, feel free to reply to this email.\n\n` +
-        `Best regards,\n` +
-        `The Recruitment Team\n` +
-        `${application.job?.company}`,
-    );
+  const openEmailClient = (type = 'schedule') => {
+    let subject, body;
+
+    if (type === 'schedule') {
+      subject = encodeURIComponent(
+        `Interview Invitation: ${application.job?.title} position`,
+      );
+      body = encodeURIComponent(
+        `Dear ${application.first_name} ${application.last_name},\n\n` +
+          `We are pleased to invite you for an interview for the ${application.job?.title} position at ${application.job?.company}.\n\n` +
+          `Interview Details:\n` +
+          `Date: ${formatInterviewDate(formData.interview_date)}\n\n` +
+          `Please let us know if this time works for you. If you have any questions or need to reschedule, feel free to reply to this email.\n\n` +
+          `Best regards,\n` +
+          `The Recruitment Team\n` +
+          `${application.job?.company}`,
+      );
+    } else if (type === 'reschedule') {
+      subject = encodeURIComponent(
+        `Interview Rescheduled: ${application.job?.title} position`,
+      );
+      body = encodeURIComponent(
+        `Dear ${application.first_name} ${application.last_name},\n\n` +
+          `This is to inform you that your interview for the ${application.job?.title} position at ${application.job?.company} has been rescheduled.\n\n` +
+          `New Interview Details:\n` +
+          `Date: ${formatInterviewDate(formData.interview_date)}\n\n` +
+          `Previous Interview Date: ${formatInterviewDate(previousInterviewDate)}\n\n` +
+          `Please let us know if this new time works for you. If you have any questions, feel free to reply to this email.\n\n` +
+          `Best regards,\n` +
+          `The Recruitment Team\n` +
+          `${application.job?.company}`,
+      );
+    } else if (type === 'cancel') {
+      subject = encodeURIComponent(
+        `Interview Cancelled: ${application.job?.title} position`,
+      );
+      body = encodeURIComponent(
+        `Dear ${application.first_name} ${application.last_name},\n\n` +
+          `We regret to inform you that your interview for the ${application.job?.title} position at ${application.job?.company} scheduled for ${formatInterviewDate(previousInterviewDate)} has been cancelled.\n\n` +
+          `We will contact you soon with further updates.\n\n` +
+          `Best regards,\n` +
+          `The Recruitment Team\n` +
+          `${application.job?.company}`,
+      );
+    }
 
     window.location.href = `mailto:${application.email}?subject=${subject}&body=${body}`;
     setShowEmailPrompt(false);
-    toast.info('Email client opened - please send the interview invitation');
+    setIsEditingInterview(false);
+    toast.info('Email client opened');
+  };
+
+  const handleEditInterview = () => {
+    setIsEditingInterview(true);
+    setIsEditing(true);
+  };
+
+  const handleCancelInterview = () => {
+    if (previousInterviewDate) {
+      setFormData((prev) => ({ ...prev, interview_date: '' }));
+    }
   };
 
   if (loading && !application) {
@@ -221,26 +268,65 @@ const ApplicationDetails = () => {
               <div className='px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4'>
                 <div className='sm:flex sm:items-start'>
                   <div className='flex items-center justify-center flex-shrink-0 w-12 h-12 mx-auto bg-green-100 rounded-full sm:mx-0 sm:h-10 sm:w-10'>
-                    <Calendar className='w-6 h-6 text-green-600' />
+                    <Mail className='w-6 h-6 text-green-600' />
                   </div>
                   <div className='mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left'>
                     <h3 className='text-lg font-medium leading-6 text-gray-900'>
-                      Send Interview Invitation
+                      {previousInterviewDate &&
+                      formData.interview_date !== previousInterviewDate
+                        ? 'Reschedule Interview'
+                        : 'Schedule Interview'}
                     </h3>
                     <div className='mt-2'>
                       <p className='text-sm text-gray-500'>
-                        You have scheduled an interview for{' '}
-                        <span className='font-semibold text-gray-700'>
-                          {application.first_name} {application.last_name}
-                        </span>
-                        .
+                        {previousInterviewDate &&
+                        formData.interview_date !== previousInterviewDate ? (
+                          <>
+                            You have rescheduled the interview for{' '}
+                            <span className='font-semibold text-gray-700'>
+                              {application.first_name} {application.last_name}
+                            </span>
+                            .
+                          </>
+                        ) : (
+                          <>
+                            You have scheduled an interview for{' '}
+                            <span className='font-semibold text-gray-700'>
+                              {application.first_name} {application.last_name}
+                            </span>
+                            .
+                          </>
+                        )}
                       </p>
-                      <p className='mt-2 text-sm text-gray-500'>
-                        <span className='font-semibold'>Interview Date:</span>{' '}
-                        {formatInterviewDate(formData.interview_date)}
-                      </p>
+
+                      <div className='mt-4 bg-gray-50 p-4 rounded-lg'>
+                        {previousInterviewDate &&
+                          formData.interview_date !== previousInterviewDate && (
+                            <div className='mb-3 pb-3 border-b border-gray-200'>
+                              <p className='text-sm text-gray-500 flex items-center'>
+                                <Clock className='w-4 h-4 mr-2 text-gray-400' />
+                                Previous Date:
+                              </p>
+                              <p className='text-sm font-medium text-gray-700 mt-1 line-through'>
+                                {formatInterviewDate(previousInterviewDate)}
+                              </p>
+                            </div>
+                          )}
+
+                        <p className='text-sm text-gray-500 flex items-center'>
+                          <Calendar className='w-4 h-4 mr-2 text-gray-400' />
+                          {previousInterviewDate &&
+                          formData.interview_date !== previousInterviewDate
+                            ? 'New Interview Date:'
+                            : 'Interview Date:'}
+                        </p>
+                        <p className='text-sm font-medium text-gray-900 mt-1'>
+                          {formatInterviewDate(formData.interview_date)}
+                        </p>
+                      </div>
+
                       <p className='mt-4 text-sm text-gray-500'>
-                        Would you like to send an email invitation to the
+                        Would you like to send an email notification to the
                         candidate?
                       </p>
                     </div>
@@ -250,7 +336,14 @@ const ApplicationDetails = () => {
               <div className='px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse'>
                 <button
                   type='button'
-                  onClick={openEmailClient}
+                  onClick={() =>
+                    openEmailClient(
+                      previousInterviewDate &&
+                        formData.interview_date !== previousInterviewDate
+                        ? 'reschedule'
+                        : 'schedule',
+                    )
+                  }
                   className='inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-green-600 border border-transparent rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm'
                 >
                   <Send className='w-4 h-4 mr-2' />
@@ -596,48 +689,80 @@ const ApplicationDetails = () => {
               )}
             </div>
             <div className='p-6'>
-              <div className='space-y-4'>
+              <div className='space-y-6'>
+                {/* Interview Date Section */}
                 <div>
-                  <label
-                    htmlFor='interview_date'
-                    className='block text-sm font-medium text-gray-700 mb-1'
-                  >
-                    Interview Date
-                  </label>
-                  {isEditing ? (
-                    <div className='relative rounded-md shadow-sm'>
-                      <input
-                        type='datetime-local'
-                        id='interview_date'
-                        name='interview_date'
-                        value={formData.interview_date}
-                        onChange={handleInputChange}
-                        className='focus:ring-green-500 focus:border-green-500 block w-full pl-3 pr-10 py-2 sm:text-sm border-gray-300 rounded-md'
-                      />
-                      <div className='absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none'>
-                        <Calendar className='h-5 w-5 text-gray-400' />
+                  <div className='flex justify-between items-center mb-2'>
+                    <label
+                      htmlFor='interview_date'
+                      className='block text-sm font-medium text-gray-700'
+                    >
+                      Interview Date
+                    </label>
+                    {!isEditing && application.interview_date && (
+                      <button
+                        onClick={handleEditInterview}
+                        className='text-xs text-green-600 hover:text-green-800 flex items-center'
+                      >
+                        <Edit className='h-3 w-3 mr-1' />
+                        Edit
+                      </button>
+                    )}
+                  </div>
+
+                  {isEditingInterview || isEditing ? (
+                    <div className='space-y-3'>
+                      <div className='relative rounded-md shadow-sm'>
+                        <input
+                          type='datetime-local'
+                          id='interview_date'
+                          name='interview_date'
+                          value={formData.interview_date}
+                          onChange={handleInputChange}
+                          className='focus:ring-green-500 focus:border-green-500 block w-full pl-3 pr-10 py-2 sm:text-sm border-gray-300 rounded-md'
+                        />
+                        <div className='absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none'>
+                          <Calendar className='h-5 w-5 text-gray-400' />
+                        </div>
                       </div>
+
+                      {/* Show cancel option if there's a previous interview date */}
+                      {previousInterviewDate && (
+                        <button
+                          type='button'
+                          onClick={handleCancelInterview}
+                          className='text-sm text-red-600 hover:text-red-800 flex items-center'
+                        >
+                          <X className='h-4 w-4 mr-1' />
+                          Cancel interview
+                        </button>
+                      )}
                     </div>
                   ) : (
                     <div>
                       {application.interview_date ? (
-                        <p className='text-gray-800 bg-purple-50 p-3 rounded-md border border-purple-200'>
-                          <span className='font-semibold text-purple-700'>
-                            Scheduled:
-                          </span>{' '}
-                          {formatInterviewDate(application.interview_date)}
-                        </p>
+                        <div className='bg-purple-50 p-4 rounded-lg border border-purple-200'>
+                          <p className='text-sm font-medium text-purple-700 mb-2'>
+                            Scheduled Interview
+                          </p>
+                          <p className='text-sm text-gray-800'>
+                            {formatInterviewDate(application.interview_date)}
+                          </p>
+                        </div>
                       ) : (
-                        <p className='text-gray-500 italic'>Not scheduled</p>
+                        <p className='text-gray-500 italic text-sm bg-gray-50 p-3 rounded-md'>
+                          No interview scheduled
+                        </p>
                       )}
                     </div>
                   )}
                 </div>
 
+                {/* Admin Notes */}
                 <div>
                   <label
                     htmlFor='admin_notes'
-                    className='block text-sm font-medium text-gray-700 mb-1'
+                    className='block text-sm font-medium text-gray-700 mb-2'
                   >
                     Notes
                   </label>
@@ -652,11 +777,43 @@ const ApplicationDetails = () => {
                       placeholder='Add internal notes about this candidate...'
                     />
                   ) : (
-                    <p className='whitespace-pre-line text-gray-800 bg-gray-50 p-3 rounded-md'>
+                    <p className='whitespace-pre-line text-gray-800 bg-gray-50 p-3 rounded-md text-sm'>
                       {application.admin_notes || 'No notes added'}
                     </p>
                   )}
                 </div>
+
+                {/* Quick Actions */}
+                {application.interview_date && !isEditing && (
+                  <div className='border-t pt-4 mt-2'>
+                    <h3 className='text-xs font-medium text-gray-500 uppercase tracking-wider mb-3'>
+                      Quick Actions
+                    </h3>
+                    <div className='flex flex-col space-y-2'>
+                      <button
+                        onClick={() => openEmailClient('schedule')}
+                        className='flex items-center text-sm text-green-600 hover:text-green-800'
+                      >
+                        <Send className='h-4 w-4 mr-2' />
+                        Send interview invitation
+                      </button>
+                      <button
+                        onClick={() => openEmailClient('reschedule')}
+                        className='flex items-center text-sm text-yellow-600 hover:text-yellow-800'
+                      >
+                        <Clock className='h-4 w-4 mr-2' />
+                        Send reschedule notice
+                      </button>
+                      <button
+                        onClick={() => openEmailClient('cancel')}
+                        className='flex items-center text-sm text-red-600 hover:text-red-800'
+                      >
+                        <X className='h-4 w-4 mr-2' />
+                        Send cancellation notice
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
