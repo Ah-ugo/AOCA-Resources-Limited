@@ -2,26 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Search,
-  Filter,
-  Eye,
-  Download,
-  Loader,
-  User,
-  Share2,
-  Facebook,
-  Twitter,
-  Linkedin,
-  Mail,
-  Link as LinkIcon,
-  X,
-  Check,
-  Globe,
-  MessageCircle,
-  Send,
-  Instagram,
-} from 'lucide-react';
+import { Search, Filter, Eye, Download, Loader, User } from 'lucide-react';
 import {
   getApplications,
   updateApplication,
@@ -35,11 +16,6 @@ const ApplicationsList = () => {
   const [selectedStatus, setSelectedStatus] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-
-  // Share modal state
-  const [showShareModal, setShowShareModal] = useState(false);
-  const [selectedJob, setSelectedJob] = useState(null);
-  const [shareSuccess, setShareSuccess] = useState(false);
 
   const getStatusBadgeClass = (status) => {
     switch (status) {
@@ -80,7 +56,7 @@ const ApplicationsList = () => {
       setLoading(true);
       const response = await getApplications(page, status, search);
       const apps = response.applications || [];
-      console.log('Fetched applications:', apps);
+      console.log('Fetched applications:', apps); // Debug log
       setApplications(apps);
       setTotalPages(response.totalPages || 1);
       setCurrentPage(response.currentPage || 1);
@@ -154,114 +130,6 @@ const ApplicationsList = () => {
     a.download = `applications_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
-  };
-
-  // Share functions
-  const openShareModal = (job) => {
-    setSelectedJob(job);
-    setShowShareModal(true);
-    setShareSuccess(false);
-  };
-
-  const getShareText = (job) => {
-    return encodeURIComponent(
-      `🚀 We're hiring! Check out this ${job?.title} position at ${job?.company}! Join our team and make a difference. #hiring #jobs #careers`,
-    );
-  };
-
-  const getShareUrl = () => {
-    if (!selectedJob?._id) return '';
-    const baseUrl = window.location.origin;
-    return encodeURIComponent(`${baseUrl}/careers/${selectedJob._id}`);
-  };
-
-  const shareOnFacebook = () => {
-    if (!selectedJob) return;
-    window.open(
-      `https://www.facebook.com/sharer/sharer.php?u=${getShareUrl()}`,
-      '_blank',
-      'width=600,height=400,scrollbars=yes',
-    );
-    setShareSuccess(true);
-    setTimeout(() => setShowShareModal(false), 1000);
-  };
-
-  const shareOnTwitter = () => {
-    if (!selectedJob) return;
-    window.open(
-      `https://twitter.com/intent/tweet?text=${getShareText(selectedJob)}&url=${getShareUrl()}`,
-      '_blank',
-      'width=600,height=400,scrollbars=yes',
-    );
-    setShareSuccess(true);
-    setTimeout(() => setShowShareModal(false), 1000);
-  };
-
-  const shareOnLinkedIn = () => {
-    if (!selectedJob) return;
-    window.open(
-      `https://www.linkedin.com/sharing/share-offsite/?url=${getShareUrl()}`,
-      '_blank',
-      'width=600,height=400,scrollbars=yes',
-    );
-    setShareSuccess(true);
-    setTimeout(() => setShowShareModal(false), 1000);
-  };
-
-  const shareOnWhatsApp = () => {
-    if (!selectedJob) return;
-    window.open(
-      `https://wa.me/?text=${getShareText(selectedJob)}%20${getShareUrl()}`,
-      '_blank',
-    );
-    setShareSuccess(true);
-    setTimeout(() => setShowShareModal(false), 1000);
-  };
-
-  const shareOnTelegram = () => {
-    if (!selectedJob) return;
-    window.open(
-      `https://t.me/share/url?url=${getShareUrl()}&text=${getShareText(selectedJob)}`,
-      '_blank',
-    );
-    setShareSuccess(true);
-    setTimeout(() => setShowShareModal(false), 1000);
-  };
-
-  const shareOnInstagram = () => {
-    if (!selectedJob) return;
-    // Instagram doesn't have direct share URL, so copy to clipboard
-    const fullUrl = `${window.location.origin}/careers/${selectedJob._id}`;
-    navigator.clipboard.writeText(fullUrl);
-    setShareSuccess(true);
-    setTimeout(() => setShowShareModal(false), 1500);
-  };
-
-  const shareViaEmail = () => {
-    if (!selectedJob) return;
-    const subject = encodeURIComponent(
-      `Job Opportunity: ${selectedJob.title} at ${selectedJob.company}`,
-    );
-    const body = encodeURIComponent(
-      `Hi,\n\nI thought you might be interested in this ${selectedJob.title} position at ${selectedJob.company}.\n\n` +
-        `Job Details:\n` +
-        `- Location: ${selectedJob.location?.city}, ${selectedJob.location?.country}\n` +
-        `- Type: ${selectedJob.employment_type}\n` +
-        `- Experience Level: ${selectedJob.experience_level}\n\n` +
-        `Check out the full details here: ${window.location.origin}/careers/${selectedJob._id}\n\n` +
-        `Best regards`,
-    );
-    window.location.href = `mailto:?subject=${subject}&body=${body}`;
-    setShareSuccess(true);
-    setTimeout(() => setShowShareModal(false), 1000);
-  };
-
-  const copyToClipboard = () => {
-    if (!selectedJob) return;
-    const fullUrl = `${window.location.origin}/careers/${selectedJob._id}`;
-    navigator.clipboard.writeText(fullUrl);
-    setShareSuccess(true);
-    setTimeout(() => setShowShareModal(false), 1500);
   };
 
   const renderPagination = () => {
@@ -362,22 +230,13 @@ const ApplicationsList = () => {
           </select>
         </td>
         <td className='px-6 py-4 whitespace-nowrap text-right text-sm font-medium'>
-          <div className='flex items-center justify-end space-x-3'>
-            <button
-              onClick={() => openShareModal(application.job)}
-              className='text-blue-600 hover:text-blue-900 inline-flex items-center'
-              title='Share this job'
-            >
-              <Share2 className='h-4 w-4' />
-            </button>
-            <Link
-              to={`/admin/careers/applications/${application._id}`}
-              className='text-green-600 hover:text-green-900 inline-flex items-center'
-              title='View details'
-            >
-              <Eye className='h-4 w-4' />
-            </Link>
-          </div>
+          <Link
+            to={`/admin/careers/applications/${application._id}`}
+            className='text-green-600 hover:text-green-900 inline-flex items-center'
+          >
+            <Eye className='h-4 w-4 mr-1' />
+            View Details
+          </Link>
         </td>
       </tr>
     );
@@ -385,137 +244,6 @@ const ApplicationsList = () => {
 
   return (
     <div className='p-6'>
-      {/* Share Modal */}
-      {showShareModal && selectedJob && (
-        <div className='fixed inset-0 z-50 overflow-y-auto'>
-          <div className='flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0'>
-            {/* Background overlay */}
-            <div
-              className='fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75'
-              onClick={() => setShowShareModal(false)}
-            ></div>
-
-            {/* Modal panel */}
-            <div className='inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full'>
-              {shareSuccess ? (
-                <div className='p-8 text-center'>
-                  <div className='mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4'>
-                    <Check className='h-6 w-6 text-green-600' />
-                  </div>
-                  <h3 className='text-lg font-medium text-gray-900 mb-2'>
-                    Shared Successfully!
-                  </h3>
-                  <p className='text-sm text-gray-500'>
-                    The job posting has been shared.
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <div className='px-6 py-4 border-b border-gray-200'>
-                    <div className='flex items-center justify-between'>
-                      <h3 className='text-lg font-medium text-gray-900'>
-                        Share Job: {selectedJob.title}
-                      </h3>
-                      <button
-                        onClick={() => setShowShareModal(false)}
-                        className='text-gray-400 hover:text-gray-500'
-                      >
-                        <X className='h-5 w-5' />
-                      </button>
-                    </div>
-                    <p className='mt-1 text-sm text-gray-500'>
-                      {selectedJob.company} • {selectedJob.location?.city},{' '}
-                      {selectedJob.location?.country}
-                    </p>
-                  </div>
-
-                  <div className='p-6'>
-                    <div className='grid grid-cols-3 gap-3 mb-6'>
-                      <button
-                        onClick={shareOnFacebook}
-                        className='flex flex-col items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors group'
-                      >
-                        <Facebook className='h-6 w-6 text-blue-600 mb-2' />
-                        <span className='text-xs text-gray-600'>Facebook</span>
-                      </button>
-                      <button
-                        onClick={shareOnTwitter}
-                        className='flex flex-col items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors group'
-                      >
-                        <Twitter className='h-6 w-6 text-blue-400 mb-2' />
-                        <span className='text-xs text-gray-600'>Twitter</span>
-                      </button>
-                      <button
-                        onClick={shareOnLinkedIn}
-                        className='flex flex-col items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors group'
-                      >
-                        <Linkedin className='h-6 w-6 text-blue-700 mb-2' />
-                        <span className='text-xs text-gray-600'>LinkedIn</span>
-                      </button>
-                      <button
-                        onClick={shareOnWhatsApp}
-                        className='flex flex-col items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors group'
-                      >
-                        <MessageCircle className='h-6 w-6 text-green-500 mb-2' />
-                        <span className='text-xs text-gray-600'>WhatsApp</span>
-                      </button>
-                      <button
-                        onClick={shareOnTelegram}
-                        className='flex flex-col items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors group'
-                      >
-                        <Send className='h-6 w-6 text-blue-500 mb-2' />
-                        <span className='text-xs text-gray-600'>Telegram</span>
-                      </button>
-                      <button
-                        onClick={shareOnInstagram}
-                        className='flex flex-col items-center p-4 bg-pink-50 rounded-lg hover:bg-pink-100 transition-colors group'
-                      >
-                        <Instagram className='h-6 w-6 text-pink-600 mb-2' />
-                        <span className='text-xs text-gray-600'>Instagram</span>
-                      </button>
-                      <button
-                        onClick={shareViaEmail}
-                        className='flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors group'
-                      >
-                        <Mail className='h-6 w-6 text-gray-600 mb-2' />
-                        <span className='text-xs text-gray-600'>Email</span>
-                      </button>
-                      <button
-                        onClick={copyToClipboard}
-                        className='flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors group col-span-2'
-                      >
-                        <LinkIcon className='h-6 w-6 text-gray-600 mb-2' />
-                        <span className='text-xs text-gray-600'>Copy Link</span>
-                      </button>
-                    </div>
-
-                    {/* Job Preview */}
-                    <div className='border-t pt-4'>
-                      <h4 className='text-sm font-medium text-gray-700 mb-2'>
-                        Share Preview
-                      </h4>
-                      <div className='bg-gray-50 p-3 rounded-md'>
-                        <p className='text-sm text-gray-800 mb-1'>
-                          <span className='font-semibold'>
-                            {selectedJob.title}
-                          </span>{' '}
-                          at {selectedJob.company}
-                        </p>
-                        <p className='text-xs text-gray-500'>
-                          {selectedJob.location?.city},{' '}
-                          {selectedJob.location?.country} •{' '}
-                          {selectedJob.employment_type}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
       <div className='flex flex-col md:flex-row md:items-center md:justify-between mb-6'>
         <div>
           <h1 className='text-2xl font-bold text-gray-800 mb-2'>
