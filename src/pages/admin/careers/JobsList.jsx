@@ -133,7 +133,7 @@ const JobsList = () => {
 
   const getShareUrl = (job) => {
     return encodeURIComponent(
-      `${window.location.origin}/careers/jobs/${job?._id}`,
+      `${window.location.origin}/career/jobs/${job?._id}`,
     );
   };
 
