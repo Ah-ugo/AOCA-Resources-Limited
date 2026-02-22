@@ -18,6 +18,8 @@ import {
   FiLinkedin,
   FiCopy,
   FiMail,
+  FiGrid,
+  FiList,
 } from 'react-icons/fi';
 import {
   FaWhatsapp,
@@ -26,7 +28,6 @@ import {
   FaTimes,
   FaCheckCircle,
 } from 'react-icons/fa';
-import AdminLayout from '../../../components/admin/AdminLayout';
 import { adminService } from '../../../services/admin-service';
 import { formatDate } from '../../../utils/formatters';
 
@@ -41,6 +42,8 @@ const JobsList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalJobs, setTotalJobs] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [viewMode, setViewMode] = useState('table'); // 'table' or 'grid'
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Share modal state
   const [showShareModal, setShowShareModal] = useState(false);
@@ -89,6 +92,7 @@ const JobsList = () => {
     e.preventDefault();
     setCurrentPage(1);
     fetchJobs();
+    setMobileMenuOpen(false);
   };
 
   const handleDelete = async (jobId) => {
@@ -214,20 +218,23 @@ const JobsList = () => {
     closeShareModal();
   };
 
+  // Mobile filter toggle
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
   return (
-    <div className='container mx-auto px-4 py-6'>
+    <div className='min-h-screen bg-gray-50'>
       {/* Share Modal */}
       {showShareModal && selectedJob && (
         <div className='fixed inset-0 z-50 overflow-y-auto'>
           <div className='flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0'>
-            {/* Background overlay */}
             <div
               className='fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75'
               onClick={closeShareModal}
             ></div>
 
-            {/* Modal panel */}
-            <div className='inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full'>
+            <div className='inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full w-full max-w-md mx-4'>
               <div className='px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4'>
                 <div className='sm:flex sm:items-start'>
                   <div className='flex items-center justify-center flex-shrink-0 w-12 h-12 mx-auto bg-green-100 rounded-full sm:mx-0 sm:h-10 sm:w-10'>
@@ -235,10 +242,10 @@ const JobsList = () => {
                   </div>
                   <div className='mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left'>
                     <h3 className='text-lg font-medium leading-6 text-gray-900'>
-                      Share Job: {selectedJob.title}
+                      Share Job
                     </h3>
-                    <p className='mt-2 text-sm text-gray-500'>
-                      Share this job opportunity with your network
+                    <p className='mt-2 text-sm text-gray-500 break-words'>
+                      {selectedJob.title} at {selectedJob.company}
                     </p>
 
                     {shareSuccess ? (
@@ -250,123 +257,104 @@ const JobsList = () => {
                       </div>
                     ) : (
                       <>
-                        {/* Share buttons grid */}
-                        <div className='mt-6 grid grid-cols-3 gap-3'>
+                        <div className='mt-6 grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-3'>
                           <button
                             onClick={() => shareOnFacebook(selectedJob)}
-                            className='flex flex-col items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors'
+                            className='flex flex-col items-center p-2 sm:p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors'
                           >
-                            <FiFacebook className='text-blue-600 text-2xl mb-2' />
-                            <span className='text-xs text-gray-600'>
-                              Facebook
+                            <FiFacebook className='text-blue-600 text-xl sm:text-2xl mb-1 sm:mb-2' />
+                            <span className='text-xs text-gray-600 truncate w-full text-center'>
+                              FB
                             </span>
                           </button>
 
                           <button
                             onClick={() => shareOnTwitter(selectedJob)}
-                            className='flex flex-col items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors'
+                            className='flex flex-col items-center p-2 sm:p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors'
                           >
-                            <FiTwitter className='text-blue-400 text-2xl mb-2' />
-                            <span className='text-xs text-gray-600'>
-                              Twitter
+                            <FiTwitter className='text-blue-400 text-xl sm:text-2xl mb-1 sm:mb-2' />
+                            <span className='text-xs text-gray-600 truncate w-full text-center'>
+                              X
                             </span>
                           </button>
 
                           <button
                             onClick={() => shareOnLinkedIn(selectedJob)}
-                            className='flex flex-col items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors'
+                            className='flex flex-col items-center p-2 sm:p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors'
                           >
-                            <FiLinkedin className='text-blue-700 text-2xl mb-2' />
-                            <span className='text-xs text-gray-600'>
-                              LinkedIn
+                            <FiLinkedin className='text-blue-700 text-xl sm:text-2xl mb-1 sm:mb-2' />
+                            <span className='text-xs text-gray-600 truncate w-full text-center'>
+                              IN
                             </span>
                           </button>
 
                           <button
                             onClick={() => shareOnWhatsApp(selectedJob)}
-                            className='flex flex-col items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors'
+                            className='flex flex-col items-center p-2 sm:p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors'
                           >
-                            <FaWhatsapp className='text-green-500 text-2xl mb-2' />
-                            <span className='text-xs text-gray-600'>
-                              WhatsApp
+                            <FaWhatsapp className='text-green-500 text-xl sm:text-2xl mb-1 sm:mb-2' />
+                            <span className='text-xs text-gray-600 truncate w-full text-center'>
+                              WA
                             </span>
                           </button>
 
                           <button
                             onClick={() => shareOnTelegram(selectedJob)}
-                            className='flex flex-col items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors'
+                            className='flex flex-col items-center p-2 sm:p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors'
                           >
-                            <FaTelegram className='text-blue-500 text-2xl mb-2' />
-                            <span className='text-xs text-gray-600'>
-                              Telegram
+                            <FaTelegram className='text-blue-500 text-xl sm:text-2xl mb-1 sm:mb-2' />
+                            <span className='text-xs text-gray-600 truncate w-full text-center'>
+                              TG
                             </span>
                           </button>
 
                           <button
                             onClick={() => shareOnInstagram(selectedJob)}
-                            className='flex flex-col items-center p-4 bg-pink-50 rounded-lg hover:bg-pink-100 transition-colors'
+                            className='flex flex-col items-center p-2 sm:p-4 bg-pink-50 rounded-lg hover:bg-pink-100 transition-colors'
                           >
-                            <FaInstagram className='text-pink-600 text-2xl mb-2' />
-                            <span className='text-xs text-gray-600'>
-                              Instagram
+                            <FaInstagram className='text-pink-600 text-xl sm:text-2xl mb-1 sm:mb-2' />
+                            <span className='text-xs text-gray-600 truncate w-full text-center'>
+                              IG
                             </span>
                           </button>
 
                           <button
                             onClick={() => copyToClipboard(selectedJob)}
-                            className='flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors'
+                            className='flex flex-col items-center p-2 sm:p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors'
                           >
-                            <FiCopy className='text-gray-600 text-2xl mb-2' />
-                            <span className='text-xs text-gray-600'>
-                              Copy Link
+                            <FiCopy className='text-gray-600 text-xl sm:text-2xl mb-1 sm:mb-2' />
+                            <span className='text-xs text-gray-600 truncate w-full text-center'>
+                              Copy
                             </span>
                           </button>
 
                           <button
                             onClick={() => shareViaEmail(selectedJob)}
-                            className='flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors'
+                            className='flex flex-col items-center p-2 sm:p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors'
                           >
-                            <FiMail className='text-gray-600 text-2xl mb-2' />
-                            <span className='text-xs text-gray-600'>Email</span>
-                          </button>
-
-                          <button
-                            onClick={() =>
-                              window.open(
-                                `/careers/jobs/${selectedJob._id}`,
-                                '_blank',
-                              )
-                            }
-                            className='flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors'
-                          >
-                            <FiEye className='text-gray-600 text-2xl mb-2' />
-                            <span className='text-xs text-gray-600'>
-                              Preview
+                            <FiMail className='text-gray-600 text-xl sm:text-2xl mb-1 sm:mb-2' />
+                            <span className='text-xs text-gray-600 truncate w-full text-center'>
+                              Email
                             </span>
                           </button>
                         </div>
 
-                        {/* Job summary */}
-                        <div className='mt-6 p-4 bg-gray-50 rounded-lg'>
-                          <h4 className='text-sm font-medium text-gray-700 mb-2'>
+                        <div className='mt-6 p-3 sm:p-4 bg-gray-50 rounded-lg'>
+                          <h4 className='text-xs sm:text-sm font-medium text-gray-700 mb-2'>
                             Job Summary
                           </h4>
-                          <p className='text-sm text-gray-600 mb-1'>
+                          <p className='text-xs sm:text-sm text-gray-600 mb-1 break-words'>
                             <span className='font-medium'>Title:</span>{' '}
                             {selectedJob.title}
                           </p>
-                          <p className='text-sm text-gray-600 mb-1'>
+                          <p className='text-xs sm:text-sm text-gray-600 mb-1 break-words'>
                             <span className='font-medium'>Company:</span>{' '}
                             {selectedJob.company}
                           </p>
-                          <p className='text-sm text-gray-600 mb-1'>
+                          <p className='text-xs sm:text-sm text-gray-600 break-words'>
                             <span className='font-medium'>Location:</span>{' '}
                             {selectedJob.location?.city},{' '}
                             {selectedJob.location?.country}
-                          </p>
-                          <p className='text-sm text-gray-600'>
-                            <span className='font-medium'>Type:</span>{' '}
-                            {selectedJob.employment_type}
                           </p>
                         </div>
                       </>
@@ -389,307 +377,472 @@ const JobsList = () => {
         </div>
       )}
 
-      <div className='flex justify-between items-center mb-6'>
-        <h1 className='text-3xl font-bold text-gray-800'>Job Listings</h1>
+      {/* Header */}
+      <div className='bg-white border-b sticky top-0 z-30'>
+        <div className='px-4 sm:px-6 lg:px-8 py-4'>
+          <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
+            <div>
+              <h1 className='text-2xl sm:text-3xl font-bold text-gray-800'>
+                Job Listings
+              </h1>
+              <p className='text-sm text-gray-600 mt-1'>
+                Manage all job postings
+              </p>
+            </div>
+
+            <div className='flex items-center gap-2'>
+              {/* View toggle - hidden on mobile */}
+              <div className='hidden sm:flex items-center bg-gray-100 rounded-lg p-1'>
+                <button
+                  onClick={() => setViewMode('table')}
+                  className={`p-2 rounded-md transition-colors ${
+                    viewMode === 'table'
+                      ? 'bg-white shadow text-green-600'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                  title='Table View'
+                >
+                  <FiList className='w-5 h-5' />
+                </button>
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`p-2 rounded-md transition-colors ${
+                    viewMode === 'grid'
+                      ? 'bg-white shadow text-green-600'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                  title='Grid View'
+                >
+                  <FiGrid className='w-5 h-5' />
+                </button>
+              </div>
+
+              <button
+                onClick={() => navigate('/admin/careers/jobs/new')}
+                className='bg-green-600 hover:bg-green-700 text-white px-3 sm:px-4 py-2 rounded-md flex items-center text-sm sm:text-base'
+              >
+                <FiPlus className='mr-2' />
+                <span className='hidden sm:inline'>Add New Job</span>
+                <span className='sm:hidden'>Add</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Filter Toggle */}
+      <div className='sm:hidden bg-white border-b px-4 py-2 sticky top-[73px] z-20'>
         <button
-          onClick={() => navigate('/admin/careers/jobs/new')}
-          className='bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center'
+          onClick={toggleMobileMenu}
+          className='w-full flex items-center justify-between bg-gray-50 px-4 py-2 rounded-lg'
         >
-          <FiPlus className='mr-2' />
-          Add New Job
+          <span className='flex items-center text-gray-700'>
+            <FiFilter className='mr-2' />
+            Filters & Search
+          </span>
+          <span
+            className={`transform transition-transform ${mobileMenuOpen ? 'rotate-180' : ''}`}
+          >
+            ▼
+          </span>
         </button>
       </div>
 
-      {/* Filters */}
-      <div className='bg-white rounded-lg shadow-md p-6 mb-6'>
-        <form
-          onSubmit={handleSearch}
-          className='flex flex-col md:flex-row gap-4'
-        >
-          <div className='flex-1'>
-            <div className='relative'>
-              <FiSearch className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' />
-              <input
-                type='text'
-                placeholder='Search jobs, companies, locations...'
-                className='w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500'
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+      {/* Filters - Desktop always visible, Mobile toggleable */}
+      <div
+        className={`px-4 sm:px-6 lg:px-8 py-4 ${mobileMenuOpen ? 'block' : 'hidden sm:block'}`}
+      >
+        <div className='bg-white rounded-lg shadow-md p-4 sm:p-6'>
+          <form onSubmit={handleSearch} className='space-y-4'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'>
+              <div className='lg:col-span-2'>
+                <div className='relative'>
+                  <FiSearch className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' />
+                  <input
+                    type='text'
+                    placeholder='Search jobs, companies, locations...'
+                    className='w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm'
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className='relative'>
+                <FiFilter className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10' />
+                <select
+                  className='w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 appearance-none bg-white text-sm'
+                  value={categoryFilter}
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                >
+                  <option value=''>All Categories</option>
+                  {categories.map((category) => (
+                    <option
+                      key={category._id || category.id}
+                      value={category.name}
+                    >
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className='relative'>
+                <FiFilter className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10' />
+                <select
+                  className='w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 appearance-none bg-white text-sm'
+                  value={publishedFilter}
+                  onChange={(e) => setPublishedFilter(e.target.value)}
+                >
+                  <option value=''>All Status</option>
+                  <option value='true'>Published</option>
+                  <option value='false'>Draft</option>
+                </select>
+              </div>
             </div>
-          </div>
-          <div className='w-full md:w-48'>
-            <div className='relative'>
-              <FiFilter className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' />
-              <select
-                className='w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 appearance-none'
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
+
+            <div className='flex justify-end'>
+              <button
+                type='submit'
+                className='bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md text-sm'
               >
-                <option value=''>All Categories</option>
-                {categories.map((category) => (
-                  <option
-                    key={category._id || category.id}
-                    value={category.name}
-                  >
-                    {category.name}
-                  </option>
-                ))}
-              </select>
+                Search
+              </button>
             </div>
-          </div>
-          <div className='w-full md:w-48'>
-            <div className='relative'>
-              <FiFilter className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' />
-              <select
-                className='w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 appearance-none'
-                value={publishedFilter}
-                onChange={(e) => setPublishedFilter(e.target.value)}
-              >
-                <option value=''>All Status</option>
-                <option value='true'>Published</option>
-                <option value='false'>Draft</option>
-              </select>
-            </div>
-          </div>
-          <button
-            type='submit'
-            className='bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md'
-          >
-            Search
-          </button>
-        </form>
+          </form>
+        </div>
       </div>
 
       {/* Error message */}
       {error && (
-        <div
-          className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6'
-          role='alert'
-        >
-          <strong className='font-bold'>Error!</strong>
-          <span className='block sm:inline'> {error}</span>
+        <div className='px-4 sm:px-6 lg:px-8 mt-4'>
+          <div
+            className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative'
+            role='alert'
+          >
+            <strong className='font-bold'>Error!</strong>
+            <span className='block sm:inline'> {error}</span>
+          </div>
         </div>
       )}
 
-      {/* Jobs table */}
-      <div className='bg-white rounded-lg shadow-md overflow-hidden'>
+      {/* Jobs display */}
+      <div className='px-4 sm:px-6 lg:px-8 py-4'>
         {loading ? (
           <div className='flex justify-center items-center h-64'>
             <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500'></div>
           </div>
         ) : jobs.length > 0 ? (
           <>
-            <div className='overflow-x-auto'>
-              <table className='min-w-full divide-y divide-gray-200'>
-                <thead className='bg-gray-50'>
-                  <tr>
-                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                      Job Title
-                    </th>
-                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                      Company
-                    </th>
-                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                      Category
-                    </th>
-                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                      Location
-                    </th>
-                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                      Status
-                    </th>
-                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                      Applications
-                    </th>
-                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className='bg-white divide-y divide-gray-200'>
-                  {jobs.map((job) => (
-                    <tr key={job._id} className='hover:bg-gray-50'>
-                      <td className='px-6 py-4 whitespace-nowrap'>
-                        <div className='text-sm font-medium text-gray-900'>
+            {/* Table View (Desktop default) */}
+            {viewMode === 'table' ? (
+              <div className='bg-white rounded-lg shadow-md overflow-hidden'>
+                <div className='overflow-x-auto'>
+                  <table className='min-w-full divide-y divide-gray-200'>
+                    <thead className='bg-gray-50'>
+                      <tr>
+                        <th className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                          Job Title
+                        </th>
+                        <th className='hidden sm:table-cell px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                          Company
+                        </th>
+                        <th className='hidden md:table-cell px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                          Category
+                        </th>
+                        <th className='hidden lg:table-cell px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                          Location
+                        </th>
+                        <th className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                          Status
+                        </th>
+                        <th className='hidden md:table-cell px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                          Apps
+                        </th>
+                        <th className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className='bg-white divide-y divide-gray-200'>
+                      {jobs.map((job) => (
+                        <tr key={job._id} className='hover:bg-gray-50'>
+                          <td className='px-4 sm:px-6 py-4'>
+                            <div className='text-sm font-medium text-gray-900'>
+                              {job.title}
+                            </div>
+                            <div className='text-xs text-gray-500 sm:hidden mt-1'>
+                              {job.company} • {job.location?.city}
+                            </div>
+                            <div className='text-xs text-gray-400'>
+                              {formatDate(job.created_at)}
+                            </div>
+                          </td>
+                          <td className='hidden sm:table-cell px-4 sm:px-6 py-4'>
+                            <div className='text-sm text-gray-900'>
+                              {job.company}
+                            </div>
+                          </td>
+                          <td className='hidden md:table-cell px-4 sm:px-6 py-4'>
+                            <div className='text-sm text-gray-900'>
+                              {job.category}
+                            </div>
+                          </td>
+                          <td className='hidden lg:table-cell px-4 sm:px-6 py-4'>
+                            <div className='text-sm text-gray-900'>
+                              {job.location?.city}, {job.location?.country}
+                              {job.location?.remote && (
+                                <span className='ml-1 text-green-600 text-xs'>
+                                  (Remote)
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className='px-4 sm:px-6 py-4'>
+                            <div className='flex flex-col gap-1'>
+                              <span
+                                className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full w-fit ${
+                                  job.is_published
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-gray-100 text-gray-800'
+                                }`}
+                              >
+                                {job.is_published ? 'Published' : 'Draft'}
+                              </span>
+                              {job.is_featured && (
+                                <span className='px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 w-fit'>
+                                  Featured
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className='hidden md:table-cell px-4 sm:px-6 py-4'>
+                            <div className='flex items-center'>
+                              <FiUsers className='mr-1 h-4 w-4 text-gray-500' />
+                              <span className='text-sm text-gray-900'>
+                                {job.applications_count || 0}
+                              </span>
+                            </div>
+                          </td>
+                          <td className='px-4 sm:px-6 py-4'>
+                            <div className='flex flex-wrap items-center gap-2'>
+                              <button
+                                onClick={() =>
+                                  navigate(`/careers/jobs/${job._id}`)
+                                }
+                                className='text-green-600 hover:text-green-900 p-1'
+                                title='View Job'
+                              >
+                                <FiEye className='h-4 w-4 sm:h-5 sm:w-5' />
+                              </button>
+                              <button
+                                onClick={() =>
+                                  navigate(
+                                    `/admin/careers/jobs/${job._id}/edit`,
+                                  )
+                                }
+                                className='text-blue-600 hover:text-blue-900 p-1'
+                                title='Edit Job'
+                              >
+                                <FiEdit className='h-4 w-4 sm:h-5 sm:w-5' />
+                              </button>
+                              <button
+                                onClick={() => openShareModal(job)}
+                                className='text-purple-600 hover:text-purple-900 p-1'
+                                title='Share Job'
+                              >
+                                <FiShare2 className='h-4 w-4 sm:h-5 sm:w-5' />
+                              </button>
+                              <button
+                                onClick={() =>
+                                  navigate(
+                                    `/admin/careers/applications?job_id=${job._id}`,
+                                  )
+                                }
+                                className='text-indigo-600 hover:text-indigo-900 p-1'
+                                title='View Applications'
+                              >
+                                <FiUsers className='h-4 w-4 sm:h-5 sm:w-5' />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(job._id)}
+                                className='text-red-600 hover:text-red-900 p-1'
+                                title='Delete Job'
+                              >
+                                <FiTrash2 className='h-4 w-4 sm:h-5 sm:w-5' />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ) : (
+              /* Grid View (Alternative) */
+              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6'>
+                {jobs.map((job) => (
+                  <div
+                    key={job._id}
+                    className='bg-white rounded-lg shadow-md p-4 sm:p-6 hover:shadow-lg transition-shadow'
+                  >
+                    <div className='flex justify-between items-start mb-3'>
+                      <div>
+                        <h3 className='text-lg font-semibold text-gray-900'>
                           {job.title}
-                        </div>
-                        <div className='text-sm text-gray-500'>
-                          {formatDate(job.created_at)}
-                        </div>
-                      </td>
-                      <td className='px-6 py-4 whitespace-nowrap'>
-                        <div className='text-sm text-gray-900'>
-                          {job.company}
-                        </div>
-                      </td>
-                      <td className='px-6 py-4 whitespace-nowrap'>
-                        <div className='text-sm text-gray-900'>
-                          {job.category}
-                        </div>
-                      </td>
-                      <td className='px-6 py-4 whitespace-nowrap'>
-                        <div className='text-sm text-gray-900'>
-                          {job.location?.city}, {job.location?.country}
-                          {job.location?.remote && (
-                            <span className='ml-1 text-green-600'>
-                              (Remote)
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className='px-6 py-4 whitespace-nowrap'>
-                        <span
-                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            job.is_published
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800'
+                        </h3>
+                        <p className='text-sm text-gray-600'>{job.company}</p>
+                      </div>
+                      <span
+                        className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                          job.is_published
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
+                        {job.is_published ? 'Published' : 'Draft'}
+                      </span>
+                    </div>
+
+                    <div className='space-y-2 mb-4'>
+                      <p className='text-sm text-gray-500'>
+                        📍 {job.location?.city}, {job.location?.country}
+                        {job.location?.remote && ' (Remote)'}
+                      </p>
+                      <p className='text-sm text-gray-500'>
+                        📂 {job.category} • {job.employment_type}
+                      </p>
+                      <p className='text-sm text-gray-500'>
+                        📅 Posted {formatDate(job.created_at)}
+                      </p>
+                      <p className='text-sm text-gray-500 flex items-center'>
+                        <FiUsers className='mr-1' />{' '}
+                        {job.applications_count || 0} applications
+                      </p>
+                    </div>
+
+                    {job.is_featured && (
+                      <span className='inline-block mb-3 px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800'>
+                        Featured
+                      </span>
+                    )}
+
+                    <div className='flex flex-wrap items-center gap-2 pt-3 border-t'>
+                      <button
+                        onClick={() => navigate(`/careers/jobs/${job._id}`)}
+                        className='flex-1 min-w-[40px] p-2 text-green-600 hover:bg-green-50 rounded-md transition-colors'
+                        title='View'
+                      >
+                        <FiEye className='h-4 w-4 mx-auto' />
+                      </button>
+                      <button
+                        onClick={() =>
+                          navigate(`/admin/careers/jobs/${job._id}/edit`)
+                        }
+                        className='flex-1 min-w-[40px] p-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors'
+                        title='Edit'
+                      >
+                        <FiEdit className='h-4 w-4 mx-auto' />
+                      </button>
+                      <button
+                        onClick={() => openShareModal(job)}
+                        className='flex-1 min-w-[40px] p-2 text-purple-600 hover:bg-purple-50 rounded-md transition-colors'
+                        title='Share'
+                      >
+                        <FiShare2 className='h-4 w-4 mx-auto' />
+                      </button>
+                      <button
+                        onClick={() =>
+                          navigate(
+                            `/admin/careers/applications?job_id=${job._id}`,
+                          )
+                        }
+                        className='flex-1 min-w-[40px] p-2 text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors'
+                        title='Applications'
+                      >
+                        <FiUsers className='h-4 w-4 mx-auto' />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(job._id)}
+                        className='flex-1 min-w-[40px] p-2 text-red-600 hover:bg-red-50 rounded-md transition-colors'
+                        title='Delete'
+                      >
+                        <FiTrash2 className='h-4 w-4 mx-auto' />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Pagination - Responsive */}
+            <div className='mt-6 bg-white px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-4 rounded-lg shadow'>
+              <div className='text-sm text-gray-700 order-2 sm:order-1'>
+                Page <span className='font-medium'>{currentPage}</span> of{' '}
+                <span className='font-medium'>{totalPages}</span> ({totalJobs}{' '}
+                total jobs)
+              </div>
+              <div className='flex items-center gap-2 order-1 sm:order-2'>
+                <button
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className={`px-3 py-1 rounded-md border text-sm ${
+                    currentPage === 1
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : 'bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  Previous
+                </button>
+                <div className='flex gap-1'>
+                  {[...Array(Math.min(3, totalPages)).keys()].map((i) => {
+                    const pageNumber =
+                      currentPage > 2 ? currentPage - 2 + i + 1 : i + 1;
+                    if (pageNumber <= totalPages && pageNumber > 0) {
+                      return (
+                        <button
+                          key={pageNumber}
+                          onClick={() => setCurrentPage(pageNumber)}
+                          className={`hidden sm:block px-3 py-1 rounded-md border text-sm ${
+                            currentPage === pageNumber
+                              ? 'bg-green-600 text-white border-green-600'
+                              : 'bg-white text-gray-700 hover:bg-gray-50'
                           }`}
                         >
-                          {job.is_published ? 'Published' : 'Draft'}
-                        </span>
-                        {job.is_featured && (
-                          <span className='ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800'>
-                            Featured
-                          </span>
-                        )}
-                      </td>
-                      <td className='px-6 py-4 whitespace-nowrap'>
-                        <div className='flex items-center'>
-                          <FiUsers className='mr-1 h-4 w-4 text-gray-500' />
-                          <span className='text-sm text-gray-900'>
-                            {job.applications_count || 0}
-                          </span>
-                        </div>
-                      </td>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm font-medium'>
-                        <div className='flex items-center space-x-2'>
-                          <button
-                            onClick={() => navigate(`/careers/jobs/${job._id}`)}
-                            className='text-green-600 hover:text-green-900'
-                            title='View Job'
-                          >
-                            <FiEye className='h-5 w-5' />
-                          </button>
-                          <button
-                            onClick={() =>
-                              navigate(`/admin/careers/jobs/${job._id}/edit`)
-                            }
-                            className='text-blue-600 hover:text-blue-900'
-                            title='Edit Job'
-                          >
-                            <FiEdit className='h-5 w-5' />
-                          </button>
-                          <button
-                            onClick={() => openShareModal(job)}
-                            className='text-purple-600 hover:text-purple-900'
-                            title='Share Job'
-                          >
-                            <FiShare2 className='h-5 w-5' />
-                          </button>
-                          <button
-                            onClick={() =>
-                              navigate(
-                                `/admin/careers/applications?job_id=${job._id}`,
-                              )
-                            }
-                            className='text-indigo-600 hover:text-indigo-900'
-                            title='View Applications'
-                          >
-                            <FiUsers className='h-5 w-5' />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(job._id)}
-                            className='text-red-600 hover:text-red-900'
-                            title='Delete Job'
-                          >
-                            <FiTrash2 className='h-5 w-5' />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Pagination */}
-            <div className='bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6'>
-              <div className='hidden sm:flex-1 sm:flex sm:items-center sm:justify-between'>
-                <div>
-                  <p className='text-sm text-gray-700'>
-                    Showing page{' '}
-                    <span className='font-medium'>{currentPage}</span> of{' '}
-                    <span className='font-medium'>{totalPages}</span> pages ({' '}
-                    <span className='font-medium'>{totalJobs}</span> total jobs)
-                  </p>
+                          {pageNumber}
+                        </button>
+                      );
+                    }
+                    return null;
+                  })}
                 </div>
-                <div>
-                  <nav
-                    className='relative z-0 inline-flex rounded-md shadow-sm -space-x-px'
-                    aria-label='Pagination'
-                  >
-                    <button
-                      onClick={() =>
-                        setCurrentPage(Math.max(1, currentPage - 1))
-                      }
-                      disabled={currentPage === 1}
-                      className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
-                        currentPage === 1
-                          ? 'text-gray-300 cursor-not-allowed'
-                          : 'text-gray-500 hover:bg-gray-50'
-                      }`}
-                    >
-                      Previous
-                    </button>
-                    {[...Array(Math.min(5, totalPages)).keys()].map((i) => {
-                      const pageNumber =
-                        currentPage > 3 ? currentPage - 3 + i + 1 : i + 1;
-                      if (pageNumber <= totalPages) {
-                        return (
-                          <button
-                            key={pageNumber}
-                            onClick={() => setCurrentPage(pageNumber)}
-                            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                              currentPage === pageNumber
-                                ? 'z-10 bg-green-50 border-green-500 text-green-600'
-                                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                            }`}
-                          >
-                            {pageNumber}
-                          </button>
-                        );
-                      }
-                      return null;
-                    })}
-                    <button
-                      onClick={() =>
-                        setCurrentPage(Math.min(totalPages, currentPage + 1))
-                      }
-                      disabled={currentPage === totalPages}
-                      className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
-                        currentPage === totalPages
-                          ? 'text-gray-300 cursor-not-allowed'
-                          : 'text-gray-500 hover:bg-gray-50'
-                      }`}
-                    >
-                      Next
-                    </button>
-                  </nav>
-                </div>
+                <button
+                  onClick={() =>
+                    setCurrentPage(Math.min(totalPages, currentPage + 1))
+                  }
+                  disabled={currentPage === totalPages}
+                  className={`px-3 py-1 rounded-md border text-sm ${
+                    currentPage === totalPages
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : 'bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  Next
+                </button>
               </div>
             </div>
           </>
         ) : (
-          <div className='flex flex-col items-center justify-center h-64'>
-            <FiSearch className='h-12 w-12 text-gray-400 mb-4' />
+          <div className='bg-white rounded-lg shadow-md p-8 sm:p-12 text-center'>
+            <FiSearch className='h-12 w-12 text-gray-400 mx-auto mb-4' />
             <p className='text-gray-500 text-lg'>No jobs found</p>
-            <p className='text-gray-400'>
+            <p className='text-gray-400 text-sm mt-2'>
               Try adjusting your search or filter criteria
             </p>
             <button
               onClick={() => navigate('/admin/careers/jobs/new')}
-              className='mt-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center'
+              className='mt-6 bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md flex items-center mx-auto'
             >
               <FiPlus className='mr-2' />
               Add New Job
