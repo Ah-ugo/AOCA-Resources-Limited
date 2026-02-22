@@ -182,7 +182,7 @@ const JobsList = () => {
 
   const shareOnInstagram = (job) => {
     navigator.clipboard.writeText(
-      `${window.location.origin}/careers/jobs/${job?._id}`,
+      `${window.location.origin}/career/jobs/${job?._id}`,
     );
     setShareSuccess(true);
     setTimeout(() => {
@@ -193,7 +193,7 @@ const JobsList = () => {
 
   const copyToClipboard = (job) => {
     navigator.clipboard.writeText(
-      `${window.location.origin}/careers/jobs/${job?._id}`,
+      `${window.location.origin}/career/jobs/${job?._id}`,
     );
     setShareSuccess(true);
     setTimeout(() => {
@@ -212,7 +212,7 @@ const JobsList = () => {
         `Company: ${job?.company}\n` +
         `Location: ${job?.location?.city}, ${job?.location?.country}\n` +
         `Type: ${job?.employment_type}\n\n` +
-        `View details: ${window.location.origin}/careers/jobs/${job?._id}`,
+        `View details: ${window.location.origin}/career/jobs/${job?._id}`,
     );
     window.location.href = `mailto:?subject=${subject}&body=${body}`;
     closeShareModal();
