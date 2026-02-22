@@ -30,6 +30,12 @@ import {
   FaPhone,
   FaSpinner,
   FaTimes,
+  FaFacebook,
+  FaTwitter,
+  FaInstagram,
+  FaWhatsapp,
+  FaTelegram,
+  FaLink,
 } from 'react-icons/fa';
 
 const CareerDetail = () => {
@@ -42,6 +48,7 @@ const CareerDetail = () => {
   const [resumeFile, setResumeFile] = useState(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [applicationSuccess, setApplicationSuccess] = useState(false);
+  const [showShareMenu, setShowShareMenu] = useState(false);
 
   // Alert states
   const [showAlert, setShowAlert] = useState(false);
@@ -258,6 +265,70 @@ const CareerDetail = () => {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
+  // Social Media Share Functions
+  const getShareText = () => {
+    return encodeURIComponent(
+      `Check out this ${job?.title} position at ${job?.company}!`,
+    );
+  };
+
+  const getShareUrl = () => {
+    return encodeURIComponent(window.location.href);
+  };
+
+  const shareOnFacebook = () => {
+    window.open(
+      `https://www.facebook.com/sharer/sharer.php?u=${getShareUrl()}`,
+      '_blank',
+      'width=600,height=400',
+    );
+  };
+
+  const shareOnTwitter = () => {
+    window.open(
+      `https://twitter.com/intent/tweet?text=${getShareText()}&url=${getShareUrl()}`,
+      '_blank',
+      'width=600,height=400',
+    );
+  };
+
+  const shareOnLinkedIn = () => {
+    window.open(
+      `https://www.linkedin.com/sharing/share-offsite/?url=${getShareUrl()}`,
+      '_blank',
+      'width=600,height=400',
+    );
+  };
+
+  const shareOnWhatsApp = () => {
+    window.open(
+      `https://wa.me/?text=${getShareText()}%20${getShareUrl()}`,
+      '_blank',
+    );
+  };
+
+  const shareOnTelegram = () => {
+    window.open(
+      `https://t.me/share/url?url=${getShareUrl()}&text=${getShareText()}`,
+      '_blank',
+    );
+  };
+
+  const shareOnInstagram = () => {
+    // Instagram doesn't have a direct share URL, so we copy to clipboard
+    navigator.clipboard.writeText(window.location.href);
+    showAlertMessage(
+      'Link copied! You can now share it on Instagram.',
+      'success',
+    );
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(window.location.href);
+    showAlertMessage('Job link copied to clipboard!', 'success');
+    setShowShareMenu(false);
+  };
+
   if (loading) {
     return (
       <div className='container mx-auto px-4 py-12'>
@@ -446,24 +517,94 @@ const CareerDetail = () => {
               </div>
             </div>
 
-            {/* Quick Apply Button */}
+            {/* Quick Apply and Share Buttons */}
             <div className='mt-6 flex flex-col sm:flex-row gap-4'>
               <a
                 href='#apply-section'
-                className='bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-md transition duration-300 text-center'
+                className='bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-md transition duration-300 text-center flex-1'
               >
                 Apply Now
               </a>
-              <button
-                className='bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-md transition duration-300 text-center flex items-center justify-center'
-                onClick={() => {
-                  navigator.clipboard.writeText(window.location.href);
-                  showAlertMessage('Job link copied to clipboard!', 'success');
-                }}
-              >
-                <FaShareAlt className='mr-2' />
-                Share Job
-              </button>
+              <div className='relative flex-1'>
+                <button
+                  onClick={() => setShowShareMenu(!showShareMenu)}
+                  className='w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-md transition duration-300 text-center flex items-center justify-center'
+                >
+                  <FaShareAlt className='mr-2' />
+                  Share Job
+                </button>
+
+                {/* Share Menu Dropdown */}
+                {showShareMenu && (
+                  <>
+                    {/* Backdrop */}
+                    <div
+                      className='fixed inset-0 z-40'
+                      onClick={() => setShowShareMenu(false)}
+                    ></div>
+
+                    {/* Share Menu */}
+                    <div className='absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl z-50 border border-gray-200'>
+                      <div className='p-2'>
+                        <div className='text-sm font-medium text-gray-700 px-3 py-2 border-b'>
+                          Share via
+                        </div>
+                        <div className='grid grid-cols-2 gap-1 mt-2'>
+                          <button
+                            onClick={shareOnFacebook}
+                            className='flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 rounded-md transition-colors'
+                          >
+                            <FaFacebook className='mr-2 text-blue-600' />
+                            Facebook
+                          </button>
+                          <button
+                            onClick={shareOnTwitter}
+                            className='flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 rounded-md transition-colors'
+                          >
+                            <FaTwitter className='mr-2 text-blue-400' />
+                            Twitter
+                          </button>
+                          <button
+                            onClick={shareOnLinkedIn}
+                            className='flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 rounded-md transition-colors'
+                          >
+                            <FaLinkedin className='mr-2 text-blue-700' />
+                            LinkedIn
+                          </button>
+                          <button
+                            onClick={shareOnWhatsApp}
+                            className='flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-green-50 rounded-md transition-colors'
+                          >
+                            <FaWhatsapp className='mr-2 text-green-500' />
+                            WhatsApp
+                          </button>
+                          <button
+                            onClick={shareOnTelegram}
+                            className='flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 rounded-md transition-colors'
+                          >
+                            <FaTelegram className='mr-2 text-blue-500' />
+                            Telegram
+                          </button>
+                          <button
+                            onClick={shareOnInstagram}
+                            className='flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-pink-50 rounded-md transition-colors'
+                          >
+                            <FaInstagram className='mr-2 text-pink-600' />
+                            Instagram
+                          </button>
+                          <button
+                            onClick={copyToClipboard}
+                            className='flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors col-span-2'
+                          >
+                            <FaLink className='mr-2 text-gray-600' />
+                            Copy Link
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
 
@@ -926,33 +1067,43 @@ const CareerDetail = () => {
                 )}
               </div>
 
-              {/* Share Job */}
+              {/* Quick Share Card */}
               <div className='bg-white rounded-lg shadow-md p-6'>
                 <h3 className='text-lg font-semibold mb-4 text-gray-800'>
-                  Share This Job
+                  Quick Share
                 </h3>
-                <div className='flex space-x-2'>
+                <div className='grid grid-cols-4 gap-2'>
                   <button
-                    className='flex-1 flex justify-center items-center bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-md transition duration-300'
-                    onClick={() => {
-                      navigator.clipboard.writeText(window.location.href);
-                      showAlertMessage('Link copied to clipboard!', 'success');
-                    }}
+                    onClick={shareOnFacebook}
+                    className='flex flex-col items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors'
+                    title='Share on Facebook'
                   >
-                    <FaFileAlt className='mr-2' />
-                    Copy Link
+                    <FaFacebook className='text-blue-600 text-xl mb-1' />
+                    <span className='text-xs text-gray-600'>Facebook</span>
                   </button>
                   <button
-                    className='flex-1 flex justify-center items-center bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-md transition duration-300'
-                    onClick={() => {
-                      window.open(
-                        `mailto:?subject=Job Opportunity: ${job.title}&body=Check out this job opportunity: ${window.location.href}`,
-                        '_blank',
-                      );
-                    }}
+                    onClick={shareOnTwitter}
+                    className='flex flex-col items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors'
+                    title='Share on Twitter'
                   >
-                    <FaShareAlt className='mr-2' />
-                    Email
+                    <FaTwitter className='text-blue-400 text-xl mb-1' />
+                    <span className='text-xs text-gray-600'>Twitter</span>
+                  </button>
+                  <button
+                    onClick={shareOnLinkedIn}
+                    className='flex flex-col items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors'
+                    title='Share on LinkedIn'
+                  >
+                    <FaLinkedin className='text-blue-700 text-xl mb-1' />
+                    <span className='text-xs text-gray-600'>LinkedIn</span>
+                  </button>
+                  <button
+                    onClick={shareOnWhatsApp}
+                    className='flex flex-col items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors'
+                    title='Share on WhatsApp'
+                  >
+                    <FaWhatsapp className='text-green-500 text-xl mb-1' />
+                    <span className='text-xs text-gray-600'>WhatsApp</span>
                   </button>
                 </div>
               </div>
