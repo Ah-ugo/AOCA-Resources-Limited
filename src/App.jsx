@@ -3,10 +3,22 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useTransform,
+} from 'framer-motion';
 import {
   Calendar,
   ChevronRight,
+  ChevronLeft,
+  ArrowRight,
+  Instagram,
+  Twitter,
+  Facebook,
+  Linkedin,
+  Mail,
   Clock,
   FileText,
   Globe,
@@ -80,6 +92,8 @@ import ClassPreview from './pages/admin/lessons/ClassPreview';
 import ClassEdit from './pages/admin/lessons/ClassEdit';
 import AdminContactSubmissions from './pages/admin/contact-forms/ContactMain';
 import ApplicationDetails from './pages/admin/careers/ApplicationDetails';
+import PathwayDetail from './pages/PathwayDetail';
+import ServiceDetail from './pages/ServiceDetail';
 
 function App() {
   return (
@@ -99,6 +113,8 @@ function App() {
           />
           <Route path='/faq' element={<FAQ />} />
           <Route path='/about' element={<AboutUs />} />
+          <Route path='/pathways/:id' element={<PathwayDetail />} />
+          <Route path='/services/:id' element={<ServiceDetail />} />
           <Route path='/contact' element={<ContactUs />} />
           <Route path='/careers' element={<Careers />} />
           <Route path='/career/:id' element={<CareerDetail />} />
@@ -227,829 +243,902 @@ function AdminRoute({ children }) {
   return children;
 }
 
-function HomePage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { scrollYProgress } = useScroll();
-  const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
-  const scale = useTransform(scrollYProgress, [0, 0.2], [1, 0.9]);
-  const targetRef = useRef(null);
-  const pathwaysRef = useRef(null);
-  const coursesRef = useRef(null);
-  const servicesRef = useRef(null);
-  const navigate = useNavigate();
-  const [blogPosts, setPosts] = useState([]);
+// Mock components for missing pages
+const PlaceholderPage = ({ title }) => (
+  <div className='min-h-screen flex items-center justify-center pt-32'>
+    <h1 className='text-4xl font-serif font-bold'>{title}</h1>
+  </div>
+);
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-
-  const getBlogPostss = async () => {
-    const blogPosts = await getBlogPosts();
-    setPosts(blogPosts);
-  };
-
-  useEffect(() => {
-    getBlogPostss();
-  }, []);
-
-  const formatCreatedAt = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
-
-  const pathways = [
-    {
-      title: 'Nursing Work Contract',
-      description:
-        'Specialized pathway for nursing professionals to secure work contracts with German healthcare institutions.',
-      icon: <Globe className='h-10 w-10 text-primary' />,
-    },
-    {
-      title: 'Ausbildung Training',
-      description:
-        'Vocational training pathway that combines theoretical learning with practical work experience in Germany.',
-      icon: <GraduationCap className='h-10 w-10 text-primary' />,
-    },
-    {
-      title: 'Study Pathway',
-      description:
-        'Academic route for students looking to pursue higher education at German universities and colleges.',
-      icon: <FileText className='h-10 w-10 text-primary' />,
-    },
-    {
-      title: 'Opportunity/Job Seeker',
-      description:
-        'Pathway for qualified professionals seeking employment opportunities in the German job market.',
-      icon: <Laptop className='h-10 w-10 text-primary' />,
-    },
-  ];
-
-  const services = [
-    {
-      title: 'Professional Exam Prep',
-      description:
-        'Comprehensive preparation for IELTS, GMAT, SAT, GRE, GCSE, and TOEFL exams with experienced instructors.',
-      icon: <Award className='h-10 w-10 text-primary' />,
-      topics: ['IELTS', 'GMAT', 'SAT', 'GRE', 'GCSE', 'TOEFL'],
-    },
-    {
-      title: 'Computer Programming',
-      description:
-        'Learn programming from scratch with Python and other languages to build real-world applications.',
-      icon: <Code className='h-10 w-10 text-primary' />,
-      topics: ['Scratch', 'Python', 'Web Development'],
-    },
-    {
-      title: 'Data Analysis',
-      description:
-        'Master data analysis tools and techniques to extract insights and make data-driven decisions.',
-      icon: <BarChart className='h-10 w-10 text-primary' />,
-      topics: ['Excel', 'SQL', 'Python', 'Visualization'],
-    },
-    {
-      title: 'Cyber Security',
-      description:
-        'Gain essential skills in cyber security to protect systems and networks from digital threats.',
-      icon: <Shield className='h-10 w-10 text-primary' />,
-      topics: ['Network Security', 'Ethical Hacking', 'Risk Management'],
-    },
-    {
-      title: 'Project Management',
-      description:
-        'Learn professional project planning, scheduling, and management methodologies for successful delivery.',
-      icon: <Briefcase className='h-10 w-10 text-primary' />,
-      topics: ['Planning', 'Scheduling', 'Agile', 'Risk Management'],
-    },
-    {
-      title: 'German Language',
-      description:
-        'Professional German language training from beginner to advanced levels with certification prep.',
-      icon: <BookOpen className='h-10 w-10 text-primary' />,
-      topics: ['A1-A2', 'B1-B2', 'TestDaF', 'Goethe Exam'],
-    },
-  ];
-
-  const courses = [
-    {
-      name: 'Beginner Course',
-      level: 'A1',
-      flag: 'https://via.placeholder.com/60x40',
-    },
-    {
-      name: 'Intermediary Course',
-      level: 'A2',
-      flag: 'https://via.placeholder.com/60x40',
-    },
-    {
-      name: 'Advance Course',
-      level: 'B1',
-      flag: 'https://via.placeholder.com/60x40',
-    },
-    {
-      name: 'Upper Advance Course',
-      level: 'B2',
-      flag: 'https://via.placeholder.com/60x40',
-    },
-  ];
-
+function TestimonialsSection() {
   const testimonials = [
     {
       name: 'Chioma A.',
       role: 'Nursing Professional',
       text: "The German language course was excellent! I passed my B1 exam and secured a nursing position in Berlin through AOCA's work contract pathway.",
-      image: 'https://via.placeholder.com/80x80',
+      image:
+        'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=80&w=200',
     },
     {
       name: 'Emmanuel O.',
       role: 'IT Professional',
       text: 'Thanks to their job seeker pathway services, I secured a job with a top German tech company. The visa process was smooth and well-guided.',
-      image: 'https://via.placeholder.com/80x80',
+      image:
+        'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=200',
     },
     {
       name: 'Blessing M.',
       role: 'Data Analyst',
       text: "The Data Analysis course gave me practical skills that landed me a role at a leading analytics firm. AOCA's training is world-class!",
-      image: 'https://via.placeholder.com/80x80',
+      image:
+        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
     },
   ];
 
   return (
-    <div className='min-h-screen bg-background'>
-      <Header
-        pathwaysRef={pathwaysRef}
-        coursesRef={coursesRef}
-        servicesRef={servicesRef}
-      />
-
-      {/* Hero Section */}
-      <section className='pt-32 pb-20 md:pt-40 md:pb-32 relative overflow-hidden'>
-        <div className='absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/5 z-0' />
-        <motion.div
-          style={{ opacity, scale }}
-          className='container mx-auto px-4 relative z-10'
-          ref={targetRef}
-        >
-          <div className='grid md:grid-cols-2 gap-12 items-center'>
-            <div className='space-y-6'>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <h1 className='text-4xl md:text-5xl lg:text-6xl font-bold leading-tight'>
-                  Your Gateway to{' '}
-                  <span className='text-primary'>Global Success</span>
-                </h1>
-              </motion.div>
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className='text-xl text-muted-foreground'
-              >
-                Professional training in German language, exam preparation,
-                programming, data analysis, cyber security, and project
-                management. Plus visa consultancy and recruitment services to
-                help Nigerians achieve their international dreams.
-              </motion.p>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-                className='flex flex-col sm:flex-row gap-4'
-              >
-                <Link
-                  to='/register'
-                  className='bg-primary text-white px-6 py-3 rounded-md text-lg font-medium hover:bg-primary/90 transition-colors'
-                >
-                  Start Learning
-                </Link>
-                <Link
-                  to='/contact'
-                  className='border border-input bg-background px-6 py-3 rounded-md text-lg font-medium hover:bg-accent hover:text-accent-foreground transition-colors'
-                >
-                  Contact Us
-                </Link>
-              </motion.div>
-            </div>
+    <section className='py-32 bg-white'>
+      <div className='container mx-auto px-6'>
+        <div className='text-center max-w-3xl mx-auto mb-20'>
+          <span className='text-emerald-600 font-bold uppercase tracking-[0.3em] text-sm block mb-4'>
+            Success Stories
+          </span>
+          <h2 className='text-fluid-h2 font-serif font-bold text-luxury-black'>
+            Trusted by Professionals
+          </h2>
+        </div>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12'>
+          {testimonials.map((t, i) => (
             <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.7 }}
-              className='relative'
+              key={i}
+              whileHover={{ y: -10 }}
+              className='p-10 rounded-[2.5rem] bg-luxury-cream border border-gray-100 relative'
             >
-              <div className='relative h-[400px] w-full rounded-2xl overflow-hidden shadow-2xl'>
-                <img
-                  src='https://res.cloudinary.com/dejeplzpv/image/upload/v1744418391/m5tgp0rr8ihaqinxyoxd.jpg'
-                  alt='Global opportunities'
-                  className='w-full h-full object-cover'
-                />
+              <div className='text-6xl font-serif text-emerald-500/20 absolute top-6 left-6'>
+                "
               </div>
-              <div className='absolute -bottom-6 -left-6 bg-background p-4 rounded-lg shadow-lg'>
-                <div className='flex items-center gap-2'>
-                  <div className='bg-primary/20 p-2 rounded-full'>
-                    <GraduationCap className='h-6 w-6 text-primary' />
-                  </div>
-                  <div>
-                    <p className='font-medium'>Success Rate</p>
-                    <p className='text-2xl font-bold'>98%</p>
-                  </div>
+              <p className='text-lg text-gray-600 font-light leading-relaxed mb-8 relative z-10 italic'>
+                {t.text}
+              </p>
+              <div className='flex items-center gap-4'>
+                <img
+                  src={t.image}
+                  alt={t.name}
+                  className='w-14 h-14 rounded-full object-cover border-2 border-white shadow-md'
+                />
+                <div>
+                  <h4 className='font-serif font-bold text-luxury-black'>
+                    {t.name}
+                  </h4>
+                  <p className='text-xs uppercase tracking-widest text-emerald-600 font-bold'>
+                    {t.role}
+                  </p>
                 </div>
               </div>
             </motion.div>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Professional Services Section */}
-      <section id='services' className='py-20 bg-muted/50' ref={servicesRef}>
-        <div className='container mx-auto px-4'>
-          <div className='text-center mb-16'>
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className='text-3xl md:text-4xl font-bold mb-4'
-            >
-              Professional Training & Development
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className='text-xl text-muted-foreground max-w-2xl mx-auto'
-            >
-              Comprehensive training programs to enhance your skills and advance
-              your career
-            </motion.p>
-          </div>
-
-          <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8'>
-            {services.map((service, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <div className='bg-white rounded-lg shadow-md h-full hover:shadow-lg transition-shadow'>
-                  <div className='p-6 flex flex-col h-full'>
-                    <div className='mb-4'>{service.icon}</div>
-                    <h3 className='text-xl font-bold mb-2'>{service.title}</h3>
-                    <p className='text-muted-foreground mb-4 flex-grow'>
-                      {service.description}
-                    </p>
-                    <div className='mb-4'>
-                      <div className='flex flex-wrap gap-2'>
-                        {service.topics.map((topic, i) => (
-                          <span
-                            key={i}
-                            className='text-xs bg-primary/10 text-primary px-2 py-1 rounded-full'
-                          >
-                            {topic}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => navigate('/contact')}
-                      className='border border-input bg-background px-4 py-2 rounded-md w-full flex justify-between items-center group hover:bg-accent hover:text-accent-foreground transition-colors'
-                    >
-                      Learn More
-                      <ChevronRight className='h-4 w-4 group-hover:translate-x-1 transition-transform' />
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          ))}
         </div>
-      </section>
+      </div>
+    </section>
+  );
+}
 
-      {/* Germany Travel Pathways Section */}
-      <section id='pathways' className='py-20' ref={pathwaysRef}>
-        <div className='container mx-auto px-4'>
-          <div className='text-center mb-16'>
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className='text-3xl md:text-4xl font-bold mb-4'
-            >
-              Germany Travel Pathways
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className='text-xl text-muted-foreground max-w-2xl mx-auto'
-            >
-              Comprehensive solutions to help you achieve your German
-              immigration goals
-            </motion.p>
-          </div>
+function WhyGermanySection() {
+  const reasonsRow1 = [
+    {
+      title: 'Free Education',
+      desc: 'Public universities in Germany offer tuition-free education for international students.',
+    },
+    {
+      title: 'Strong Economy',
+      desc: "Europe's largest economy with a high demand for skilled professionals.",
+    },
+    {
+      title: 'Work-Life Balance',
+      desc: 'Germany is famous for its high quality of life and generous vacation time.',
+    },
+    {
+      title: 'Career Growth',
+      desc: 'Access to global companies and a thriving startup ecosystem.',
+    },
+  ];
 
-          <div className='grid md:grid-cols-2 lg:grid-cols-4 gap-8'>
-            {pathways.map((pathway, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <div className='bg-white rounded-lg shadow-md h-full hover:shadow-lg transition-shadow'>
-                  <div className='p-6 flex flex-col h-full'>
-                    <div className='mb-4'>{pathway.icon}</div>
-                    <h3 className='text-xl font-bold mb-2'>{pathway.title}</h3>
-                    <p className='text-muted-foreground mb-6 flex-grow'>
-                      {pathway.description}
-                    </p>
-                    <button
-                      onClick={() => navigate('/faq')}
-                      className='border border-input bg-background px-4 py-2 rounded-md w-full flex justify-between items-center group hover:bg-accent hover:text-accent-foreground transition-colors'
-                    >
-                      Learn More
-                      <ChevronRight className='h-4 w-4 group-hover:translate-x-1 transition-transform' />
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+  const reasonsRow2 = [
+    {
+      title: 'Innovation Hub',
+      desc: 'A global leader in automotive, engineering, and digital transformation.',
+    },
+    {
+      title: 'Cultural Richness',
+      desc: 'Experience a vibrant mix of history, art, and modern European lifestyle.',
+    },
+    {
+      title: 'Safety & Stability',
+      desc: 'One of the safest and most politically stable countries in the world.',
+    },
+    {
+      title: 'Central Location',
+      desc: 'Perfectly positioned in the heart of Europe for easy travel and business.',
+    },
+  ];
+
+  return (
+    <section className='py-32 bg-luxury-black text-white relative overflow-hidden'>
+      <div className='absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none'>
+        <Globe className='w-full h-full scale-150 translate-x-1/2' />
+      </div>
+
+      <div className='container mx-auto px-6 relative z-10 mb-20'>
+        <div className='max-w-3xl'>
+          <span className='text-emerald-400 font-bold uppercase tracking-[0.3em] text-sm block mb-4'>
+            The Destination
+          </span>
+          <h2 className='text-fluid-h2 font-serif font-bold mb-8'>
+            Why Choose Germany?
+          </h2>
+          <p className='text-xl text-white/60 font-light leading-relaxed'>
+            Germany offers unparalleled opportunities for career advancement and
+            personal growth. As a global leader in technology and healthcare, it
+            remains the top choice for ambitious professionals.
+          </p>
         </div>
-      </section>
+      </div>
 
-      {/* German Courses Section */}
-      <section id='courses' className='py-20 bg-muted/50' ref={coursesRef}>
-        <div className='container mx-auto px-4'>
-          <div className='text-center mb-16'>
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className='text-3xl md:text-4xl font-bold mb-4'
-            >
-              German Language Courses
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className='text-xl text-muted-foreground max-w-2xl mx-auto'
-            >
-              Professional German language courses with certified instructors
-            </motion.p>
-          </div>
-
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
-            {courses.map((course, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: index * 0.1 }}
-                whileHover={{ y: -10 }}
-                className='bg-background rounded-xl p-6 text-center shadow-md border'
-              >
-                <div className='mb-4 flex justify-center'>
-                  <div className='w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center'>
-                    <span className='text-3xl font-bold text-primary'>
-                      {course.level}
-                    </span>
-                  </div>
-                </div>
-                <h3 className='font-bold text-lg mb-1'>{course.name}</h3>
-                <p className='text-muted-foreground text-sm mb-4'>
-                  Level {course.level}
-                </p>
-                <div className='space-y-2 text-left mb-6'>
-                  <div className='flex items-center gap-2'>
-                    <Clock className='h-4 w-4 text-primary' />
-                    <span className='text-sm'>3 months duration</span>
-                  </div>
-                  <div className='flex items-center gap-2'>
-                    <Video className='h-4 w-4 text-primary' />
-                    <span className='text-sm'>Live online classes</span>
-                  </div>
-                  <div className='flex items-center gap-2'>
-                    <FileText className='h-4 w-4 text-primary' />
-                    <span className='text-sm'>Certification exam prep</span>
-                  </div>
-                </div>
-                <Link
-                  to='/register'
-                  className='inline-block w-full bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors'
-                >
-                  Enroll Now
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-
+      <div className='relative space-y-8 md:space-y-12'>
+        {/* Row 1: Moving Left */}
+        <div className='flex overflow-hidden'>
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className='mt-12 text-center'
+            animate={{ x: [0, -1920] }}
+            transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
+            className='flex gap-4 md:gap-8 whitespace-nowrap'
           >
+            {[...reasonsRow1, ...reasonsRow1, ...reasonsRow1].map((r, i) => (
+              <div
+                key={i}
+                className='w-[300px] md:w-[400px] p-8 md:p-10 rounded-[2rem] md:rounded-[2.5rem] bg-white/5 border border-white/10 backdrop-blur-md shrink-0'
+              >
+                <h4 className='text-xl md:text-2xl font-serif font-bold mb-3 md:mb-4 text-emerald-400'>
+                  {r.title}
+                </h4>
+                <p className='text-sm md:text-base text-white/50 font-light leading-relaxed whitespace-normal'>
+                  {r.desc}
+                </p>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+
+        {/* Row 2: Moving Right */}
+        <div className='flex overflow-hidden'>
+          <motion.div
+            animate={{ x: [-1920, 0] }}
+            transition={{ duration: 45, repeat: Infinity, ease: 'linear' }}
+            className='flex gap-4 md:gap-8 whitespace-nowrap'
+          >
+            {[...reasonsRow2, ...reasonsRow2, ...reasonsRow2].map((r, i) => (
+              <div
+                key={i}
+                className='w-[300px] md:w-[400px] p-8 md:p-10 rounded-[2rem] md:rounded-[2.5rem] bg-white/5 border border-white/10 backdrop-blur-md shrink-0'
+              >
+                <h4 className='text-xl md:text-2xl font-serif font-bold mb-3 md:mb-4 text-emerald-400'>
+                  {r.title}
+                </h4>
+                <p className='text-sm md:text-base text-white/50 font-light leading-relaxed whitespace-normal'>
+                  {r.desc}
+                </p>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </div>
+
+      <div className='container mx-auto px-6 mt-24'>
+        <div className='flex justify-center'>
+          <Link
+            to='/about'
+            className='group flex items-center gap-4 text-white/80 hover:text-white transition-colors'
+          >
+            <span className='text-sm uppercase tracking-[0.3em] font-bold'>
+              Discover More About Germany
+            </span>
+            <div className='w-12 h-12 rounded-full border border-white/20 flex items-center justify-center group-hover:border-emerald-500 transition-colors'>
+              <ArrowRight className='h-5 w-5 group-hover:translate-x-1 transition-transform' />
+            </div>
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function GlobalReach() {
+  return (
+    <section className='py-32 bg-white'>
+      <div className='container mx-auto px-6'>
+        <div className='flex flex-col lg:flex-row items-center gap-20'>
+          <div className='flex-1'>
+            <span className='text-emerald-600 font-bold uppercase tracking-[0.3em] text-sm block mb-4'>
+              Our Reach
+            </span>
+            <h2 className='text-fluid-h2 font-serif font-bold text-luxury-black mb-8'>
+              A Bridge Between Continents
+            </h2>
+            <p className='text-xl text-gray-500 font-light leading-relaxed mb-12'>
+              With offices in Lagos and Port Harcourt, and strategic partners
+              across Germany, we provide a seamless bridge for professionals
+              looking to expand their horizons.
+            </p>
+            <div className='space-y-6'>
+              {[
+                {
+                  city: 'Lagos, Nigeria',
+                  role: 'Headquarters & Training Center',
+                },
+                {
+                  city: 'Berlin, Germany',
+                  role: 'Recruitment & Partner Relations',
+                },
+                {
+                  city: 'Port Harcourt, Nigeria',
+                  role: 'Regional Consultancy Hub',
+                },
+              ].map((loc, i) => (
+                <div
+                  key={i}
+                  className='flex items-center gap-4 p-6 rounded-2xl bg-luxury-cream border border-gray-100'
+                >
+                  <div className='w-3 h-3 rounded-full bg-emerald-500' />
+                  <div>
+                    <h4 className='font-serif font-bold text-luxury-black'>
+                      {loc.city}
+                    </h4>
+                    <p className='text-sm text-gray-400'>{loc.role}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className='flex-1 relative'>
+            <div className='aspect-square rounded-[3rem] overflow-hidden shadow-2xl bg-luxury-black flex items-center justify-center p-12'>
+              <div className='relative w-full h-full opacity-20'>
+                <Globe className='w-full h-full text-emerald-500' />
+              </div>
+              <div className='absolute inset-0 flex items-center justify-center'>
+                <div className='relative'>
+                  <div className='absolute -top-12 -left-12 w-4 h-4 bg-emerald-500 rounded-full animate-ping' />
+                  <div className='absolute -top-12 -left-12 w-4 h-4 bg-emerald-500 rounded-full' />
+                  <div className='absolute top-24 left-32 w-4 h-4 bg-emerald-500 rounded-full animate-ping' />
+                  <div className='absolute top-24 left-32 w-4 h-4 bg-emerald-500 rounded-full' />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FAQSection() {
+  const faqs = [
+    {
+      q: 'What is the Ausbildung program?',
+      a: 'Ausbildung is a dual vocational training system in Germany that combines classroom education with on-the-job training, allowing you to earn while you learn.',
+    },
+    {
+      q: 'Do I need to speak German to apply?',
+      a: 'For most pathways, at least a B1 level of German is required. We provide intensive language training to help you reach this level.',
+    },
+    {
+      q: 'How long does the visa process take?',
+      a: 'The duration varies depending on the pathway, but typically it takes between 3 to 6 months after securing a contract.',
+    },
+    {
+      q: 'Can I bring my family with me?',
+      a: 'Yes, many work visas allow for family reunification, though specific requirements must be met for each family member.',
+    },
+  ];
+
+  return (
+    <section id='faq' className='py-32 bg-luxury-cream'>
+      <div className='container mx-auto px-6'>
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-20'>
+          <div>
+            <span className='text-emerald-600 font-bold uppercase tracking-[0.3em] text-sm block mb-4'>
+              Common Questions
+            </span>
+            <h2 className='text-fluid-h2 font-serif font-bold text-luxury-black mb-8'>
+              Frequently Asked Questions
+            </h2>
+            <p className='text-xl text-gray-500 font-light leading-relaxed mb-12'>
+              Everything you need to know about our pathways and services. Can't
+              find the answer? Contact our team.
+            </p>
             <Link
               to='/contact'
-              className='border border-input bg-background px-6 py-3 rounded-md text-lg font-medium hover:bg-accent hover:text-accent-foreground transition-colors'
+              className='px-10 py-5 bg-luxury-black text-white rounded-full text-sm uppercase tracking-widest font-bold hover:bg-emerald-600 transition-all'
             >
-              Request Course Information
+              Ask a Question
             </Link>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Blog Section */}
-      <section id='blog' className='py-20'>
-        <div className='container mx-auto px-4'>
-          <div className='text-center mb-16'>
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className='text-3xl md:text-4xl font-bold mb-4'
-            >
-              Latest from Our Blog
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className='text-xl text-muted-foreground max-w-2xl mx-auto'
-            >
-              Insights, guides, and news about career development, language
-              learning, and international opportunities
-            </motion.p>
           </div>
-
-          <div className='grid md:grid-cols-3 gap-8'>
-            {blogPosts.map((post, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className='bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow'
+          <div className='space-y-8'>
+            {faqs.map((faq, i) => (
+              <div
+                key={i}
+                className='p-8 bg-white rounded-[2rem] shadow-sm border border-gray-100'
               >
-                <div className='relative h-48 w-full overflow-hidden'>
-                  <img
-                    src={post.featured_image || '/placeholder.svg'}
-                    alt={post.title}
-                    className='w-full h-full object-cover transition-transform duration-500 hover:scale-105'
-                  />
-                  <div className='absolute top-4 left-4 bg-primary text-white text-xs font-semibold px-2 py-1 rounded'>
-                    {post.category}
-                  </div>
-                </div>
-                <div className='p-6'>
-                  <h3 className='text-xl font-bold mb-2 hover:text-primary transition-colors'>
-                    <a href={`/blog/${post._id}`}>{post.title}</a>
-                  </h3>
-                  <p className='text-muted-foreground mb-4'>{post.excerpt}</p>
-                  <div className='flex items-center justify-between text-sm text-muted-foreground mb-4'>
-                    <div className='flex items-center gap-1'>
-                      <User className='h-4 w-4' />
-                      <span>{post.author?.name || 'Unknown Author'}</span>
-                    </div>
-                    <div className='flex items-center gap-1'>
-                      <Calendar className='h-4 w-4' />
-                      <span>{formatCreatedAt(post.created_at)}</span>
-                    </div>
-                  </div>
-
-                  <a
-                    href={`/blog/${post._id}`}
-                    className='inline-flex items-center text-primary font-medium hover:underline'
-                  >
-                    Read More
-                    <ChevronRight className='h-4 w-4 ml-1' />
-                  </a>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className='mt-12 text-center'
-            onClick={() => navigate('/blogs')}
-          >
-            <button className='border border-input bg-background px-6 py-3 rounded-md text-lg font-medium hover:bg-accent hover:text-accent-foreground transition-colors'>
-              View All Articles
-            </button>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section id='testimonials' className='py-20 bg-muted/50'>
-        <div className='container mx-auto px-4'>
-          <div className='text-center mb-16'>
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className='text-3xl md:text-4xl font-bold mb-4'
-            >
-              Success Stories
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className='text-xl text-muted-foreground max-w-2xl mx-auto'
-            >
-              Hear from our clients who have successfully achieved their career
-              and immigration goals
-            </motion.p>
-          </div>
-
-          <div className='grid md:grid-cols-3 gap-8'>
-            {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <div className='bg-white rounded-lg shadow-md h-full'>
-                  <div className='p-6'>
-                    <div className='flex items-center gap-4 mb-4'>
-                      <div className='relative h-16 w-16 rounded-full overflow-hidden'>
-                        <img
-                          src={testimonial.image || '/placeholder.svg'}
-                          alt={testimonial.name}
-                          className='w-full h-full object-cover'
-                        />
-                      </div>
-                      <div>
-                        <h3 className='font-bold text-lg'>
-                          {testimonial.name}
-                        </h3>
-                        <p className='text-muted-foreground'>
-                          {testimonial.role}
-                        </p>
-                      </div>
-                    </div>
-                    <p className='text-muted-foreground italic'>
-                      "{testimonial.text}"
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
+                <h4 className='text-xl font-serif font-bold text-luxury-black mb-4'>
+                  {faq.q}
+                </h4>
+                <p className='text-gray-500 font-light leading-relaxed'>
+                  {faq.a}
+                </p>
+              </div>
             ))}
           </div>
         </div>
-      </section>
+      </div>
+    </section>
+  );
+}
 
-      {/* CTA Section */}
-      <section className='py-20 bg-primary text-white'>
-        <div className='container mx-auto px-4'>
-          <div className='text-center max-w-3xl mx-auto'>
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className='text-3xl md:text-4xl font-bold mb-6'
-            >
-              Ready to Start Your Journey to Success?
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className='text-xl mb-8 text-white/90'
-            >
-              Explore our professional training programs, language courses, and
-              visa pathways. Take the first step toward advancing your career
-              and achieving your international goals.
-            </motion.p>
+const slides = [
+  {
+    image:
+      'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=2000',
+    title: 'Global Excellence',
+    subtitle: 'Your Gateway to International Success',
+    description:
+      'Professional training and recruitment services tailored for your global ambitions.',
+  },
+  {
+    image:
+      'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&q=80&w=2000',
+    title: 'German Pathways',
+    subtitle: 'Expert Visa & Career Consultancy',
+    description:
+      'Specialized routes for nursing, vocational training, and academic excellence in Germany.',
+  },
+  {
+    image:
+      'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=2000',
+    title: 'Elite Training',
+    subtitle: 'Master the Skills of Tomorrow',
+    description:
+      'From Cyber Security to Data Analysis, we provide world-class education for the modern professional.',
+  },
+];
+
+function HeroCarousel() {
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % slides.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <section className='relative h-screen w-full overflow-hidden bg-black'>
+      <AnimatePresence mode='wait'>
+        <motion.div
+          key={current}
+          initial={{ opacity: 0, scale: 1.1 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          transition={{ duration: 1.5, ease: [0.19, 1, 0.22, 1] }}
+          className='absolute inset-0'
+        >
+          <div className='absolute inset-0 bg-black/40 z-10' />
+          <div className='absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/20 z-10' />
+          <img
+            src={slides[current].image}
+            alt={slides[current].title}
+            className='h-full w-full object-cover'
+          />
+        </motion.div>
+      </AnimatePresence>
+
+      <div className='absolute inset-0 z-20 flex items-center'>
+        <div className='container mx-auto px-6 lg:px-12'>
+          <div className='max-w-5xl'>
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              key={`text-${current}`}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+            >
+              <span className='inline-block text-emerald-400 text-xs md:text-sm uppercase tracking-[0.4em] font-bold mb-6'>
+                {slides[current].subtitle}
+              </span>
+              <h1 className='text-fluid-h1 font-serif font-bold text-white mb-8 tracking-tighter'>
+                {slides[current].title.split(' ').map((word, i) => (
+                  <span key={i} className='block'>
+                    {word}
+                  </span>
+                ))}
+              </h1>
+              <p className='text-lg md:text-xl text-white/70 max-w-xl mb-12 font-light leading-relaxed'>
+                {slides[current].description}
+              </p>
+              <div className='flex flex-wrap gap-4 md:gap-6'>
+                <Link
+                  to='/register'
+                  className='px-8 md:px-10 py-4 md:py-5 bg-emerald-600 text-white rounded-full text-xs md:text-sm uppercase tracking-widest font-bold hover:bg-emerald-500 transition-all duration-300 hover:scale-105 shadow-[0_10px_30px_rgba(16,185,129,0.3)]'
+                >
+                  Get Started
+                </Link>
+                <Link
+                  to='/about'
+                  className='px-8 md:px-10 py-4 md:py-5 bg-white/10 backdrop-blur-md text-white border border-white/20 rounded-full text-xs md:text-sm uppercase tracking-widest font-bold hover:bg-white/20 transition-all duration-300'
+                >
+                  Our Story
+                </Link>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+
+      <div className='absolute bottom-8 md:bottom-12 right-6 md:right-12 z-30 flex items-center gap-4 md:gap-6'>
+        <div className='hidden md:flex items-center gap-2'>
+          {slides.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrent(i)}
+              className={`h-1 transition-all duration-500 rounded-full ${
+                current === i ? 'w-12 bg-emerald-500' : 'w-4 bg-white/30'
+              }`}
+            />
+          ))}
+        </div>
+        <div className='flex gap-2'>
+          <button
+            onClick={() =>
+              setCurrent((prev) => (prev - 1 + slides.length) % slides.length)
+            }
+            className='p-3 md:p-4 rounded-full border border-white/20 text-white hover:bg-white/10 transition-all'
+          >
+            <ChevronLeft className='h-5 w-5 md:h-6 md:w-6' />
+          </button>
+          <button
+            onClick={() => setCurrent((prev) => (prev + 1) % slides.length)}
+            className='p-3 md:p-4 rounded-full border border-white/20 text-white hover:bg-white/10 transition-all'
+          >
+            <ChevronRight className='h-5 w-5 md:h-6 md:w-6' />
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ServicesSection() {
+  const services = [
+    {
+      id: 'exam-prep',
+      title: 'Professional Exam Prep',
+      description: 'Elite preparation for IELTS, GMAT, SAT, and more.',
+      icon: Award,
+      color: 'bg-blue-500',
+    },
+    {
+      id: 'german',
+      title: 'German Language',
+      description: 'Master German from A1 to B2 with native-level fluency.',
+      icon: BookOpen,
+      color: 'bg-emerald-500',
+    },
+    {
+      id: 'cyber-security',
+      title: 'Cyber Security',
+      description: 'Advanced protection strategies for the digital age.',
+      icon: Shield,
+      color: 'bg-purple-500',
+    },
+    {
+      id: 'data-analysis',
+      title: 'Data Analysis',
+      description: 'Transform raw data into strategic business insights.',
+      icon: BarChart,
+      color: 'bg-orange-500',
+    },
+    {
+      id: 'programming',
+      title: 'Programming',
+      description: 'Build the future with Python and modern web tech.',
+      icon: Code,
+      color: 'bg-cyan-500',
+    },
+    {
+      id: 'project-management',
+      title: 'Project Management',
+      description: 'Lead complex initiatives with precision and agility.',
+      icon: Briefcase,
+      color: 'bg-rose-500',
+    },
+  ];
+
+  return (
+    <section className='py-32 bg-luxury-cream'>
+      <div className='container mx-auto px-6'>
+        <div className='flex flex-col lg:flex-row justify-between items-end mb-20 gap-8'>
+          <div className='max-w-2xl'>
+            <span className='text-emerald-600 font-bold uppercase tracking-[0.3em] text-sm block mb-4'>
+              Our Expertise
+            </span>
+            <h2 className='text-fluid-h2 font-serif font-bold text-luxury-black'>
+              Crafting Your <br /> Professional Future
+            </h2>
+          </div>
+          <p className='text-lg md:text-xl text-gray-500 max-w-md font-light leading-relaxed'>
+            We provide specialized training programs designed to meet the
+            highest international standards.
+          </p>
+        </div>
+
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+          {services.map((service, i) => (
+            <motion.div
+              key={i}
+              whileHover={{ y: -10 }}
+              className='group relative bg-white p-8 md:p-10 rounded-[2.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-100 overflow-hidden'
+            >
+              <div
+                className={`absolute top-0 right-0 w-32 h-32 ${service.color} opacity-[0.03] rounded-bl-full transition-all duration-500 group-hover:scale-150`}
+              />
+              <div className='relative z-10'>
+                <div
+                  className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl ${service.color} flex items-center justify-center mb-8 shadow-lg shadow-emerald-500/10`}
+                >
+                  <service.icon className='h-7 w-7 md:h-8 md:w-8 text-white' />
+                </div>
+                <h3 className='text-2xl font-serif font-bold text-luxury-black mb-4'>
+                  {service.title}
+                </h3>
+                <p className='text-gray-500 font-light mb-8 leading-relaxed'>
+                  {service.description}
+                </p>
+                <Link
+                  to={`/services/${service.id}`}
+                  className='inline-flex items-center gap-2 text-luxury-black font-bold uppercase tracking-widest text-xs group-hover:text-emerald-600 transition-colors'
+                >
+                  Learn More{' '}
+                  <ArrowRight className='h-4 w-4 transition-transform group-hover:translate-x-2' />
+                </Link>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function WhyChooseUs() {
+  const features = [
+    {
+      title: 'Global Network',
+      desc: 'Direct partnerships with top institutions in Germany and beyond.',
+    },
+    {
+      title: 'Expert Mentors',
+      desc: 'Learn from professionals with decades of international experience.',
+    },
+    {
+      title: 'Proven Success',
+      desc: 'Over 98% of our students achieve their career and visa goals.',
+    },
+    {
+      title: 'End-to-End Support',
+      desc: 'From training to recruitment and visa processing, we handle it all.',
+    },
+  ];
+
+  return (
+    <section className='py-32 bg-white'>
+      <div className='container mx-auto px-6'>
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-20 items-center'>
+          <div className='relative'>
+            <div className='aspect-[4/5] rounded-[3rem] overflow-hidden shadow-2xl'>
+              <img
+                src='https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=1000'
+                alt='Team'
+                className='w-full h-full object-cover'
+              />
+            </div>
+            <div className='absolute -bottom-10 -right-10 w-64 h-64 bg-emerald-600 rounded-[2rem] p-8 text-white hidden md:flex flex-col justify-center'>
+              <span className='text-5xl font-serif font-bold mb-2'>15+</span>
+              <p className='text-sm uppercase tracking-widest font-bold opacity-80'>
+                Years of Excellence in Global Education
+              </p>
+            </div>
+          </div>
+          <div>
+            <span className='text-emerald-600 font-bold uppercase tracking-[0.3em] text-sm block mb-4'>
+              Why AOCA Elite
+            </span>
+            <h2 className='text-fluid-h2 font-serif font-bold text-luxury-black mb-8'>
+              Unmatched Support for Your Ambitions
+            </h2>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+              {features.map((f, i) => (
+                <div key={i} className='space-y-3'>
+                  <h4 className='text-xl font-serif font-bold text-luxury-black'>
+                    {f.title}
+                  </h4>
+                  <p className='text-gray-500 font-light leading-relaxed'>
+                    {f.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <Link
+              to='/about'
+              className='inline-flex items-center gap-3 mt-12 text-luxury-black font-bold uppercase tracking-widest text-sm hover:text-emerald-600 transition-colors'
+            >
+              Discover Our Story <ArrowRight className='h-5 w-5' />
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ProcessSection() {
+  const steps = [
+    {
+      number: '01',
+      title: 'Consultation',
+      desc: 'We assess your goals and recommend the best pathway.',
+    },
+    {
+      number: '02',
+      title: 'Elite Training',
+      desc: 'Intensive language or skill training with expert mentors.',
+    },
+    {
+      number: '03',
+      title: 'Placement',
+      desc: 'We connect you with top global employers or institutions.',
+    },
+    {
+      number: '04',
+      title: 'Visa & Travel',
+      desc: 'Full support for your visa processing and relocation.',
+    },
+  ];
+
+  return (
+    <section className='py-32 bg-luxury-cream'>
+      <div className='container mx-auto px-6'>
+        <div className='text-center max-w-3xl mx-auto mb-20'>
+          <span className='text-emerald-600 font-bold uppercase tracking-[0.3em] text-sm block mb-4'>
+            The Journey
+          </span>
+          <h2 className='text-fluid-h2 font-serif font-bold text-luxury-black'>
+            Your Path to Success
+          </h2>
+        </div>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
+          {steps.map((step, i) => (
+            <div key={i} className='relative group'>
+              <div className='text-8xl font-serif font-bold text-emerald-500/10 absolute -top-10 -left-4 group-hover:text-emerald-500/20 transition-colors'>
+                {step.number}
+              </div>
+              <div className='relative z-10 pt-8'>
+                <h3 className='text-2xl font-serif font-bold text-luxury-black mb-4'>
+                  {step.title}
+                </h3>
+                <p className='text-gray-500 font-light leading-relaxed'>
+                  {step.desc}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Newsletter() {
+  return (
+    <section className='py-32 bg-white'>
+      <div className='container mx-auto px-6'>
+        <div className='bg-luxury-black rounded-[3rem] p-12 md:p-24 relative overflow-hidden'>
+          <div className='absolute top-0 right-0 w-96 h-96 bg-emerald-600/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl' />
+          <div className='relative z-10 max-w-2xl'>
+            <h2 className='text-4xl md:text-6xl font-serif font-bold text-white mb-8'>
+              Stay Ahead of the Curve
+            </h2>
+            <p className='text-xl text-white/60 font-light mb-12'>
+              Get the latest insights on global career trends and international
+              opportunities delivered to your inbox.
+            </p>
+            <form className='flex flex-col md:flex-row gap-4'>
+              <input
+                type='email'
+                placeholder='Your email address'
+                className='flex-1 bg-white/10 border border-white/20 rounded-full px-8 py-5 text-white placeholder:text-white/30 focus:outline-none focus:border-emerald-500 transition-colors'
+              />
+              <button className='px-10 py-5 bg-emerald-600 text-white rounded-full font-bold uppercase tracking-widest text-sm hover:bg-emerald-500 transition-all'>
+                Subscribe
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function StatsSection() {
+  const stats = [
+    { label: 'Success Rate', value: '98%' },
+    { label: 'Students Trained', value: '5K+' },
+    { label: 'Global Partners', value: '120+' },
+    { label: 'Years Excellence', value: '15+' },
+  ];
+
+  return (
+    <section className='py-24 bg-luxury-black text-white'>
+      <div className='container mx-auto px-6'>
+        <div className='grid grid-cols-2 lg:grid-cols-4 gap-12'>
+          {stats.map((stat, i) => (
+            <div key={i} className='text-center'>
+              <h3 className='text-5xl md:text-7xl font-serif font-bold mb-4 text-emerald-500'>
+                {stat.value}
+              </h3>
+              <p className='text-sm uppercase tracking-[0.3em] text-white/50 font-medium'>
+                {stat.label}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className='bg-luxury-black text-white pt-32 pb-12'>
+      <div className='container mx-auto px-6'>
+        <div className='grid grid-cols-1 lg:grid-cols-4 gap-20 mb-32'>
+          <div className='lg:col-span-2'>
+            <Link to='/' className='text-4xl font-serif font-bold mb-8 block'>
+              AOCA<span className='text-emerald-500'>.</span>
+            </Link>
+            <p className='text-xl text-white/50 font-light max-w-md leading-relaxed mb-12'>
+              Empowering the next generation of global professionals through
+              elite training and strategic career pathways.
+            </p>
+            <div className='flex gap-6'>
+              {[Instagram, Twitter, Facebook, Linkedin].map((Icon, i) => (
+                <a
+                  key={i}
+                  href='#'
+                  className='p-4 rounded-full border border-white/10 hover:bg-white/10 transition-all'
+                >
+                  <Icon className='h-5 w-5' />
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h4 className='text-sm uppercase tracking-[0.3em] font-bold mb-8 text-emerald-500'>
+              Navigation
+            </h4>
+            <ul className='space-y-4'>
+              {['Pathways', 'Services', 'Blog', 'About Us', 'Contact'].map(
+                (item) => (
+                  <li key={item}>
+                    <Link
+                      to={`/${item.toLowerCase().replace(' ', '-')}`}
+                      className='text-white/60 hover:text-white transition-colors font-light text-lg'
+                    >
+                      {item}
+                    </Link>
+                  </li>
+                ),
+              )}
+            </ul>
+          </div>
+
+          <div>
+            <h4 className='text-sm uppercase tracking-[0.3em] font-bold mb-8 text-emerald-500'>
+              Contact
+            </h4>
+            <ul className='space-y-6'>
+              <li className='flex items-start gap-4 text-white/60 font-light'>
+                <MapPin className='h-6 w-6 text-emerald-500 shrink-0' />
+                <span>8 Bayo Adetuna Street off Sangotedo, Lagos.</span>
+              </li>
+              <li className='flex items-center gap-4 text-white/60 font-light'>
+                <Phone className='h-6 w-6 text-emerald-500 shrink-0' />
+                <span>+234 803 886 5466</span>
+              </li>
+              <li className='flex items-center gap-4 text-white/60 font-light'>
+                <Mail className='h-6 w-6 text-emerald-500 shrink-0' />
+                <span>info@aocaresourcesltd.com</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className='pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8 text-white/30 text-sm font-light'>
+          <p>
+            © {new Date().getFullYear()} AOCA Resources Limited. All Rights
+            Reserved.
+          </p>
+          <div className='flex gap-8'>
+            <a href='#' className='hover:text-white transition-colors'>
+              Privacy Policy
+            </a>
+            <a href='#' className='hover:text-white transition-colors'>
+              Terms of Service
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+function HomePage() {
+  return (
+    <main className='overflow-hidden'>
+      <Header />
+      <HeroCarousel />
+      <StatsSection />
+      <WhyChooseUs />
+      <WhyGermanySection />
+      <GlobalReach />
+      <ProcessSection />
+      <ServicesSection />
+      <TestimonialsSection />
+      <FAQSection />
+
+      {/* Luxury Image Section */}
+      <section className='relative h-[70vh] md:h-[80vh] w-full overflow-hidden'>
+        <div className='absolute inset-0 bg-black/40 z-10' />
+        <img
+          src='https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=2000'
+          alt='Luxury Office'
+          className='h-full w-full object-cover'
+        />
+        <div className='absolute inset-0 z-20 flex items-center justify-center text-center'>
+          <div className='container mx-auto px-6'>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className='flex flex-col sm:flex-row gap-4 justify-center'
+              className='max-w-4xl mx-auto'
             >
+              <h2 className='text-fluid-h2 font-serif font-bold text-white mb-8'>
+                Elevate Your Career to New Heights
+              </h2>
+              <p className='text-lg md:text-xl text-white/80 font-light mb-12'>
+                Join thousands of professionals who have transformed their lives
+                with our elite training programs.
+              </p>
               <Link
                 to='/register'
-                className='bg-white text-primary px-6 py-3 rounded-md text-lg font-medium hover:bg-white/90 transition-colors'
+                className='px-10 md:px-12 py-5 md:py-6 bg-white text-luxury-black rounded-full text-xs md:text-sm uppercase tracking-widest font-bold hover:bg-emerald-500 hover:text-white transition-all duration-500'
               >
-                Register Now
-              </Link>
-              <Link
-                to='/contact'
-                className='border border-white bg-transparent px-6 py-3 rounded-md text-lg font-medium hover:bg-white/10 transition-colors'
-              >
-                Contact Us
+                Join the Elite
               </Link>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      {/* Footer */}
-      <footer className='bg-gray-900 text-white py-12'>
-        <div className='container mx-auto px-4'>
-          <div className='grid md:grid-cols-4 gap-8'>
-            <div>
-              <Link to='/' className='flex items-center gap-2 mb-4'>
-                <img
-                  src='/aocalogo.jpeg'
-                  alt='AOCA Resources Limited'
-                  className='h-12 w-auto'
-                />
-              </Link>
-              <p className='text-gray-400 mb-4'>
-                Your trusted partner for professional training, German language
-                courses, visa consultancy, and recruitment services.
-              </p>
-            </div>
-            <div>
-              <h3 className='font-bold text-lg mb-4'>Quick Links</h3>
-              <ul className='space-y-2'>
-                <li>
-                  <a
-                    href='#services'
-                    className='text-gray-400 hover:text-white transition-colors'
-                  >
-                    Services
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href='#pathways'
-                    className='text-gray-400 hover:text-white transition-colors'
-                  >
-                    Pathways
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href='#courses'
-                    className='text-gray-400 hover:text-white transition-colors'
-                  >
-                    Courses
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href='#blog'
-                    className='text-gray-400 hover:text-white transition-colors'
-                  >
-                    Blog
-                  </a>
-                </li>
-                <li>
-                  <Link
-                    to='/about'
-                    className='text-gray-400 hover:text-white transition-colors'
-                  >
-                    About Us
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to='/contact'
-                    className='text-gray-400 hover:text-white transition-colors'
-                  >
-                    Contact
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className='font-bold text-lg mb-4'>Contact</h3>
-              <ul className='space-y-3'>
-                <li className='flex items-start gap-2'>
-                  <MapPin className='h-5 w-5 mt-0.5' />
-                  <div>
-                    <p className='font-medium'>Lagos Office:</p>
-                    <p className='text-gray-400'>
-                      8 Bayo Adetuna Street off Sangotedo. Lagos.
-                    </p>
-                  </div>
-                </li>
-                <li className='flex items-start gap-2'>
-                  <MapPin className='h-5 w-5 mt-0.5' />
-                  <div>
-                    <p className='font-medium'>Port Harcourt Office:</p>
-                    <p className='text-gray-400'>
-                      No 70 Eliogbolo Road, Rumuodumaya, Port Harcourt
-                    </p>
-                  </div>
-                </li>
-                <li className='flex items-center gap-2'>
-                  <Phone className='h-5 w-5' />
-                  <span className='text-gray-400'>
-                    08038865466, +49 1522 1688675
-                  </span>
-                </li>
-                <li className='flex items-center gap-2'>
-                  <MessageSquare className='h-5 w-5' />
-                  <span className='text-gray-400'>WhatsApp: 08038865466</span>
-                </li>
-                <li className='flex items-start gap-2'>
-                  <MessageSquare className='h-5 w-5 mt-0.5' />
-                  <div>
-                    <p className='text-gray-400'>info@aocaresourcesltd.com</p>
-                    <p className='text-gray-400'>aocaresources@gmail.com</p>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className='font-bold text-lg mb-4'>Follow Us</h3>
-              <div className='flex gap-4 mb-6'>
-                <a
-                  href='#'
-                  className='bg-gray-800 p-2 rounded-full hover:bg-primary transition-colors'
-                >
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    width='20'
-                    height='20'
-                    fill='currentColor'
-                    viewBox='0 0 24 24'
-                  >
-                    <path d='M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z' />
-                  </svg>
-                </a>
-                <a
-                  href='#'
-                  className='bg-gray-800 p-2 rounded-full hover:bg-primary transition-colors'
-                >
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    width='20'
-                    height='20'
-                    fill='currentColor'
-                    viewBox='0 0 24 24'
-                  >
-                    <path d='M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z' />
-                  </svg>
-                </a>
-                <a
-                  href='#'
-                  className='bg-gray-800 p-2 rounded-full hover:bg-primary transition-colors'
-                >
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    width='20'
-                    height='20'
-                    fill='currentColor'
-                    viewBox='0 0 24 24'
-                  >
-                    <path d='M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z' />
-                  </svg>
-                </a>
-              </div>
-              <h3 className='font-bold text-lg mb-4'>Student Portal</h3>
-              <Link
-                to='/login'
-                className='bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors inline-block'
-              >
-                Login to Dashboard
-              </Link>
-            </div>
-          </div>
-          <div className='border-t border-gray-800 mt-8 pt-8 text-center'>
-            <p className='text-gray-400'>
-              &copy; {new Date().getFullYear()} AOCA Resources Limited. All
-              rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
-    </div>
+      <Newsletter />
+      <Footer />
+    </main>
   );
 }
 
