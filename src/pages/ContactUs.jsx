@@ -2,48 +2,35 @@
 
 'use client';
 
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Globe,
+  Mail,
+  Phone,
   MapPin,
   MessageSquare,
-  Phone,
-  Mail,
+  Clock,
   Send,
-  CheckCircle,
+  CheckCircle2,
   AlertCircle,
+  Loader2,
 } from 'lucide-react';
-import Header from '../components/Header';
-import Footer2 from '../components/Footer2';
+import { FaWhatsapp } from 'react-icons/fa';
 
-function ContactUs() {
+export default function Contact() {
   const [formData, setFormData] = useState({
-    first_name: '',
-    last_name: '',
+    name: '',
     email: '',
     phone: '',
-    service: '',
+    service: 'General Inquiry',
     message: '',
   });
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState(null);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const [status, setStatus] = useState();
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setError(null);
+    setStatus('loading');
 
     try {
       const response = await fetch(
@@ -52,385 +39,346 @@ function ContactUs() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            accept: 'application/json',
           },
           body: JSON.stringify(formData),
         },
       );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to submit form');
-      }
-
-      const data = await response.json();
-      setIsSuccess(true);
-
-      // Reset form after 3 seconds
-      setTimeout(() => {
-        setIsSuccess(false);
+      if (response.ok) {
+        setStatus('success');
         setFormData({
-          first_name: '',
-          last_name: '',
+          name: '',
           email: '',
           phone: '',
-          service: '',
+          service: 'General Inquiry',
           message: '',
         });
-      }, 3000);
-    } catch (err) {
-      setError(err.message || 'Something went wrong. Please try again.');
-    } finally {
-      setIsSubmitting(false);
+      } else {
+        const data = await response.json();
+        throw new Error(data.message || 'Failed to send message');
+      }
+    } catch (error) {
+      setStatus('error');
+      setErrorMessage(
+        error.message || 'Something went wrong. Please try again later.',
+      );
     }
   };
 
   return (
-    <div className='min-h-screen bg-background'>
-      <Header />
+    <div className='min-h-screen bg-white'>
+      {/* Hero Section */}
+      <section className='relative pt-48 pb-32 bg-luxury-black text-white overflow-hidden'>
+        <div className='absolute inset-0 z-0'>
+          <img
+            src='https://images.unsplash.com/photo-1534536281715-e28d76689b4d?auto=format&fit=crop&q=80&w=2000'
+            alt='Contact Hero'
+            className='w-full h-full object-cover opacity-30'
+          />
+          <div className='absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-luxury-black' />
+        </div>
 
-      <main className='pt-24 pb-16'>
-        {/* Hero Section */}
-        <section className='bg-primary/10 py-16'>
-          <div className='container mx-auto px-4'>
-            <div className='max-w-3xl mx-auto text-center'>
-              <h1 className='text-4xl md:text-5xl font-bold mb-6'>
-                Contact Us
-              </h1>
-              <p className='text-xl text-gray-600'>
-                Get in touch with our team for inquiries about our services
-              </p>
-            </div>
+        <div className='container mx-auto px-6 relative z-10'>
+          <div className='max-w-3xl'>
+            <motion.span
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className='text-emerald-400 font-bold uppercase tracking-[0.4em] text-sm block mb-6'
+            >
+              Get in Touch
+            </motion.span>
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className='text-5xl md:text-8xl font-serif font-bold mb-8'
+            >
+              Let's Start a <br /> Conversation
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className='text-xl text-white/60 font-light leading-relaxed'
+            >
+              Whether you're looking for career guidance, language training, or
+              partnership opportunities, our elite team is here to help.
+            </motion.p>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Contact Information */}
-        <section className='py-16'>
-          <div className='container mx-auto px-4'>
-            <div className='grid md:grid-cols-2 gap-12'>
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-                className='space-y-8'
-              >
-                <div>
-                  <h2 className='text-3xl font-bold mb-6'>Get In Touch</h2>
-                  <p className='text-gray-600 mb-8'>
-                    Have questions about our services? Contact us today and our
-                    team will be happy to assist you with any inquiries.
-                  </p>
-                </div>
-
-                <div className='space-y-6'>
-                  <div className='flex items-start gap-4'>
-                    <div className='bg-primary/10 p-3 rounded-full'>
-                      <MapPin className='h-6 w-6 text-primary' />
+      {/* Contact Content */}
+      <section className='py-32'>
+        <div className='container mx-auto px-6'>
+          <div className='grid grid-cols-1 lg:grid-cols-3 gap-20'>
+            {/* Contact Info */}
+            <div className='space-y-12'>
+              <div>
+                <h3 className='text-2xl font-serif font-bold text-luxury-black mb-8'>
+                  Our Offices
+                </h3>
+                <div className='space-y-8'>
+                  <div className='flex gap-6'>
+                    <div className='w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center shrink-0'>
+                      <MapPin className='h-6 w-6 text-emerald-600' />
                     </div>
                     <div>
-                      <h3 className='font-bold text-lg'>Lagos Office</h3>
-                      <p className='text-gray-600'>
-                        8 Bayo Adetuna Street off Sangotedo. Lagos.
+                      <h4 className='font-serif font-bold text-luxury-black mb-2'>
+                        Lagos Headquarters
+                      </h4>
+                      <p className='text-gray-500 font-light leading-relaxed'>
+                        8 Bayo Adetuna Street off Sangotedo, Lagos, Nigeria.
                       </p>
                     </div>
                   </div>
-
-                  <div className='flex items-start gap-4'>
-                    <div className='bg-primary/10 p-3 rounded-full'>
-                      <MapPin className='h-6 w-6 text-primary' />
+                  <div className='flex gap-6'>
+                    <div className='w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center shrink-0'>
+                      <MapPin className='h-6 w-6 text-emerald-600' />
                     </div>
                     <div>
-                      <h3 className='font-bold text-lg'>
+                      <h4 className='font-serif font-bold text-luxury-black mb-2'>
                         Port Harcourt Office
-                      </h3>
-                      <p className='text-gray-600'>
-                        No 70 Eliogbolo Road, Rumuodumaya, Port Harcourt
+                      </h4>
+                      <p className='text-gray-500 font-light leading-relaxed'>
+                        Regional Consultancy Hub, Port Harcourt, Nigeria.
                       </p>
                     </div>
                   </div>
+                </div>
+              </div>
 
-                  <div className='flex items-center gap-4'>
-                    <div className='bg-primary/10 p-3 rounded-full'>
-                      <Phone className='h-6 w-6 text-primary' />
+              <div>
+                <h3 className='text-2xl font-serif font-bold text-luxury-black mb-8'>
+                  Direct Contact
+                </h3>
+                <div className='space-y-6'>
+                  <a
+                    href='tel:+2348038865466'
+                    className='flex items-center gap-4 group'
+                  >
+                    <div className='w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all'>
+                      <Phone className='h-4 w-4' />
                     </div>
-                    <div>
-                      <h3 className='font-bold text-lg'>Call Us</h3>
-                      <p className='text-gray-600'>
-                        08038865466, +49 1522 1688675
-                      </p>
+                    <span className='text-gray-600 font-light'>
+                      +234 803 886 5466
+                    </span>
+                  </a>
+                  <a
+                    href='https://wa.me/2348038865466'
+                    className='flex items-center gap-4 group'
+                  >
+                    <div className='w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center group-hover:bg-green-500 group-hover:text-white transition-all'>
+                      <FaWhatsapp size={16} />
                     </div>
+                    <span className='text-gray-600 font-light'>
+                      WhatsApp Support
+                    </span>
+                  </a>
+                  <a
+                    href='mailto:info@aocaresourcesltd.com'
+                    className='flex items-center gap-4 group'
+                  >
+                    <div className='w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center group-hover:bg-luxury-black group-hover:text-white transition-all'>
+                      <Mail className='h-4 w-4' />
+                    </div>
+                    <span className='text-gray-600 font-light'>
+                      info@aocaresourcesltd.com
+                    </span>
+                  </a>
+                </div>
+              </div>
+
+              <div className='p-10 rounded-[2.5rem] bg-luxury-cream border border-gray-100'>
+                <h3 className='text-xl font-serif font-bold text-luxury-black mb-6'>
+                  Business Hours
+                </h3>
+                <div className='space-y-4'>
+                  <div className='flex justify-between text-sm'>
+                    <span className='text-gray-400'>Mon - Fri</span>
+                    <span className='font-bold text-luxury-black'>
+                      9:00 AM - 6:00 PM
+                    </span>
                   </div>
-
-                  <div className='flex items-center gap-4'>
-                    <div className='bg-primary/10 p-3 rounded-full'>
-                      <MessageSquare className='h-6 w-6 text-primary' />
-                    </div>
-                    <div>
-                      <h3 className='font-bold text-lg'>WhatsApp</h3>
-                      <p className='text-gray-600'>08038865466</p>
-                    </div>
+                  <div className='flex justify-between text-sm'>
+                    <span className='text-gray-400'>Saturday</span>
+                    <span className='font-bold text-luxury-black'>
+                      10:00 AM - 2:00 PM
+                    </span>
                   </div>
-
-                  <div className='flex items-start gap-4'>
-                    <div className='bg-primary/10 p-3 rounded-full'>
-                      <Mail className='h-6 w-6 text-primary' />
-                    </div>
-                    <div>
-                      <h3 className='font-bold text-lg'>Email Us</h3>
-                      <p className='text-gray-600'>info@aocaresourcesltd.com</p>
-                      <p className='text-gray-600'>aocaresources@gmail.com</p>
-                    </div>
+                  <div className='flex justify-between text-sm'>
+                    <span className='text-gray-400'>Sunday</span>
+                    <span className='font-bold text-emerald-600 uppercase tracking-widest'>
+                      Closed
+                    </span>
                   </div>
                 </div>
+              </div>
+            </div>
 
-                <div className='pt-6'>
-                  <div className='relative h-[300px] w-full rounded-xl overflow-hidden'>
-                    <img
-                      src='https://img.freepik.com/free-photo/business-people-doing-teamwork-startup-presentation-anlayzing-research-data-information-documents-planning-report-project-with-notes-paperwork-files-office-with-big-windows_482257-49771.jpg?t=st=1742664704~exp=1742668304~hmac=b2c3a671eead2d806d89d1224dd343e6cfe48af532779b94ce8481a0074537a7&w=2000'
-                      alt='Office location'
-                      className='w-full h-full object-cover'
-                    />
-                  </div>
-                </div>
-              </motion.div>
+            {/* Contact Form */}
+            <div className='lg:col-span-2'>
+              <div className='bg-white p-8 md:p-16 rounded-[3rem] shadow-2xl shadow-gray-200/50 border border-gray-100'>
+                <h2 className='text-3xl md:text-4xl font-serif font-bold text-luxury-black mb-8'>
+                  Send a Message
+                </h2>
 
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-              >
-                <div className='bg-white rounded-lg shadow-md'>
-                  <div className='p-6'>
-                    <h3 className='font-bold text-xl mb-6'>
-                      Send Us a Message
+                {status === 'success' ? (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className='text-center py-20'
+                  >
+                    <div className='w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-8'>
+                      <CheckCircle2 className='h-10 w-10 text-emerald-600' />
+                    </div>
+                    <h3 className='text-2xl font-serif font-bold text-luxury-black mb-4'>
+                      Message Sent!
                     </h3>
-
-                    {isSuccess ? (
-                      <div className='bg-green-50 border border-green-200 rounded-md p-4 text-center'>
-                        <CheckCircle className='h-12 w-12 text-green-500 mx-auto mb-3' />
-                        <h4 className='text-lg font-medium text-green-800 mb-1'>
-                          Message Sent!
-                        </h4>
-                        <p className='text-green-600'>
-                          Thank you for contacting us. We'll get back to you
-                          shortly.
-                        </p>
+                    <p className='text-gray-500 font-light mb-8'>
+                      Thank you for reaching out. Our team will get back to you
+                      shortly.
+                    </p>
+                    <button
+                      onClick={() => setStatus('idle')}
+                      className='px-10 py-4 bg-luxury-black text-white rounded-full font-bold uppercase tracking-widest text-xs hover:bg-emerald-600 transition-all'
+                    >
+                      Send Another Message
+                    </button>
+                  </motion.div>
+                ) : (
+                  <form onSubmit={handleSubmit} className='space-y-8'>
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+                      <div className='space-y-2'>
+                        <label className='text-[10px] uppercase tracking-[0.2em] font-bold text-gray-400 ml-4'>
+                          Full Name
+                        </label>
+                        <input
+                          required
+                          type='text'
+                          value={formData.name}
+                          onChange={(e) =>
+                            setFormData({ ...formData, name: e.target.value })
+                          }
+                          placeholder='John Doe'
+                          className='w-full px-8 py-5 rounded-2xl bg-gray-50 border border-gray-100 focus:outline-none focus:border-emerald-500 transition-colors'
+                        />
                       </div>
-                    ) : (
-                      <>
-                        {error && (
-                          <div className='bg-red-50 border border-red-200 rounded-md p-4 mb-4 text-center'>
-                            <AlertCircle className='h-12 w-12 text-red-500 mx-auto mb-3' />
-                            <h4 className='text-lg font-medium text-red-800 mb-1'>
-                              Error
-                            </h4>
-                            <p className='text-red-600'>{error}</p>
-                          </div>
-                        )}
-                        <form className='space-y-4' onSubmit={handleSubmit}>
-                          <div className='grid grid-cols-2 gap-4'>
-                            <div className='space-y-2'>
-                              <label
-                                htmlFor='first_name'
-                                className='text-sm font-medium'
-                              >
-                                First Name
-                              </label>
-                              <input
-                                id='first_name'
-                                name='first_name'
-                                value={formData.first_name}
-                                onChange={handleChange}
-                                required
-                                className='w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary'
-                              />
-                            </div>
-                            <div className='space-y-2'>
-                              <label
-                                htmlFor='last_name'
-                                className='text-sm font-medium'
-                              >
-                                Last Name
-                              </label>
-                              <input
-                                id='last_name'
-                                name='last_name'
-                                value={formData.last_name}
-                                onChange={handleChange}
-                                required
-                                className='w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary'
-                              />
-                            </div>
-                          </div>
-                          <div className='space-y-2'>
-                            <label
-                              htmlFor='email'
-                              className='text-sm font-medium'
-                            >
-                              Email
-                            </label>
-                            <input
-                              id='email'
-                              name='email'
-                              type='email'
-                              value={formData.email}
-                              onChange={handleChange}
-                              required
-                              className='w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary'
-                            />
-                          </div>
-                          <div className='space-y-2'>
-                            <label
-                              htmlFor='phone'
-                              className='text-sm font-medium'
-                            >
-                              Phone
-                            </label>
-                            <input
-                              id='phone'
-                              name='phone'
-                              value={formData.phone}
-                              onChange={handleChange}
-                              required
-                              className='w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary'
-                            />
-                          </div>
-                          <div className='space-y-2'>
-                            <label
-                              htmlFor='service'
-                              className='text-sm font-medium'
-                            >
-                              Service Interested In
-                            </label>
-                            <select
-                              id='service'
-                              name='service'
-                              value={formData.service}
-                              onChange={handleChange}
-                              required
-                              className='w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary'
-                            >
-                              <option value=''>Select a service</option>
-                              <option value='language'>
-                                German Language Course
-                              </option>
-                              <option value='nursing'>
-                                Nursing Work Contract
-                              </option>
-                              <option value='ausbildung'>
-                                Ausbildung Training
-                              </option>
-                              <option value='study'>Study Pathway</option>
-                              <option value='job'>Job Seeker Pathway</option>
-                              <option value='other'>Other</option>
-                            </select>
-                          </div>
-                          <div className='space-y-2'>
-                            <label
-                              htmlFor='message'
-                              className='text-sm font-medium'
-                            >
-                              Message
-                            </label>
-                            <textarea
-                              id='message'
-                              name='message'
-                              rows={4}
-                              value={formData.message}
-                              onChange={handleChange}
-                              required
-                              className='w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary'
-                            ></textarea>
-                          </div>
-                          <button
-                            type='submit'
-                            disabled={isSubmitting}
-                            className='w-full bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-70'
-                          >
-                            {isSubmitting ? (
-                              'Sending...'
-                            ) : (
-                              <>
-                                <Send className='h-4 w-4' />
-                                Send Message
-                              </>
-                            )}
-                          </button>
-                        </form>
-                      </>
+                      <div className='space-y-2'>
+                        <label className='text-[10px] uppercase tracking-[0.2em] font-bold text-gray-400 ml-4'>
+                          Email Address
+                        </label>
+                        <input
+                          required
+                          type='email'
+                          value={formData.email}
+                          onChange={(e) =>
+                            setFormData({ ...formData, email: e.target.value })
+                          }
+                          placeholder='john@example.com'
+                          className='w-full px-8 py-5 rounded-2xl bg-gray-50 border border-gray-100 focus:outline-none focus:border-emerald-500 transition-colors'
+                        />
+                      </div>
+                    </div>
+
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+                      <div className='space-y-2'>
+                        <label className='text-[10px] uppercase tracking-[0.2em] font-bold text-gray-400 ml-4'>
+                          Phone Number
+                        </label>
+                        <input
+                          type='tel'
+                          value={formData.phone}
+                          onChange={(e) =>
+                            setFormData({ ...formData, phone: e.target.value })
+                          }
+                          placeholder='+234 ...'
+                          className='w-full px-8 py-5 rounded-2xl bg-gray-50 border border-gray-100 focus:outline-none focus:border-emerald-500 transition-colors'
+                        />
+                      </div>
+                      <div className='space-y-2'>
+                        <label className='text-[10px] uppercase tracking-[0.2em] font-bold text-gray-400 ml-4'>
+                          Service of Interest
+                        </label>
+                        <select
+                          value={formData.service}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              service: e.target.value,
+                            })
+                          }
+                          className='w-full px-8 py-5 rounded-2xl bg-gray-50 border border-gray-100 focus:outline-none focus:border-emerald-500 transition-colors appearance-none'
+                        >
+                          <option>General Inquiry</option>
+                          <option>Nursing Work Contract</option>
+                          <option>Ausbildung Training</option>
+                          <option>German Language Course</option>
+                          <option>Professional Exam Prep</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className='space-y-2'>
+                      <label className='text-[10px] uppercase tracking-[0.2em] font-bold text-gray-400 ml-4'>
+                        Your Message
+                      </label>
+                      <textarea
+                        required
+                        rows={6}
+                        value={formData.message}
+                        onChange={(e) =>
+                          setFormData({ ...formData, message: e.target.value })
+                        }
+                        placeholder='How can we help you?'
+                        className='w-full px-8 py-5 rounded-2xl bg-gray-50 border border-gray-100 focus:outline-none focus:border-emerald-500 transition-colors resize-none'
+                      ></textarea>
+                    </div>
+
+                    {status === 'error' && (
+                      <div className='flex items-center gap-3 p-4 rounded-xl bg-red-50 text-red-600 text-sm'>
+                        <AlertCircle className='h-5 w-5 shrink-0' />
+                        {errorMessage}
+                      </div>
                     )}
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-          </div>
-        </section>
 
-        {/* Map Section */}
-        <section className='py-16 bg-gray-50'>
-          <div className='container mx-auto px-4'>
-            <div className='max-w-3xl mx-auto text-center mb-12'>
-              <h2 className='text-3xl font-bold mb-4'>Visit Our Offices</h2>
-              <p className='text-gray-600'>
-                We have offices in Lagos and Port Harcourt to serve you better
-              </p>
-            </div>
-
-            <div className='grid md:grid-cols-2 gap-8'>
-              <div className='bg-white rounded-lg shadow-md overflow-hidden'>
-                <div className='p-4 bg-primary text-white'>
-                  <h3 className='font-bold'>Lagos Office</h3>
-                </div>
-                <div className='h-64'>
-                  <iframe
-                    src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3964.7286767086897!2d3.5638!3d6.4355!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNsKwMjYnMDcuOCJOIDPCsDMzJzQ5LjciRQ!5e0!3m2!1sen!2sng!4v1616603763408!5m2!1sen!2sng'
-                    width='100%'
-                    height='100%'
-                    style={{ border: 0 }}
-                    allowFullScreen=''
-                    loading='lazy'
-                    title='Lagos Office Map'
-                  ></iframe>
-                </div>
-                <div className='p-4'>
-                  <p className='text-gray-600'>
-                    8 Bayo Adetuna Street off Sangotedo. Lagos.
-                  </p>
-                </div>
-              </div>
-
-              <div className='bg-white rounded-lg shadow-md overflow-hidden'>
-                <div className='p-4 bg-primary text-white'>
-                  <h3 className='font-bold'>Port Harcourt Office</h3>
-                </div>
-                <div className='h-64'>
-                  <iframe
-                    src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3975.5741!2d7.0498!3d4.8156!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNMKwNDgnNTYuMiJOIDfCsDAyJzU5LjMiRQ!5e0!3m2!1sen!2sng!4v1616603763408!5m2!1sen!2sng'
-                    width='100%'
-                    height='100%'
-                    style={{ border: 0 }}
-                    allowFullScreen=''
-                    loading='lazy'
-                    title='Port Harcourt Office Map'
-                  ></iframe>
-                </div>
-                <div className='p-4'>
-                  <p className='text-gray-600'>
-                    No 70 Eliogbolo Road, Rumuodumaya, Port Harcourt
-                  </p>
-                </div>
+                    <button
+                      type='submit'
+                      disabled={status === 'loading'}
+                      className='w-full py-6 bg-luxury-black text-white rounded-2xl font-bold uppercase tracking-widest text-sm hover:bg-emerald-600 transition-all shadow-xl shadow-black/5 flex items-center justify-center gap-3 group disabled:opacity-50 disabled:cursor-not-allowed'
+                    >
+                      {status === 'loading' ? (
+                        <>
+                          <Loader2 className='h-5 w-5 animate-spin' />{' '}
+                          Sending...
+                        </>
+                      ) : (
+                        <>
+                          Send Message{' '}
+                          <Send className='h-5 w-5 group-hover:translate-x-1 transition-transform' />
+                        </>
+                      )}
+                    </button>
+                  </form>
+                )}
               </div>
             </div>
           </div>
-        </section>
-      </main>
+        </div>
+      </section>
 
-      {/* Footer */}
-      <Footer2 />
+      {/* Map Section */}
+      <section className='h-[600px] w-full bg-gray-100 grayscale hover:grayscale-0 transition-all duration-1000'>
+        <iframe
+          src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3964.728257844033!2d3.6186413!3d6.4353457!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103bf9046098059f%3A0x86810246028186!2s8%20Bayo%20Adetuna%20St%2C%20Sangotedo%2C%20Lekki%20106104%2C%20Lagos!5e0!3m2!1sen!2sng!4v1715500000000!5m2!1sen!2sng'
+          width='100%'
+          height='100%'
+          style={{ border: 0 }}
+          allowFullScreen
+          loading='lazy'
+          referrerPolicy='no-referrer-when-downgrade'
+        ></iframe>
+      </section>
     </div>
   );
 }
-
-export default ContactUs;

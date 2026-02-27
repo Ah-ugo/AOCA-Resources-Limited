@@ -1,5 +1,7 @@
 /** @format */
 
+'use client';
+
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -79,8 +81,9 @@ function Header() {
     { name: 'Pathways', type: 'dropdown', id: 'pathways' },
     { name: 'Services', type: 'dropdown', id: 'services' },
     { name: 'Blog', path: '/blogs' },
+    { name: 'Careers', path: '/careers' },
     { name: 'FAQ', path: '/#faq' },
-    { name: 'About Us', path: '/about' },
+    { name: 'About', path: '/about' },
     { name: 'Contact', path: '/contact' },
   ];
 
@@ -111,7 +114,7 @@ function Header() {
                 <img
                   src='/aocalogo-bg.png'
                   alt='AOCA'
-                  className='h-12 w-auto rounded-lg'
+                  className='h-15 w-auto rounded-lg'
                 />
               </div>
               <span

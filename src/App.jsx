@@ -95,33 +95,137 @@ import ApplicationDetails from './pages/admin/careers/ApplicationDetails';
 import PathwayDetail from './pages/PathwayDetail';
 import ServiceDetail from './pages/ServiceDetail';
 
+function Layout({ children, hideHeaderFooter = false }) {
+  return (
+    <>
+      {!hideHeaderFooter && <Header />}
+      {children}
+      {!hideHeaderFooter && <Footer />}
+    </>
+  );
+}
+
 function App() {
+  // Function to determine if current path is admin or dashboard
+  const shouldHideHeaderFooter = (pathname) => {
+    return pathname.startsWith('/admin') || pathname.startsWith('/dashboard');
+  };
+
   return (
     <Router>
       <AuthProvider>
         <Routes>
-          <Route path='/' element={<HomePage />} />
-          <Route path='/login' element={<Login />} />
-          <Route path='/register' element={<Register />} />
+          {/* Public routes with header and footer */}
+          <Route
+            path='/'
+            element={
+              <Layout>
+                <HomePage />
+              </Layout>
+            }
+          />
+          <Route
+            path='/login'
+            element={
+              <Layout>
+                <Login />
+              </Layout>
+            }
+          />
+          <Route
+            path='/register'
+            element={
+              <Layout>
+                <Register />
+              </Layout>
+            }
+          />
+          <Route
+            path='/faq'
+            element={
+              <Layout>
+                <FAQ />
+              </Layout>
+            }
+          />
+          <Route
+            path='/about'
+            element={
+              <Layout>
+                <AboutUs />
+              </Layout>
+            }
+          />
+          <Route
+            path='/pathways/:id'
+            element={
+              <Layout>
+                <PathwayDetail />
+              </Layout>
+            }
+          />
+          <Route
+            path='/services/:id'
+            element={
+              <Layout>
+                <ServiceDetail />
+              </Layout>
+            }
+          />
+          <Route
+            path='/contact'
+            element={
+              <Layout>
+                <ContactUs />
+              </Layout>
+            }
+          />
+          <Route
+            path='/careers'
+            element={
+              <Layout>
+                <Careers />
+              </Layout>
+            }
+          />
+          <Route
+            path='/careers/:id'
+            element={
+              <Layout>
+                <CareerDetail />
+              </Layout>
+            }
+          />
+          <Route
+            path='/blogs'
+            element={
+              <Layout>
+                <Blog />
+              </Layout>
+            }
+          />
+          <Route
+            path='/blog/:slug'
+            element={
+              <Layout>
+                <BlogPost />
+              </Layout>
+            }
+          />
+
+          {/* Dashboard route - NO header/footer */}
           <Route
             path='/dashboard/*'
             element={
               <PrivateRoute>
-                <Dashboard />
+                <Layout hideHeaderFooter={true}>
+                  <Dashboard />
+                </Layout>
               </PrivateRoute>
             }
           />
-          <Route path='/faq' element={<FAQ />} />
-          <Route path='/about' element={<AboutUs />} />
-          <Route path='/pathways/:id' element={<PathwayDetail />} />
-          <Route path='/services/:id' element={<ServiceDetail />} />
-          <Route path='/contact' element={<ContactUs />} />
-          <Route path='/careers' element={<Careers />} />
-          <Route path='/career/:id' element={<CareerDetail />} />
-          <Route path='/blogs' element={<Blog />} />
-          <Route path='/blog/:slug' element={<BlogPost />} />
 
-          {/* Admin Routes */}
+          {/* Admin Routes - NO header/footer */}
           <Route
             path='/admin'
             element={<Navigate to='/admin/dashboard' replace />}
@@ -130,85 +234,105 @@ function App() {
             path='/admin/*'
             element={
               <AdminRoute>
-                <AdminLayout>
-                  <Routes>
-                    <Route path='dashboard' element={<AdminDashboard />} />
+                <Layout hideHeaderFooter={true}>
+                  <AdminLayout>
+                    <Routes>
+                      <Route path='dashboard' element={<AdminDashboard />} />
 
-                    <Route path='users' element={<UsersList />} />
-                    <Route path='users/new' element={<UserForm />} />
-                    <Route path='users/:id' element={<UserDetail />} />
-                    <Route path='users/:id/edit' element={<UserForm />} />
+                      <Route path='users' element={<UsersList />} />
+                      <Route path='users/new' element={<UserForm />} />
+                      <Route path='users/:id' element={<UserDetail />} />
+                      <Route path='users/:id/edit' element={<UserForm />} />
 
-                    <Route path='careers/jobs' element={<JobsList />} />
-                    <Route path='careers/jobs/new' element={<JobForm />} />
-                    <Route path='careers/jobs/:id/edit' element={<JobForm />} />
+                      <Route path='careers/jobs' element={<JobsList />} />
+                      <Route path='careers/jobs/new' element={<JobForm />} />
+                      <Route
+                        path='careers/jobs/:id/edit'
+                        element={<JobForm />}
+                      />
 
-                    <Route
-                      path='careers/applications'
-                      element={<ApplicationsList />}
-                    />
-                    <Route
-                      path='careers/applications/:id'
-                      element={<ApplicationDetails />}
-                    />
+                      <Route
+                        path='careers/applications'
+                        element={<ApplicationsList />}
+                      />
+                      <Route
+                        path='careers/applications/:id'
+                        element={<ApplicationDetails />}
+                      />
 
-                    <Route
-                      path='careers/categories'
-                      element={<JobCategoriesList />}
-                    />
+                      <Route
+                        path='careers/categories'
+                        element={<JobCategoriesList />}
+                      />
 
-                    {/* Blog Management */}
-                    <Route path='blogs' element={<BlogsList />} />
-                    <Route path='blogs/new' element={<BlogForm />} />
-                    <Route path='blogs/:id/edit' element={<BlogForm />} />
-                    <Route
-                      path='blogs/categories'
-                      element={<CategoriesList />}
-                    />
+                      {/* Blog Management */}
+                      <Route path='blogs' element={<BlogsList />} />
+                      <Route path='blogs/new' element={<BlogForm />} />
+                      <Route path='blogs/:id/edit' element={<BlogForm />} />
+                      <Route
+                        path='blogs/categories'
+                        element={<CategoriesList />}
+                      />
 
-                    {/* Course Management */}
-                    <Route path='courses' element={<CoursesList />} />
-                    <Route path='courses/new' element={<CourseForm />} />
-                    <Route path='courses/:id' element={<CourseDetail />} />
-                    <Route path='courses/:id/edit' element={<CourseForm />} />
-                    <Route path='classes' element={<ClassesList />} />
+                      {/* Course Management */}
+                      <Route path='courses' element={<CoursesList />} />
+                      <Route path='courses/new' element={<CourseForm />} />
+                      <Route path='courses/:id' element={<CourseDetail />} />
+                      <Route path='courses/:id/edit' element={<CourseForm />} />
+                      <Route path='classes' element={<ClassesList />} />
 
-                    {/* Course Lessons Management */}
-                    <Route path='lessons' element={<ClassesList />} />
-                    <Route path='classes/new' element={<ClassCreate />} />
-                    <Route path='classes/:id' element={<ClassPreview />} />
-                    <Route path='classes/:id/edit' element={<ClassEdit />} />
-                    <Route
-                      path='courses/:courseId/lessons'
-                      element={<LessonsList />}
-                    />
-                    <Route
-                      path='courses/:courseId/lessons/new'
-                      element={<LessonForm />}
-                    />
-                    <Route
-                      path='courses/:courseId/lessons/:lessonId'
-                      element={<LessonDetail />}
-                    />
-                    <Route
-                      path='courses/:courseId/lessons/:lessonId/edit'
-                      element={<LessonForm />}
-                    />
+                      {/* Course Lessons Management */}
+                      <Route path='lessons' element={<ClassesList />} />
+                      <Route path='classes/new' element={<ClassCreate />} />
+                      <Route path='classes/:id' element={<ClassPreview />} />
+                      <Route path='classes/:id/edit' element={<ClassEdit />} />
+                      <Route
+                        path='courses/:courseId/lessons'
+                        element={<LessonsList />}
+                      />
+                      <Route
+                        path='courses/:courseId/lessons/new'
+                        element={<LessonForm />}
+                      />
+                      <Route
+                        path='courses/:courseId/lessons/:lessonId'
+                        element={<LessonDetail />}
+                      />
+                      <Route
+                        path='courses/:courseId/lessons/:lessonId/edit'
+                        element={<LessonForm />}
+                      />
 
-                    <Route
-                      path='messages'
-                      element={<AdminContactSubmissions />}
-                    />
+                      <Route
+                        path='messages'
+                        element={<AdminContactSubmissions />}
+                      />
 
-                    <Route path='*' element={<NotFound />} />
-                  </Routes>
-                </AdminLayout>
+                      <Route path='*' element={<NotFound />} />
+                    </Routes>
+                  </AdminLayout>
+                </Layout>
               </AdminRoute>
             }
           />
 
-          <Route path='/not-found' element={<NotFound />} />
-          <Route path='*' element={<Navigate to='/not-found' replace />} />
+          {/* 404 and redirects */}
+          <Route
+            path='/not-found'
+            element={
+              <Layout>
+                <NotFound />
+              </Layout>
+            }
+          />
+          <Route
+            path='*'
+            element={
+              <Layout>
+                <Navigate to='/not-found' replace />
+              </Layout>
+            }
+          />
         </Routes>
       </AuthProvider>
     </Router>
@@ -1091,7 +1215,7 @@ function Footer() {
 function HomePage() {
   return (
     <main className='overflow-hidden'>
-      <Header />
+      {/* <Header /> */}
       <HeroCarousel />
       <StatsSection />
       <WhyChooseUs />
@@ -1137,7 +1261,7 @@ function HomePage() {
       </section>
 
       <Newsletter />
-      <Footer />
+      {/* <Footer /> */}
     </main>
   );
 }
