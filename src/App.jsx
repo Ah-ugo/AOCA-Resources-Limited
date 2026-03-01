@@ -47,6 +47,7 @@ import {
   Link,
   Navigate,
   useNavigate,
+  ScrollRestoration,
 } from 'react-router-dom';
 import { AuthProvider } from './contexts/auth-context';
 import { authService } from './services/auth-service';
@@ -96,6 +97,7 @@ import AdminContactSubmissions from './pages/admin/contact-forms/ContactMain';
 import ApplicationDetails from './pages/admin/careers/ApplicationDetails';
 import PathwayDetail from './pages/PathwayDetail';
 import ServiceDetail from './pages/ServiceDetail';
+import ScrollToTop from './components/ScrollToTop';
 
 function Layout({ children, hideHeaderFooter = false }) {
   return (
@@ -114,6 +116,7 @@ function App() {
 
   return (
     <Router>
+      <ScrollToTop />
       <AuthProvider>
         <Routes>
           <Route
@@ -317,6 +320,7 @@ function App() {
           />
         </Routes>
       </AuthProvider>
+      {/* <ScrollRestoration /> */}
     </Router>
   );
 }
