@@ -55,7 +55,7 @@ function AboutUs() {
   return (
     <div className='min-h-screen bg-white'>
       {/* Hero Section */}
-      <section className='relative h-[60vh] flex items-center justify-center overflow-hidden bg-luxury-black'>
+      <section className='relative h-[60vh] flex items-center justify-center overflow-hidden bg-luxury-black pt-20'>
         <div className='absolute inset-0 z-0'>
           <img
             src='https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=2000'
