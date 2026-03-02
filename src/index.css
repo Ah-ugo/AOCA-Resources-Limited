@@ -1,5 +1,4 @@
 /** @format */
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
 @import 'tailwindcss';
 
@@ -15,6 +14,8 @@
 @layer base {
   html {
     font-size: 16px;
+    overflow-x: hidden;
+    width: 100%;
   }
 
   @screen sm {
@@ -30,7 +31,10 @@
   }
 
   body {
-    @apply font-sans text-luxury-black bg-white antialiased overflow-x-hidden;
+    @apply font-sans text-luxury-black bg-white antialiased;
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
   }
 
   h1,
@@ -69,4 +73,12 @@
 .scroll-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Ensure root doesn't cause overflow */
+#root {
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
 }

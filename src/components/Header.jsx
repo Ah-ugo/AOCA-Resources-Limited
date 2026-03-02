@@ -69,6 +69,18 @@ function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMenuOpen]);
+
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   const isActive = (path) => {
@@ -233,78 +245,91 @@ function Header() {
         </div>
       </motion.header>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu - Fixed */}
       <AnimatePresence>
         {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, x: '100%' }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className='fixed inset-0 z-[60] bg-white lg:hidden overflow-y-auto'
-          >
-            <div className='flex flex-col min-h-full p-8'>
-              <div className='flex justify-between items-center mb-12'>
-                <span className='text-2xl font-serif font-bold text-luxury-black'>
-                  AOCA.
-                </span>
-                <button onClick={toggleMenu} className='p-2'>
-                  <X className='h-8 w-8' />
-                </button>
-              </div>
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className='fixed inset-0 bg-black/50 z-[55] lg:hidden'
+              onClick={toggleMenu}
+            />
 
-              <nav className='flex flex-col gap-10'>
-                {navItems.map((item) => (
-                  <div key={item.name}>
-                    {item.type === 'dropdown' ? (
-                      <div className='space-y-6'>
-                        <span className='text-xs uppercase tracking-[0.3em] text-emerald-600 font-bold'>
-                          {item.name}
-                        </span>
-                        <div className='grid grid-cols-1 gap-6 pl-4 border-l border-emerald-100'>
-                          {dropdownItems[item.id].map((subItem) => (
-                            <Link
-                              key={subItem.name}
-                              to={subItem.path}
-                              className='text-xl font-medium text-luxury-black hover:text-emerald-600 transition-colors'
-                              onClick={toggleMenu}
-                            >
-                              {subItem.name}
-                            </Link>
-                          ))}
+            {/* Menu Panel */}
+            <motion.div
+              initial={{ opacity: 0, x: '100%' }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className='fixed top-0 right-0 bottom-0 w-full max-w-sm z-[60] lg:hidden overflow-y-auto bg-white'
+            >
+              <div className='flex flex-col min-h-full p-8'>
+                <div className='flex justify-between items-center mb-12'>
+                  <span className='text-2xl font-serif font-bold text-luxury-black'>
+                    AOCA.
+                  </span>
+                  <button onClick={toggleMenu} className='p-2'>
+                    <X className='h-8 w-8' />
+                  </button>
+                </div>
+
+                <nav className='flex flex-col gap-10'>
+                  {navItems.map((item) => (
+                    <div key={item.name}>
+                      {item.type === 'dropdown' ? (
+                        <div className='space-y-6'>
+                          <span className='text-xs uppercase tracking-[0.3em] text-emerald-600 font-bold'>
+                            {item.name}
+                          </span>
+                          <div className='grid grid-cols-1 gap-6 pl-4 border-l border-emerald-100'>
+                            {dropdownItems[item.id].map((subItem) => (
+                              <Link
+                                key={subItem.name}
+                                to={subItem.path}
+                                className='text-xl font-medium text-luxury-black hover:text-emerald-600 transition-colors'
+                                onClick={toggleMenu}
+                              >
+                                {subItem.name}
+                              </Link>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    ) : (
-                      <Link
-                        to={item.path}
-                        className='text-4xl font-serif font-bold text-luxury-black hover:text-emerald-600 transition-colors'
-                        onClick={toggleMenu}
-                      >
-                        {item.name}
-                      </Link>
-                    )}
-                  </div>
-                ))}
-              </nav>
+                      ) : (
+                        <Link
+                          to={item.path}
+                          className='text-4xl font-serif font-bold text-luxury-black hover:text-emerald-600 transition-colors'
+                          onClick={toggleMenu}
+                        >
+                          {item.name}
+                        </Link>
+                      )}
+                    </div>
+                  ))}
+                </nav>
 
-              <div className='mt-12 pt-8 border-t border-gray-100 flex flex-col gap-4 pb-8'>
-                <Link
-                  to='/login'
-                  className='text-center py-5 text-lg font-bold uppercase tracking-widest text-luxury-black border border-luxury-black rounded-2xl'
-                  onClick={toggleMenu}
-                >
-                  Login
-                </Link>
-                <Link
-                  to='/register'
-                  className='text-center py-5 text-lg font-bold uppercase tracking-widest text-white bg-luxury-black rounded-2xl'
-                  onClick={toggleMenu}
-                >
-                  Register
-                </Link>
+                <div className='mt-12 pt-8 border-t border-gray-100 flex flex-col gap-4 pb-8'>
+                  <Link
+                    to='/login'
+                    className='text-center py-5 text-lg font-bold uppercase tracking-widest text-luxury-black border border-luxury-black rounded-2xl'
+                    onClick={toggleMenu}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to='/register'
+                    className='text-center py-5 text-lg font-bold uppercase tracking-widest text-white bg-luxury-black rounded-2xl'
+                    onClick={toggleMenu}
+                  >
+                    Register
+                  </Link>
+                </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>

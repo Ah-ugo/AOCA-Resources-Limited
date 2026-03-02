@@ -110,10 +110,6 @@ function Layout({ children, hideHeaderFooter = false }) {
 }
 
 function App() {
-  const shouldHideHeaderFooter = (pathname) => {
-    return pathname.startsWith('/admin') || pathname.startsWith('/dashboard');
-  };
-
   return (
     <Router>
       <ScrollToTop />
@@ -320,7 +316,6 @@ function App() {
           />
         </Routes>
       </AuthProvider>
-      {/* <ScrollRestoration /> */}
     </Router>
   );
 }
@@ -750,6 +745,64 @@ function GermanyPathwaysSection() {
   );
 }
 
+// ─── PROCESS ──────────────────────────────────────────────────────────────────
+function ProcessSection() {
+  const steps = [
+    {
+      number: '01',
+      title: 'Enroll in German',
+      desc: 'Pick your level — A1, A2, B1, B2, or C1 — and start your German language journey with our certified instructors.',
+    },
+    {
+      number: '02',
+      title: 'Pass the Goethe Exam',
+      desc: 'We prepare you intensively for the official Goethe certification that German employers and visa offices require.',
+    },
+    {
+      number: '03',
+      title: 'Choose Your Pathway',
+      desc: 'Nursing, Ausbildung, Job Seeker Visa, or University — we match your certificate to the right Germany-bound route.',
+    },
+    {
+      number: '04',
+      title: 'We Handle the Rest',
+      desc: 'Visa processing, employer matching, document support, and relocation guidance — we see you through to Germany.',
+    },
+  ];
+
+  return (
+    <section className='py-32 bg-luxury-black text-white'>
+      <div className='container mx-auto px-6'>
+        <div className='text-center max-w-3xl mx-auto mb-20'>
+          <span className='text-emerald-400 font-bold uppercase tracking-[0.3em] text-sm block mb-4'>
+            The Journey
+          </span>
+          <h2 className='text-fluid-h2 font-serif font-bold'>
+            How We Get You to Germany
+          </h2>
+        </div>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
+          {steps.map((step, i) => (
+            <div key={i} className='relative group'>
+              <div className='text-8xl font-serif font-bold text-emerald-500/10 absolute -top-10 -left-4 group-hover:text-emerald-500/20 transition-colors'>
+                {step.number}
+              </div>
+              <div className='relative z-10 pt-8'>
+                <h3 className='text-2xl font-serif font-bold text-white mb-4'>
+                  {step.title}
+                </h3>
+                <p className='text-white/50 font-light leading-relaxed'>
+                  {step.desc}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ─── WHY AOCA (replaces generic WhyChooseUs) ─────────────────────────────────
 function WhyAOCASection() {
   const features = [
@@ -821,6 +874,150 @@ function WhyAOCASection() {
               Our Full Story <ArrowRight className='h-5 w-5' />
             </Link>
           </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── WHY GERMANY ──────────────────────────────────────────────────────────────
+function WhyGermanySection() {
+  const reasonsRow1 = [
+    {
+      title: 'Tuition-Free University',
+      desc: 'Public universities in Germany charge no tuition fees — even for international students from Nigeria.',
+    },
+    {
+      title: 'Nursing Demand',
+      desc: 'Germany faces a critical shortage of nurses. Qualified B2-certified nurses from Nigeria are actively recruited.',
+    },
+    {
+      title: 'Ausbildung Pays You',
+      desc: 'Unlike internships, German Ausbildung apprentices receive a monthly salary while they train.',
+    },
+    {
+      title: 'High Earning Potential',
+      desc: 'Average salaries in Germany are 3–5x higher than comparable roles in Nigeria across most professions.',
+    },
+  ];
+
+  const reasonsRow2 = [
+    {
+      title: 'Permanent Residency Path',
+      desc: 'Germany offers a clear path to permanent residency after just a few years of working there.',
+    },
+    {
+      title: 'Family Reunification',
+      desc: 'Most German work visas allow you to bring your spouse and children to Germany with you.',
+    },
+    {
+      title: 'Strong Economy',
+      desc: "Europe's largest economy with booming demand for healthcare, IT, and skilled trades.",
+    },
+    {
+      title: 'Safety & Stability',
+      desc: "Consistently ranked among the world's safest and most politically stable countries.",
+    },
+  ];
+
+  return (
+    <section className='py-32 bg-white relative overflow-hidden'>
+      <div className='container mx-auto px-6 relative z-10 mb-20'>
+        <div className='max-w-3xl'>
+          <span className='text-emerald-600 font-bold uppercase tracking-[0.3em] text-sm block mb-4'>
+            Why Germany?
+          </span>
+          <h2 className='text-fluid-h2 font-serif font-bold text-luxury-black mb-8'>
+            The Opportunity is Real.
+            <br />
+            The Door is German Language.
+          </h2>
+          <p className='text-xl text-gray-500 font-light leading-relaxed'>
+            Germany is actively seeking skilled workers from abroad. Whether
+            you're a nurse, engineer, IT expert, or trade professional —
+            speaking German is the single key that unlocks every opportunity.
+          </p>
+        </div>
+      </div>
+
+      {/* Mobile: Static grid */}
+      <div className='md:hidden container mx-auto px-6'>
+        <div className='grid grid-cols-1 gap-6'>
+          {[...reasonsRow1, ...reasonsRow2].map((r, i) => (
+            <div
+              key={i}
+              className='p-8 rounded-[2rem] bg-luxury-cream border border-gray-100'
+            >
+              <h4 className='text-xl font-serif font-bold mb-3 text-emerald-600'>
+                {r.title}
+              </h4>
+              <p className='text-sm text-gray-500 font-light leading-relaxed'>
+                {r.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Desktop: Infinite scroll */}
+      <div className='hidden md:block relative'>
+        <div className='flex overflow-hidden'>
+          <motion.div
+            animate={{ x: [0, -1920] }}
+            transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
+            className='flex gap-8 whitespace-nowrap'
+          >
+            {[...reasonsRow1, ...reasonsRow1, ...reasonsRow1].map((r, i) => (
+              <div
+                key={i}
+                className='w-[400px] p-10 rounded-[2.5rem] bg-luxury-cream border border-gray-100 shrink-0'
+              >
+                <h4 className='text-2xl font-serif font-bold mb-4 text-emerald-600'>
+                  {r.title}
+                </h4>
+                <p className='text-base text-gray-500 font-light leading-relaxed whitespace-normal'>
+                  {r.desc}
+                </p>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+        <div className='flex overflow-hidden mt-8'>
+          <motion.div
+            animate={{ x: [-1920, 0] }}
+            transition={{ duration: 45, repeat: Infinity, ease: 'linear' }}
+            className='flex gap-8 whitespace-nowrap'
+          >
+            {[...reasonsRow2, ...reasonsRow2, ...reasonsRow2].map((r, i) => (
+              <div
+                key={i}
+                className='w-[400px] p-10 rounded-[2.5rem] bg-luxury-cream border border-gray-100 shrink-0'
+              >
+                <h4 className='text-2xl font-serif font-bold mb-4 text-emerald-600'>
+                  {r.title}
+                </h4>
+                <p className='text-base text-gray-500 font-light leading-relaxed whitespace-normal'>
+                  {r.desc}
+                </p>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </div>
+
+      <div className='container mx-auto px-6 mt-24'>
+        <div className='flex justify-center'>
+          <Link
+            to='/services/german'
+            className='group flex items-center gap-4 text-luxury-black hover:text-emerald-600 transition-colors'
+          >
+            <span className='text-sm uppercase tracking-[0.3em] font-bold'>
+              Start Your German Journey
+            </span>
+            <div className='w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center group-hover:border-emerald-500 transition-colors'>
+              <ArrowRight className='h-5 w-5 group-hover:translate-x-1 transition-transform' />
+            </div>
+          </Link>
         </div>
       </div>
     </section>
@@ -938,64 +1135,6 @@ function ServicesSection() {
   );
 }
 
-// ─── PROCESS ──────────────────────────────────────────────────────────────────
-function ProcessSection() {
-  const steps = [
-    {
-      number: '01',
-      title: 'Enroll in German',
-      desc: 'Pick your level — A1, A2, B1, B2, or C1 — and start your German language journey with our certified instructors.',
-    },
-    {
-      number: '02',
-      title: 'Pass the Goethe Exam',
-      desc: 'We prepare you intensively for the official Goethe certification that German employers and visa offices require.',
-    },
-    {
-      number: '03',
-      title: 'Choose Your Pathway',
-      desc: 'Nursing, Ausbildung, Job Seeker Visa, or University — we match your certificate to the right Germany-bound route.',
-    },
-    {
-      number: '04',
-      title: 'We Handle the Rest',
-      desc: 'Visa processing, employer matching, document support, and relocation guidance — we see you through to Germany.',
-    },
-  ];
-
-  return (
-    <section className='py-32 bg-luxury-black text-white'>
-      <div className='container mx-auto px-6'>
-        <div className='text-center max-w-3xl mx-auto mb-20'>
-          <span className='text-emerald-400 font-bold uppercase tracking-[0.3em] text-sm block mb-4'>
-            The Journey
-          </span>
-          <h2 className='text-fluid-h2 font-serif font-bold'>
-            How We Get You to Germany
-          </h2>
-        </div>
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
-          {steps.map((step, i) => (
-            <div key={i} className='relative group'>
-              <div className='text-8xl font-serif font-bold text-emerald-500/10 absolute -top-10 -left-4 group-hover:text-emerald-500/20 transition-colors'>
-                {step.number}
-              </div>
-              <div className='relative z-10 pt-8'>
-                <h3 className='text-2xl font-serif font-bold text-white mb-4'>
-                  {step.title}
-                </h3>
-                <p className='text-white/50 font-light leading-relaxed'>
-                  {step.desc}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 // ─── TESTIMONIALS ─────────────────────────────────────────────────────────────
 function TestimonialsSection() {
   const testimonials = [
@@ -1063,130 +1202,6 @@ function TestimonialsSection() {
               </div>
             </motion.div>
           ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ─── WHY GERMANY ──────────────────────────────────────────────────────────────
-function WhyGermanySection() {
-  const reasonsRow1 = [
-    {
-      title: 'Tuition-Free University',
-      desc: 'Public universities in Germany charge no tuition fees — even for international students from Nigeria.',
-    },
-    {
-      title: 'Nursing Demand',
-      desc: 'Germany faces a critical shortage of nurses. Qualified B2-certified nurses from Nigeria are actively recruited.',
-    },
-    {
-      title: 'Ausbildung Pays You',
-      desc: 'Unlike internships, German Ausbildung apprentices receive a monthly salary while they train.',
-    },
-    {
-      title: 'High Earning Potential',
-      desc: 'Average salaries in Germany are 3–5x higher than comparable roles in Nigeria across most professions.',
-    },
-  ];
-
-  const reasonsRow2 = [
-    {
-      title: 'Permanent Residency Path',
-      desc: 'Germany offers a clear path to permanent residency after just a few years of working there.',
-    },
-    {
-      title: 'Family Reunification',
-      desc: 'Most German work visas allow you to bring your spouse and children to Germany with you.',
-    },
-    {
-      title: 'Strong Economy',
-      desc: "Europe's largest economy with booming demand for healthcare, IT, and skilled trades.",
-    },
-    {
-      title: 'Safety & Stability',
-      desc: "Consistently ranked among the world's safest and most politically stable countries.",
-    },
-  ];
-
-  return (
-    <section className='py-32 bg-white relative overflow-hidden'>
-      <div className='container mx-auto px-6 relative z-10 mb-20'>
-        <div className='max-w-3xl'>
-          <span className='text-emerald-600 font-bold uppercase tracking-[0.3em] text-sm block mb-4'>
-            Why Germany?
-          </span>
-          <h2 className='text-fluid-h2 font-serif font-bold text-luxury-black mb-8'>
-            The Opportunity is Real.
-            <br />
-            The Door is German Language.
-          </h2>
-          <p className='text-xl text-gray-500 font-light leading-relaxed'>
-            Germany is actively seeking skilled workers from abroad. Whether
-            you're a nurse, engineer, IT expert, or trade professional —
-            speaking German is the single key that unlocks every opportunity.
-          </p>
-        </div>
-      </div>
-
-      <div className='relative space-y-8 md:space-y-12'>
-        <div className='flex overflow-hidden'>
-          <motion.div
-            animate={{ x: [0, -1920] }}
-            transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
-            className='flex gap-4 md:gap-8 whitespace-nowrap'
-          >
-            {[...reasonsRow1, ...reasonsRow1, ...reasonsRow1].map((r, i) => (
-              <div
-                key={i}
-                className='w-[300px] md:w-[400px] p-8 md:p-10 rounded-[2rem] md:rounded-[2.5rem] bg-luxury-cream border border-gray-100 shrink-0'
-              >
-                <h4 className='text-xl md:text-2xl font-serif font-bold mb-3 md:mb-4 text-emerald-600'>
-                  {r.title}
-                </h4>
-                <p className='text-sm md:text-base text-gray-500 font-light leading-relaxed whitespace-normal'>
-                  {r.desc}
-                </p>
-              </div>
-            ))}
-          </motion.div>
-        </div>
-        <div className='flex overflow-hidden'>
-          <motion.div
-            animate={{ x: [-1920, 0] }}
-            transition={{ duration: 45, repeat: Infinity, ease: 'linear' }}
-            className='flex gap-4 md:gap-8 whitespace-nowrap'
-          >
-            {[...reasonsRow2, ...reasonsRow2, ...reasonsRow2].map((r, i) => (
-              <div
-                key={i}
-                className='w-[300px] md:w-[400px] p-8 md:p-10 rounded-[2rem] md:rounded-[2.5rem] bg-luxury-cream border border-gray-100 shrink-0'
-              >
-                <h4 className='text-xl md:text-2xl font-serif font-bold mb-3 md:mb-4 text-emerald-600'>
-                  {r.title}
-                </h4>
-                <p className='text-sm md:text-base text-gray-500 font-light leading-relaxed whitespace-normal'>
-                  {r.desc}
-                </p>
-              </div>
-            ))}
-          </motion.div>
-        </div>
-      </div>
-
-      <div className='container mx-auto px-6 mt-24'>
-        <div className='flex justify-center'>
-          <Link
-            to='/services/german'
-            className='group flex items-center gap-4 text-luxury-black hover:text-emerald-600 transition-colors'
-          >
-            <span className='text-sm uppercase tracking-[0.3em] font-bold'>
-              Start Your German Journey
-            </span>
-            <div className='w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center group-hover:border-emerald-500 transition-colors'>
-              <ArrowRight className='h-5 w-5 group-hover:translate-x-1 transition-transform' />
-            </div>
-          </Link>
         </div>
       </div>
     </section>
