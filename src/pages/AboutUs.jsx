@@ -58,7 +58,7 @@ function AboutUs() {
       <section className='relative h-[60vh] flex items-center justify-center overflow-hidden bg-luxury-black pt-20'>
         <div className='absolute inset-0 z-0'>
           <img
-            src='https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=2000'
+            src='./2.jpg'
             alt='About Hero'
             className='w-full h-full object-cover opacity-40'
           />
@@ -96,7 +96,7 @@ function AboutUs() {
             >
               <div className='aspect-[4/5] rounded-[3rem] overflow-hidden shadow-2xl'>
                 <img
-                  src='https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=1000'
+                  src='./3.jpg'
                   alt='Founder'
                   className='w-full h-full object-cover'
                 />

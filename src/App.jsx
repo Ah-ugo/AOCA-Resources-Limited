@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import {
   motion,
   AnimatePresence,
@@ -39,6 +39,10 @@ import {
   Award,
   CheckCircle,
   Star,
+  Info,
+  TrendingUp,
+  Users,
+  Zap,
 } from 'lucide-react';
 import {
   BrowserRouter as Router,
@@ -47,7 +51,6 @@ import {
   Link,
   Navigate,
   useNavigate,
-  ScrollRestoration,
 } from 'react-router-dom';
 import { AuthProvider } from './contexts/auth-context';
 import { authService } from './services/auth-service';
@@ -99,6 +102,45 @@ import PathwayDetail from './pages/PathwayDetail';
 import ServiceDetail from './pages/ServiceDetail';
 import ScrollToTop from './components/ScrollToTop';
 
+// ─── TOOLTIP COMPONENT ───────────────────────────────────────────────────────
+function Tooltip({ text, children }) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <span
+      className='relative inline-flex items-center'
+      onMouseEnter={() => setVisible(true)}
+      onMouseLeave={() => setVisible(false)}
+      onFocus={() => setVisible(true)}
+      onBlur={() => setVisible(false)}
+    >
+      {children}
+      <AnimatePresence>
+        {visible && (
+          <motion.div
+            initial={{ opacity: 0, y: 6, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 6, scale: 0.95 }}
+            transition={{ duration: 0.18 }}
+            className='absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-56 bg-luxury-black text-white text-xs font-light leading-relaxed rounded-xl px-4 py-3 shadow-xl border border-white/10 pointer-events-none text-center'
+          >
+            {text}
+            <div className='absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-luxury-black' />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </span>
+  );
+}
+
+function InfoBadge({ text }) {
+  return (
+    <Tooltip text={text}>
+      <Info className='h-3.5 w-3.5 ml-1.5 text-emerald-500 cursor-help opacity-70 hover:opacity-100 transition-opacity' />
+    </Tooltip>
+  );
+}
+
+// ─── LAYOUT ───────────────────────────────────────────────────────────────────
 function Layout({ children, hideHeaderFooter = false }) {
   return (
     <>
@@ -338,54 +380,66 @@ function AdminRoute({ children }) {
 // ─── HERO CAROUSEL ────────────────────────────────────────────────────────────
 const slides = [
   {
-    image:
-      'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=2000',
-    subtitle: "Nigeria's Premier German Language School",
+    image: './1.jpg',
+    badge: "🇳🇬 Nigeria's #1 German Language School",
     title: 'Learn German.\nWork in Germany.',
     description:
-      'We take you from zero German to B2 certified — and straight into a career, nursing role, Ausbildung, or university seat in Germany.',
+      'We take you from zero German to B2 certified — and straight into a nursing role, Ausbildung, or tech job in Germany. Over 530 of our students are already there.',
+    primary: { label: 'See Our Programs', to: '/services/german' },
+    secondary: { label: 'Enroll Today — Free Consultation', to: '/register' },
   },
   {
-    image:
-      'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&q=80&w=2000',
-    subtitle: 'Nursing · Ausbildung · Job Seeker Visa',
-    title: 'Your German\nCareer.',
+    image: './2.jpg',
+    badge: '💼 Nursing · Ausbildung · Job Seeker Visa',
+    title: 'Your German\nCareer Awaits.',
     description:
-      'Hospitals, tech companies, and vocational firms in Germany need skilled Nigerians. We train you, connect you, and process your visa end-to-end.',
+      'Hospitals, tech companies, and top firms in Germany are actively recruiting Nigerians right now. We train you, connect you, and handle your visa — end to end.',
+    primary: { label: 'Explore Pathways to Germany', to: '/pathways/nursing' },
+    secondary: { label: 'Talk to a Counsellor', to: '/contact' },
   },
   {
-    image:
-      'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=2000',
-    subtitle: 'From A1 to B2 — Fast Track Available',
-    title: 'Speak German\nFluently.',
+    image: './3.jpg',
+    badge: '⚡ Fast-Track: A1 to B2 in 6 Months',
+    title: 'Speak German\nFluently. Fast.',
     description:
-      'Our intensive programs prepare you for the Goethe examination and real-life communication in Germany — in the shortest time possible.',
+      'No prior knowledge needed. Our intensive Goethe-certified program gets you exam-ready in record time — without cutting corners on quality.',
+    primary: { label: 'Start A1 for Free', to: '/register' },
+    secondary: { label: 'View All German Levels', to: '/services/german' },
   },
 ];
 
 function HeroCarousel() {
   const [current, setCurrent] = useState(0);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
+    if (paused) return;
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % slides.length);
-    }, 6000);
+    }, 6500);
     return () => clearInterval(timer);
-  }, []);
+  }, [paused]);
+
+  const prev = () => setCurrent((p) => (p - 1 + slides.length) % slides.length);
+  const next = () => setCurrent((p) => (p + 1) % slides.length);
 
   return (
-    <section className='relative h-screen w-full overflow-hidden bg-black'>
+    <section
+      className='relative h-screen w-full overflow-hidden bg-black'
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
       <AnimatePresence mode='wait'>
         <motion.div
           key={current}
-          initial={{ opacity: 0, scale: 1.1 }}
+          initial={{ opacity: 0, scale: 1.06 }}
           animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 1.5, ease: [0.19, 1, 0.22, 1] }}
+          exit={{ opacity: 0, scale: 0.97 }}
+          transition={{ duration: 1.4, ease: [0.19, 1, 0.22, 1] }}
           className='absolute inset-0'
         >
-          <div className='absolute inset-0 bg-black/50 z-10' />
-          <div className='absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/20 z-10' />
+          <div className='absolute inset-0 bg-black/55 z-10' />
+          <div className='absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-10' />
           <img
             src={slides[current].image}
             alt={slides[current].title}
@@ -395,71 +449,90 @@ function HeroCarousel() {
       </AnimatePresence>
 
       <div className='absolute inset-0 z-20 flex items-center pt-20 md:pt-24'>
-        <div className='container mx-auto px-6 lg:px-12'>
-          <div className='max-w-5xl'>
-            <motion.div
-              key={`text-${current}`}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.5 }}
-            >
-              <span className='inline-block text-emerald-400 text-xs md:text-sm uppercase tracking-[0.4em] font-bold mb-6'>
-                {slides[current].subtitle}
-              </span>
-              <h1 className='text-fluid-h1 font-serif font-bold text-white mb-8 tracking-tighter'>
-                {slides[current].title.split('\n').map((line, i) => (
-                  <span key={i} className='block'>
-                    {line}
-                  </span>
-                ))}
-              </h1>
-              <p className='text-lg md:text-xl text-white/70 max-w-xl mb-12 font-light leading-relaxed'>
-                {slides[current].description}
-              </p>
-              <div className='flex flex-wrap gap-4 md:gap-6'>
-                <Link
-                  to='/services/german'
-                  className='px-8 md:px-10 py-4 md:py-5 bg-emerald-600 text-white rounded-full text-xs md:text-sm uppercase tracking-widest font-bold hover:bg-emerald-500 transition-all duration-300 hover:scale-105 shadow-[0_10px_30px_rgba(16,185,129,0.3)]'
-                >
-                  View German Programs
-                </Link>
-                <Link
-                  to='/register'
-                  className='px-8 md:px-10 py-4 md:py-5 bg-white/10 backdrop-blur-md text-white border border-white/20 rounded-full text-xs md:text-sm uppercase tracking-widest font-bold hover:bg-white/20 transition-all duration-300'
-                >
-                  Enroll Today
-                </Link>
-              </div>
-            </motion.div>
+        <div className='container mx-auto px-5 sm:px-8 lg:px-12'>
+          <div className='max-w-4xl'>
+            <AnimatePresence mode='wait'>
+              <motion.div
+                key={`text-${current}`}
+                initial={{ opacity: 0, y: 28 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.75, delay: 0.35 }}
+              >
+                <span className='inline-block bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[11px] sm:text-xs uppercase tracking-[0.3em] font-bold px-4 py-2 rounded-full mb-5 sm:mb-7'>
+                  {slides[current].badge}
+                </span>
+                <h1 className='text-[clamp(2.4rem,7vw,5.5rem)] font-serif font-bold text-white mb-5 sm:mb-7 leading-[1.08] tracking-tight'>
+                  {slides[current].title.split('\n').map((line, i) => (
+                    <span key={i} className='block'>
+                      {line}
+                    </span>
+                  ))}
+                </h1>
+                <p className='text-base sm:text-lg md:text-xl text-white/70 max-w-xl mb-8 sm:mb-10 font-light leading-relaxed'>
+                  {slides[current].description}
+                </p>
+                <div className='flex flex-col sm:flex-row gap-3 sm:gap-4'>
+                  <Link
+                    to={slides[current].primary.to}
+                    className='inline-flex items-center justify-center gap-2 px-7 py-4 sm:px-9 sm:py-5 bg-emerald-600 text-white rounded-full text-xs sm:text-sm uppercase tracking-widest font-bold hover:bg-emerald-500 transition-all duration-300 hover:scale-[1.03] shadow-[0_8px_25px_rgba(16,185,129,0.35)]'
+                  >
+                    {slides[current].primary.label}{' '}
+                    <ArrowRight className='h-4 w-4' />
+                  </Link>
+                  <Link
+                    to={slides[current].secondary.to}
+                    className='inline-flex items-center justify-center px-7 py-4 sm:px-9 sm:py-5 bg-white/10 backdrop-blur-md text-white border border-white/25 rounded-full text-xs sm:text-sm uppercase tracking-widest font-bold hover:bg-white/20 transition-all duration-300'
+                  >
+                    {slides[current].secondary.label}
+                  </Link>
+                </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
       </div>
 
-      <div className='absolute bottom-8 md:bottom-12 right-6 md:right-12 z-30 flex items-center gap-4 md:gap-6'>
-        <div className='hidden md:flex items-center gap-2'>
+      {/* Controls */}
+      <div className='absolute bottom-6 sm:bottom-10 left-0 right-0 z-30 flex items-center justify-between px-5 sm:px-10 lg:px-14'>
+        <div className='flex items-center gap-2'>
           {slides.map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrent(i)}
-              className={`h-1 transition-all duration-500 rounded-full ${current === i ? 'w-12 bg-emerald-500' : 'w-4 bg-white/30'}`}
+              aria-label={`Go to slide ${i + 1}`}
+              className={`h-1 rounded-full transition-all duration-500 ${current === i ? 'w-10 bg-emerald-500' : 'w-4 bg-white/30 hover:bg-white/50'}`}
             />
           ))}
         </div>
         <div className='flex gap-2'>
           <button
-            onClick={() =>
-              setCurrent((prev) => (prev - 1 + slides.length) % slides.length)
-            }
-            className='p-3 md:p-4 rounded-full border border-white/20 text-white hover:bg-white/10 transition-all'
+            onClick={prev}
+            aria-label='Previous slide'
+            className='p-3 sm:p-3.5 rounded-full border border-white/20 text-white hover:bg-white/10 transition-all'
           >
-            <ChevronLeft className='h-5 w-5 md:h-6 md:w-6' />
+            <ChevronLeft className='h-4 w-4 sm:h-5 sm:w-5' />
           </button>
           <button
-            onClick={() => setCurrent((prev) => (prev + 1) % slides.length)}
-            className='p-3 md:p-4 rounded-full border border-white/20 text-white hover:bg-white/10 transition-all'
+            onClick={next}
+            aria-label='Next slide'
+            className='p-3 sm:p-3.5 rounded-full border border-white/20 text-white hover:bg-white/10 transition-all'
           >
-            <ChevronRight className='h-5 w-5 md:h-6 md:w-6' />
+            <ChevronRight className='h-4 w-4 sm:h-5 sm:w-5' />
           </button>
+        </div>
+      </div>
+
+      {/* Trust bar at very bottom */}
+      <div className='absolute bottom-0 left-0 right-0 z-30 bg-black/60 backdrop-blur-sm border-t border-white/10 hidden md:block'>
+        <div className='container mx-auto px-8 py-3 flex items-center justify-center gap-10 text-white/50 text-xs uppercase tracking-widest font-bold'>
+          <span>✓ Goethe-Certified Training</span>
+          <span className='w-px h-4 bg-white/20' />
+          <span>✓ 5,000+ Students Trained</span>
+          <span className='w-px h-4 bg-white/20' />
+          <span>✓ 98% Exam Pass Rate</span>
+          <span className='w-px h-4 bg-white/20' />
+          <span>✓ Visa Support Included</span>
         </div>
       </div>
     </section>
@@ -469,23 +542,52 @@ function HeroCarousel() {
 // ─── STATS ────────────────────────────────────────────────────────────────────
 function StatsSection() {
   const stats = [
-    { label: 'Students Trained', value: '5K+' },
-    { label: 'Goethe Exam Success Rate', value: '98%' },
-    { label: 'Now Working in Germany', value: '530+' },
-    { label: 'Years of Excellence', value: '15+' },
+    {
+      label: 'Students Trained',
+      value: '5,000+',
+      tooltip: 'Across Lagos, Port Harcourt, and online — since 2009',
+      icon: Users,
+    },
+    {
+      label: 'Goethe Exam Pass Rate',
+      value: '98%',
+      tooltip:
+        'Verified pass rate for students who completed our full prep program',
+      icon: Award,
+    },
+    {
+      label: 'Now in Germany',
+      value: '530+',
+      tooltip:
+        'Working nurses, Ausbildung trainees, IT professionals, and university students',
+      icon: TrendingUp,
+    },
+    {
+      label: 'Years of Excellence',
+      value: '15+',
+      tooltip:
+        "Nigeria's most experienced German language & Germany placement consultancy",
+      icon: Star,
+    },
   ];
 
   return (
-    <section className='py-24 bg-luxury-black text-white'>
-      <div className='container mx-auto px-6'>
-        <div className='grid grid-cols-2 lg:grid-cols-4 gap-12'>
+    <section className='py-20 sm:py-24 bg-luxury-black text-white'>
+      <div className='container mx-auto px-5 sm:px-8'>
+        <div className='grid grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12'>
           {stats.map((stat, i) => (
-            <div key={i} className='text-center'>
-              <h3 className='text-5xl md:text-7xl font-serif font-bold mb-4 text-emerald-500'>
+            <div key={i} className='text-center group'>
+              <div className='flex justify-center mb-3'>
+                <div className='w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center'>
+                  <stat.icon className='h-5 w-5 text-emerald-400' />
+                </div>
+              </div>
+              <h3 className='text-[clamp(2rem,6vw,4.5rem)] font-serif font-bold mb-2 text-emerald-500 leading-none'>
                 {stat.value}
               </h3>
-              <p className='text-sm uppercase tracking-[0.3em] text-white/50 font-medium'>
+              <p className='text-[11px] sm:text-xs uppercase tracking-[0.25em] text-white/45 font-medium inline-flex items-center gap-1 justify-center'>
                 {stat.label}
+                <InfoBadge text={stat.tooltip} />
               </p>
             </div>
           ))}
@@ -495,122 +597,240 @@ function StatsSection() {
   );
 }
 
-// ─── GERMAN LANGUAGE PROGRAMS (CORE SECTION) ──────────────────────────────────
+// ─── GERMAN LANGUAGE PROGRAMS ─────────────────────────────────────────────────
 function GermanProgramsSection() {
   const levels = [
     {
       level: 'A1',
-      title: 'A1 German — Absolute Beginner',
+      title: 'A1 — Absolute Beginner',
       description:
-        'Never spoken German before? Never used anything beyond Duolingo? This is your starting point. We build your foundation from scratch with structured lessons, pronunciation, and basic conversational German.',
+        'Never spoken German before? This is your starting point. We build your foundation from scratch — pronunciation, basic grammar, and everyday conversation. No prior knowledge needed.',
       outcome:
         "You'll hold simple everyday conversations and read basic German texts.",
+      duration: '6–8 weeks',
+      best: "Perfect if you're just starting out",
+      color: 'bg-blue-500',
+      tooltipInfo:
+        'The A1 level is the official starting point on the European language scale (CEFR). No experience needed.',
     },
     {
       level: 'A2',
-      title: 'A2 German — Elementary',
+      title: 'A2 — Elementary',
       description:
-        'Build on your A1 foundation. At this level you expand your vocabulary, sharpen your grammar, and gain the confidence to communicate more naturally in daily life situations.',
+        'Build on your A1 base. Expand vocabulary, sharpen grammar, and gain real confidence communicating in daily situations — shopping, directions, work introductions.',
       outcome:
         "You'll handle real-world conversations and understand common written German.",
+      duration: '6–8 weeks',
+      best: 'Already know some basics',
+      color: 'bg-cyan-500',
+      tooltipInfo:
+        'A2 is recommended before applying for a tourist or family reunion visa to Germany.',
     },
     {
       level: 'B1',
-      title: 'B1 German — Intermediate',
+      title: 'B1 — Intermediate',
       description:
-        'This is where it gets serious. B1 is the minimum requirement for Ausbildung (vocational training) and many entry-level jobs in Germany. Our Goethe-focused training prepares you to pass with distinction.',
-      outcome: 'Ausbildung-ready. Entry-level job-ready. Germany-ready.',
+        'This is where it gets serious. B1 is the minimum for Ausbildung (vocational training) and most entry-level jobs in Germany. Our Goethe-focused training gets you exam-ready.',
+      outcome:
+        'Ausbildung-ready. Entry-level employment-ready. Germany application-ready.',
+      duration: '8–10 weeks',
+      best: 'Required for Ausbildung',
+      color: 'bg-emerald-500',
+      tooltipInfo:
+        "Ausbildung is Germany's paid vocational training program. You earn a salary while you train — typically €700–€1,200/month.",
     },
     {
       level: 'B2',
-      title: 'B2 German — Upper Intermediate',
+      title: 'B2 — Upper Intermediate',
       description:
-        'If you want to work as a nurse, IT professional, or skilled worker in Germany, B2 is the key. With a B2 certificate, you unlock highly sought-after roles in German hospitals, companies, and institutions.',
+        'The key level for most career pathways in Germany. Required for nursing, IT roles, and skilled immigration. A B2 certificate opens doors that no other qualification can.',
       outcome:
-        'Qualify for nursing roles, IT positions, and skilled immigration pathways.',
+        'Qualify for nursing, IT, engineering roles — and the skilled worker visa.',
+      duration: '8–12 weeks',
+      best: 'Required for nursing & most jobs',
+      color: 'bg-amber-500',
+      tooltipInfo:
+        'The German Nursing Recognition process requires B2. Most skilled worker visas also require B2 language proficiency.',
     },
     {
       level: 'C1',
-      title: 'C1 German — Advanced',
+      title: 'C1 — Advanced',
       description:
-        'Required for university admissions, specialist career tracks, and permanent residency applications in Germany. This advanced level gives you near-native fluency and academic-grade German proficiency.',
+        'Near-native fluency. Required for university admissions, permanent residency applications, and specialist career tracks in Germany. This is the highest level we offer.',
       outcome: 'University admission-ready. Permanent residency-eligible.',
+      duration: '10–14 weeks',
+      best: 'Required for German universities',
+      color: 'bg-rose-500',
+      tooltipInfo:
+        'German public universities are tuition-free — even for Nigerians — but most require a C1 certificate for admission.',
     },
   ];
 
-  const levelColors = {
-    A1: 'bg-blue-500',
-    A2: 'bg-cyan-500',
-    B1: 'bg-emerald-500',
-    B2: 'bg-amber-500',
-    C1: 'bg-rose-500',
-  };
+  const [expanded, setExpanded] = useState(null);
 
   return (
-    <section className='py-32 bg-luxury-cream'>
-      <div className='container mx-auto px-6'>
-        <div className='flex flex-col lg:flex-row justify-between items-end mb-20 gap-8'>
+    <section className='py-24 sm:py-32 bg-luxury-cream'>
+      <div className='container mx-auto px-5 sm:px-8'>
+        <div className='flex flex-col lg:flex-row justify-between items-start lg:items-end mb-14 sm:mb-20 gap-8'>
           <div className='max-w-2xl'>
-            <span className='text-emerald-600 font-bold uppercase tracking-[0.3em] text-sm block mb-4'>
+            <span className='text-emerald-600 font-bold uppercase tracking-[0.3em] text-xs sm:text-sm block mb-4'>
               Our Core Offering
             </span>
-            <h2 className='text-fluid-h2 font-serif font-bold text-luxury-black'>
-              German Language
+            <h2 className='text-[clamp(2rem,5vw,3.8rem)] font-serif font-bold text-luxury-black leading-tight'>
+              German Language Classes
               <br />
-              Classes — A1 to C1
+              A1 to C1 — Pick Your Level
             </h2>
           </div>
           <div className='max-w-md'>
-            <p className='text-xl text-gray-500 font-light leading-relaxed'>
-              We bring German to you in the most dynamic, results-driven form —
-              on a fast track that fits your career goals, your timeline, and
-              your budget.
+            <p className='text-base sm:text-xl text-gray-500 font-light leading-relaxed'>
+              Not sure which level to start at? We'll assess you for free. Every
+              level is structured around the official Goethe Institute exam.
             </p>
+            <Link
+              to='/contact'
+              className='inline-flex items-center gap-2 mt-5 text-emerald-600 font-bold text-sm hover:underline'
+            >
+              Book a Free Level Assessment <ArrowRight className='h-4 w-4' />
+            </Link>
           </div>
         </div>
 
-        <div className='space-y-6'>
-          {levels.map((lvl, i) => (
-            <motion.div
-              key={i}
-              whileHover={{ x: 6 }}
-              className='group bg-white rounded-[2rem] border border-gray-100 p-8 md:p-10 flex flex-col md:flex-row gap-6 md:gap-10 items-start shadow-sm hover:shadow-lg transition-all duration-300'
-            >
-              <div
-                className={`w-16 h-16 rounded-2xl ${levelColors[lvl.level]} flex items-center justify-center shrink-0 shadow-lg`}
+        <div className='space-y-4'>
+          {levels.map((lvl, i) => {
+            const isOpen = expanded === i;
+            const colorMap = {
+              'bg-blue-500': 'bg-blue-500',
+              'bg-cyan-500': 'bg-cyan-500',
+              'bg-emerald-500': 'bg-emerald-500',
+              'bg-amber-500': 'bg-amber-500',
+              'bg-rose-500': 'bg-rose-500',
+            };
+            return (
+              <motion.div
+                key={i}
+                layout
+                className='group bg-white rounded-2xl sm:rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300'
               >
-                <span className='text-white font-serif font-bold text-xl'>
-                  {lvl.level}
-                </span>
-              </div>
-              <div className='flex-1'>
-                <h3 className='text-2xl font-serif font-bold text-luxury-black mb-3'>
-                  {lvl.title}
-                </h3>
-                <p className='text-gray-500 font-light leading-relaxed mb-4'>
-                  {lvl.description}
-                </p>
-                <div className='flex items-start gap-2 text-emerald-700 font-semibold text-sm'>
-                  <CheckCircle className='h-4 w-4 mt-0.5 shrink-0' />
-                  <span>{lvl.outcome}</span>
-                </div>
-              </div>
-              <Link
-                to={`/services/german`}
-                className='shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-full border border-gray-200 text-luxury-black font-bold uppercase tracking-widest text-xs group-hover:bg-emerald-600 group-hover:text-white group-hover:border-emerald-600 transition-all duration-300'
-              >
-                Program Details <ArrowRight className='h-4 w-4' />
-              </Link>
-            </motion.div>
-          ))}
+                <button
+                  onClick={() => setExpanded(isOpen ? null : i)}
+                  className='w-full p-6 sm:p-8 flex items-center gap-5 sm:gap-8 text-left'
+                  aria-expanded={isOpen}
+                >
+                  <div
+                    className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl ${colorMap[lvl.color]} flex items-center justify-center shrink-0 shadow-md`}
+                  >
+                    <span className='text-white font-serif font-bold text-lg sm:text-xl'>
+                      {lvl.level}
+                    </span>
+                  </div>
+                  <div className='flex-1 min-w-0'>
+                    <div className='flex flex-wrap items-center gap-x-3 gap-y-1 mb-1'>
+                      <h3 className='text-lg sm:text-2xl font-serif font-bold text-luxury-black'>
+                        {lvl.title}
+                      </h3>
+                      <InfoBadge text={lvl.tooltipInfo} />
+                    </div>
+                    <div className='flex flex-wrap gap-3 mt-2'>
+                      <span className='inline-flex items-center gap-1.5 text-[11px] sm:text-xs bg-gray-100 text-gray-500 font-semibold uppercase tracking-wide px-3 py-1 rounded-full'>
+                        <Clock className='h-3 w-3' /> {lvl.duration}
+                      </span>
+                      <span className='inline-flex items-center gap-1.5 text-[11px] sm:text-xs bg-emerald-50 text-emerald-700 font-semibold uppercase tracking-wide px-3 py-1 rounded-full'>
+                        <CheckCircle className='h-3 w-3' /> {lvl.best}
+                      </span>
+                    </div>
+                  </div>
+                  <div className='shrink-0'>
+                    <div
+                      className={`w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center transition-all duration-300 ${isOpen ? 'bg-emerald-600 border-emerald-600 rotate-90' : 'group-hover:border-emerald-400'}`}
+                    >
+                      <ChevronRight
+                        className={`h-4 w-4 transition-colors ${isOpen ? 'text-white' : 'text-gray-400'}`}
+                      />
+                    </div>
+                  </div>
+                </button>
+
+                <AnimatePresence>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: 'easeInOut' }}
+                      className='overflow-hidden'
+                    >
+                      <div className='px-6 sm:px-8 pb-7 sm:pb-9 border-t border-gray-100 pt-5 sm:pt-6 ml-0 sm:ml-[88px]'>
+                        <p className='text-gray-500 font-light leading-relaxed mb-5 text-sm sm:text-base'>
+                          {lvl.description}
+                        </p>
+                        <div className='flex items-start gap-2 text-emerald-700 font-semibold text-sm mb-6'>
+                          <CheckCircle className='h-4 w-4 mt-0.5 shrink-0' />
+                          <span>{lvl.outcome}</span>
+                        </div>
+                        <Link
+                          to='/services/german'
+                          className='inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-full font-bold uppercase tracking-widest text-xs hover:bg-emerald-500 transition-all'
+                        >
+                          Enroll in {lvl.level}{' '}
+                          <ArrowRight className='h-4 w-4' />
+                        </Link>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            );
+          })}
         </div>
 
-        <div className='mt-16 text-center'>
+        <div className='mt-12 sm:mt-16 text-center'>
           <Link
             to='/register'
-            className='px-12 py-5 bg-emerald-600 text-white rounded-full text-sm uppercase tracking-widest font-bold hover:bg-emerald-500 transition-all duration-300 hover:scale-105 shadow-[0_10px_30px_rgba(16,185,129,0.3)]'
+            className='inline-flex items-center gap-2 px-10 sm:px-12 py-4 sm:py-5 bg-emerald-600 text-white rounded-full text-xs sm:text-sm uppercase tracking-widest font-bold hover:bg-emerald-500 transition-all duration-300 hover:scale-105 shadow-[0_10px_30px_rgba(16,185,129,0.3)]'
           >
-            Enroll in a German Class Today
+            Enroll Now — Spots Filling Fast <ArrowRight className='h-4 w-4' />
+          </Link>
+          <p className='text-xs text-gray-400 mt-3'>
+            Free consultation included. No payment needed to register.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── URGENCY BANNER ───────────────────────────────────────────────────────────
+function UrgencyBanner() {
+  return (
+    <section className='py-16 sm:py-20 bg-emerald-600 text-white relative overflow-hidden'>
+      <div className='absolute inset-0 opacity-10 pointer-events-none'>
+        <div className='absolute top-0 right-0 w-96 h-96 bg-white rounded-full -translate-y-1/2 translate-x-1/2' />
+        <div className='absolute bottom-0 left-0 w-64 h-64 bg-white rounded-full translate-y-1/2 -translate-x-1/2' />
+      </div>
+      <div className='container mx-auto px-5 sm:px-8 relative z-10 text-center'>
+        <span className='inline-block bg-white/20 text-white text-xs uppercase tracking-[0.3em] font-bold px-5 py-2 rounded-full mb-5 sm:mb-6'>
+          ⚡ New Cohort Starting Soon — Limited Seats Available
+        </span>
+        <h2 className='text-[clamp(1.8rem,5vw,3.8rem)] font-serif font-bold mb-5 sm:mb-6 leading-tight'>
+          Lock In Your Discounted Rate Today
+        </h2>
+        <p className='text-base sm:text-xl text-white/80 font-light max-w-2xl mx-auto mb-8 sm:mb-10'>
+          Prices go up once the cohort fills. Register now to secure your seat
+          at the current rate — even if your class hasn't started yet.
+        </p>
+        <div className='flex flex-col sm:flex-row gap-3 justify-center items-center'>
+          <Link
+            to='/register'
+            className='px-10 sm:px-12 py-4 sm:py-5 bg-white text-emerald-700 rounded-full text-xs sm:text-sm uppercase tracking-widest font-bold hover:bg-luxury-black hover:text-white transition-all duration-300 shadow-xl'
+          >
+            Register Now — It's Free to Start
+          </Link>
+          <Link
+            to='/contact'
+            className='px-8 py-4 sm:py-5 bg-transparent text-white border border-white/40 rounded-full text-xs sm:text-sm uppercase tracking-widest font-bold hover:bg-white/10 transition-all'
+          >
+            Speak to a Counsellor First
           </Link>
         </div>
       </div>
@@ -618,37 +838,7 @@ function GermanProgramsSection() {
   );
 }
 
-// ─── URGENCY / CTA BANNER ─────────────────────────────────────────────────────
-function UrgencyBanner() {
-  return (
-    <section className='py-20 bg-emerald-600 text-white relative overflow-hidden'>
-      <div className='absolute inset-0 opacity-10'>
-        <div className='absolute top-0 right-0 w-96 h-96 bg-white rounded-full -translate-y-1/2 translate-x-1/2' />
-        <div className='absolute bottom-0 left-0 w-64 h-64 bg-white rounded-full translate-y-1/2 -translate-x-1/2' />
-      </div>
-      <div className='container mx-auto px-6 relative z-10 text-center'>
-        <span className='inline-block bg-white/20 text-white text-xs uppercase tracking-[0.3em] font-bold px-6 py-2 rounded-full mb-6'>
-          ⚡ New Session Starting Now — Limited Spots
-        </span>
-        <h2 className='text-4xl md:text-6xl font-serif font-bold mb-6'>
-          Register Now Before Price Increases
-        </h2>
-        <p className='text-xl text-white/80 font-light max-w-2xl mx-auto mb-10'>
-          Our new German cohort is filling up fast. Once seats are booked,
-          enrollment closes immediately. Secure your discounted rate today.
-        </p>
-        <Link
-          to='/register'
-          className='inline-block px-12 py-5 bg-white text-emerald-700 rounded-full text-sm uppercase tracking-widest font-bold hover:bg-luxury-black hover:text-white transition-all duration-300 shadow-xl'
-        >
-          Claim Your Discount Now
-        </Link>
-      </div>
-    </section>
-  );
-}
-
-// ─── GERMANY PATHWAYS (What you can do with German) ───────────────────────────
+// ─── GERMANY PATHWAYS ─────────────────────────────────────────────────────────
 function GermanyPathwaysSection() {
   const pathways = [
     {
@@ -656,18 +846,24 @@ function GermanyPathwaysSection() {
       icon: '🏥',
       title: 'Work as a Nurse in Germany',
       description:
-        'We collaborate with German hospitals and recruitment agencies to place registered nurses directly into employment after obtaining a B2 certificate. Your German + our network = your German hospital contract.',
+        'Germany is actively recruiting Nigerian nurses right now. We partner with German hospitals to place our B2-certified graduates directly into nursing contracts — with accommodation and relocation support included.',
       requirement: 'B2 German Certificate Required',
+      tooltipInfo:
+        'Average nurse salary in Germany: €2,500–€3,800/month. Relocation assistance often provided by the hospital.',
+      timeline: 'Job offer within 3–6 months of B2 certification',
       color: 'bg-rose-50 border-rose-100',
       accent: 'text-rose-600',
     },
     {
       id: 'ausbildung',
       icon: '🎓',
-      title: 'Ausbildung / Vocational Training',
+      title: 'Ausbildung — Get Paid to Train',
       description:
-        "Germany's unique dual system lets you work inside German companies as an apprentice while being trained in your trade or profession. Earn while you learn — fully paid by your German employer.",
+        "Germany's Ausbildung is one of the best-kept secrets for Nigerians. You train inside a real German company, earn a salary (€700–€1,200/month), and graduate with a recognised German qualification.",
       requirement: 'B1 German Certificate Required',
+      tooltipInfo:
+        'Ausbildung typically lasts 2–3 years. After completion, most trainees are offered permanent employment.',
+      timeline: 'Place within 4–8 months of B1 certification',
       color: 'bg-blue-50 border-blue-100',
       accent: 'text-blue-600',
     },
@@ -676,67 +872,80 @@ function GermanyPathwaysSection() {
       icon: '💼',
       title: 'Job Seeker Visa',
       description:
-        'Already skilled in IT, engineering, healthcare, or another field? The German Job Seeker Visa lets you travel to Germany and find employment on the ground. We prepare your language, documents, and strategy.',
+        "Already skilled in IT, healthcare, or engineering? Germany's Job Seeker Visa lets you travel there and find work on the ground. We prepare your language skills, CV, and documentation — everything you need.",
       requirement: 'B1–B2 German Certificate Required',
+      tooltipInfo:
+        'The Job Seeker Visa gives you 6 months in Germany to find employment. No job offer needed to apply.',
+      timeline: 'Visa approval in 3–6 weeks',
       color: 'bg-amber-50 border-amber-100',
       accent: 'text-amber-600',
     },
     {
       id: 'university',
       icon: '📚',
-      title: 'University Admission in Germany',
+      title: 'University Admission — Tuition Free',
       description:
-        "Germany's public universities offer world-class, tuition-free education. We guide you through application requirements, help you reach C1 German proficiency, and manage your full admission process.",
+        'German public universities charge zero tuition — even for international students. We get you to C1 German, guide your application, and help with your student visa. A world-class degree, almost for free.',
       requirement: 'B2–C1 German Certificate Required',
+      tooltipInfo:
+        'German public universities charge only a semester fee of ~€300. No tuition fees for international students.',
+      timeline: 'Admission within one semester',
       color: 'bg-emerald-50 border-emerald-100',
       accent: 'text-emerald-600',
     },
   ];
 
   return (
-    <section className='py-32 bg-white'>
-      <div className='container mx-auto px-6'>
-        <div className='text-center max-w-3xl mx-auto mb-20'>
-          <span className='text-emerald-600 font-bold uppercase tracking-[0.3em] text-sm block mb-4'>
-            After Your German Certification
+    <section className='py-24 sm:py-32 bg-white'>
+      <div className='container mx-auto px-5 sm:px-8'>
+        <div className='text-center max-w-3xl mx-auto mb-14 sm:mb-20'>
+          <span className='text-emerald-600 font-bold uppercase tracking-[0.3em] text-xs sm:text-sm block mb-4'>
+            What Comes After Your Certificate
           </span>
-          <h2 className='text-fluid-h2 font-serif font-bold text-luxury-black mb-6'>
-            Your German Opens These Doors
+          <h2 className='text-[clamp(2rem,5vw,3.8rem)] font-serif font-bold text-luxury-black mb-5 sm:mb-6 leading-tight'>
+            Your German Unlocks These Doors
           </h2>
-          <p className='text-xl text-gray-500 font-light leading-relaxed'>
-            Learning German at AOCA isn't just language training — it's your
-            entry point into a life-changing career in Europe. Here's what comes
-            next.
+          <p className='text-base sm:text-xl text-gray-500 font-light leading-relaxed'>
+            Learning German at AOCA isn't just language class — it's the first
+            step to a real life in Germany. Here's exactly what happens next.
           </p>
         </div>
 
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8'>
           {pathways.map((p, i) => (
             <motion.div
               key={i}
-              whileHover={{ y: -8 }}
-              className={`rounded-[2.5rem] border p-10 ${p.color} transition-all duration-300`}
+              whileHover={{ y: -6 }}
+              className={`rounded-2xl sm:rounded-[2.5rem] border p-8 sm:p-10 ${p.color} transition-all duration-300 flex flex-col`}
             >
-              <div className='text-5xl mb-6'>{p.icon}</div>
-              <h3 className='text-2xl font-serif font-bold text-luxury-black mb-4'>
+              <div className='text-4xl sm:text-5xl mb-5'>{p.icon}</div>
+              <h3 className='text-xl sm:text-2xl font-serif font-bold text-luxury-black mb-3 sm:mb-4'>
                 {p.title}
               </h3>
-              <p className='text-gray-600 font-light leading-relaxed mb-6'>
+              <p className='text-gray-600 font-light leading-relaxed mb-5 text-sm sm:text-base flex-1'>
                 {p.description}
               </p>
-              <div
-                className={`inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest ${p.accent} mb-8`}
-              >
-                <CheckCircle className='h-4 w-4' /> {p.requirement}
-              </div>
-              <div>
-                <Link
-                  to={`/pathways/${p.id}`}
-                  className='inline-flex items-center gap-2 text-luxury-black font-bold uppercase tracking-widest text-xs hover:text-emerald-600 transition-colors'
+
+              <div className='space-y-2 mb-6 sm:mb-8'>
+                <div
+                  className={`inline-flex items-center gap-2 text-xs sm:text-sm font-bold uppercase tracking-widest ${p.accent}`}
                 >
-                  Explore This Pathway <ArrowRight className='h-4 w-4' />
-                </Link>
+                  <CheckCircle className='h-4 w-4 shrink-0' />
+                  <span>{p.requirement}</span>
+                  <InfoBadge text={p.tooltipInfo} />
+                </div>
+                <div className='flex items-center gap-2 text-xs text-gray-500 font-medium'>
+                  <Clock className='h-3 w-3 shrink-0' />
+                  <span>{p.timeline}</span>
+                </div>
               </div>
+
+              <Link
+                to={`/pathways/${p.id}`}
+                className='inline-flex items-center gap-2 text-luxury-black font-bold uppercase tracking-widest text-xs hover:text-emerald-600 transition-colors'
+              >
+                See Full Pathway Details <ArrowRight className='h-4 w-4' />
+              </Link>
             </motion.div>
           ))}
         </div>
@@ -750,118 +959,141 @@ function ProcessSection() {
   const steps = [
     {
       number: '01',
-      title: 'Enroll in German',
-      desc: 'Pick your level — A1, A2, B1, B2, or C1 — and start your German language journey with our certified instructors.',
+      title: 'Choose Your Level',
+      desc: 'Not sure where to start? We assess you for free. Then you enroll in the right level — A1 through C1 — and begin immediately.',
+      detail: 'Free placement test. No commitment required.',
     },
     {
       number: '02',
       title: 'Pass the Goethe Exam',
-      desc: 'We prepare you intensively for the official Goethe certification that German employers and visa offices require.',
+      desc: 'We prepare you specifically for the official Goethe Institute certification. This is the certificate German employers, embassies, and universities actually recognise.',
+      detail: '98% of our students pass on the first attempt.',
     },
     {
       number: '03',
       title: 'Choose Your Pathway',
-      desc: 'Nursing, Ausbildung, Job Seeker Visa, or University — we match your certificate to the right Germany-bound route.',
+      desc: 'Nursing, Ausbildung, Job Seeker Visa, or University — our counsellors match your certificate to the best Germany route for your profile and goals.',
+      detail: 'One-on-one career counselling included.',
     },
     {
       number: '04',
-      title: 'We Handle the Rest',
-      desc: 'Visa processing, employer matching, document support, and relocation guidance — we see you through to Germany.',
+      title: 'We Handle Everything Else',
+      desc: 'Employer matching, document preparation, embassy coaching, visa applications, and relocation support. We stay with you until you land in Germany.',
+      detail: 'Full end-to-end placement support.',
     },
   ];
 
   return (
-    <section className='py-32 bg-luxury-black text-white'>
-      <div className='container mx-auto px-6'>
-        <div className='text-center max-w-3xl mx-auto mb-20'>
-          <span className='text-emerald-400 font-bold uppercase tracking-[0.3em] text-sm block mb-4'>
+    <section className='py-24 sm:py-32 bg-luxury-black text-white'>
+      <div className='container mx-auto px-5 sm:px-8'>
+        <div className='text-center max-w-3xl mx-auto mb-14 sm:mb-20'>
+          <span className='text-emerald-400 font-bold uppercase tracking-[0.3em] text-xs sm:text-sm block mb-4'>
             The Journey
           </span>
-          <h2 className='text-fluid-h2 font-serif font-bold'>
-            How We Get You to Germany
+          <h2 className='text-[clamp(2rem,5vw,3.8rem)] font-serif font-bold leading-tight'>
+            Exactly How We Get You to Germany
           </h2>
         </div>
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10'>
           {steps.map((step, i) => (
             <div key={i} className='relative group'>
-              <div className='text-8xl font-serif font-bold text-emerald-500/10 absolute -top-10 -left-4 group-hover:text-emerald-500/20 transition-colors'>
+              <div className='text-7xl sm:text-8xl font-serif font-bold text-emerald-500/8 absolute -top-8 -left-2 group-hover:text-emerald-500/15 transition-colors select-none pointer-events-none'>
                 {step.number}
               </div>
-              <div className='relative z-10 pt-8'>
-                <h3 className='text-2xl font-serif font-bold text-white mb-4'>
+              <div className='relative z-10 pt-6 sm:pt-8'>
+                <span className='text-emerald-500 font-bold text-xs uppercase tracking-widest mb-2 block'>
+                  {step.number}
+                </span>
+                <h3 className='text-xl sm:text-2xl font-serif font-bold text-white mb-3 sm:mb-4'>
                   {step.title}
                 </h3>
-                <p className='text-white/50 font-light leading-relaxed'>
+                <p className='text-white/50 font-light leading-relaxed text-sm sm:text-base mb-3'>
                   {step.desc}
+                </p>
+                <p className='text-emerald-500 text-xs font-bold uppercase tracking-wide'>
+                  {step.detail}
                 </p>
               </div>
             </div>
           ))}
+        </div>
+        <div className='mt-14 sm:mt-16 text-center'>
+          <Link
+            to='/register'
+            className='inline-flex items-center gap-2 px-10 sm:px-12 py-4 sm:py-5 bg-emerald-600 text-white rounded-full text-xs sm:text-sm uppercase tracking-widest font-bold hover:bg-emerald-500 transition-all hover:scale-105 shadow-[0_10px_30px_rgba(16,185,129,0.25)]'
+          >
+            Begin Your Journey Today <ArrowRight className='h-4 w-4' />
+          </Link>
         </div>
       </div>
     </section>
   );
 }
 
-// ─── WHY AOCA (replaces generic WhyChooseUs) ─────────────────────────────────
+// ─── WHY AOCA ─────────────────────────────────────────────────────────────────
 function WhyAOCASection() {
   const features = [
     {
       title: 'Goethe-Certified Training',
-      desc: "Every program is structured around the official Goethe Institute examination. We don't just teach German — we prepare you to pass.",
+      desc: 'Every program is structured around the official Goethe Institute exam — the certification that German embassies, hospitals, and universities actually accept.',
     },
     {
-      title: 'Fast-Track Intensive Option',
-      desc: 'Need to reach B2 urgently for a nursing contract or visa deadline? Our intensive track gets you there faster, without cutting corners.',
+      title: 'Fast-Track Option Available',
+      desc: 'Need B2 urgently for a nursing contract or visa deadline? Our intensive track gets you there in 6 months — without cutting corners on what you actually learn.',
     },
     {
-      title: 'From Language to Germany',
-      desc: 'Unlike schools that stop at language teaching, we bridge training with placement — visa processing, employer connections, and relocation support.',
+      title: "We Don't Stop at Language",
+      desc: 'Unlike ordinary language schools, we bridge your training into placement — visa processing, employer connections, document support, and relocation guidance.',
     },
     {
-      title: 'Real-Life German Experience',
-      desc: "Our instructors have studied or lived in Germany. They don't just teach grammar — they prepare you for life and work on German soil.",
+      title: "Instructors Who've Been There",
+      desc: "Our teachers have studied or worked in Germany. They don't just teach grammar — they prepare you for real life in a German workplace or university.",
     },
   ];
 
   return (
-    <section className='py-32 bg-luxury-cream'>
-      <div className='container mx-auto px-6'>
-        <div className='grid grid-cols-1 lg:grid-cols-2 gap-20 items-center'>
-          <div className='relative'>
-            <div className='aspect-[4/5] rounded-[3rem] overflow-hidden shadow-2xl'>
+    <section className='py-24 sm:py-32 bg-luxury-cream'>
+      <div className='container mx-auto px-5 sm:px-8'>
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-14 sm:gap-20 items-center'>
+          <div className='relative order-2 lg:order-1'>
+            <div className='aspect-[4/5] rounded-[2rem] sm:rounded-[3rem] overflow-hidden shadow-2xl'>
               <img
-                src='https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=1000'
+                src='./2.jpg'
                 alt='AOCA German Training'
                 className='w-full h-full object-cover'
               />
             </div>
-            <div className='absolute -bottom-10 -right-10 w-64 h-64 bg-emerald-600 rounded-[2rem] p-8 text-white hidden md:flex flex-col justify-center'>
-              <span className='text-5xl font-serif font-bold mb-2'>98%</span>
-              <p className='text-sm uppercase tracking-widest font-bold opacity-80'>
-                Goethe Exam Pass Rate Among Our Students
+            <div className='absolute -bottom-8 -right-4 sm:-bottom-10 sm:-right-10 w-52 sm:w-64 bg-emerald-600 rounded-[1.5rem] sm:rounded-[2rem] p-6 sm:p-8 text-white hidden sm:flex flex-col justify-center shadow-2xl'>
+              <span className='text-4xl sm:text-5xl font-serif font-bold mb-2'>
+                98%
+              </span>
+              <p className='text-xs uppercase tracking-widest font-bold opacity-80 leading-relaxed'>
+                Goethe Exam Pass Rate
               </p>
             </div>
           </div>
-          <div>
-            <span className='text-emerald-600 font-bold uppercase tracking-[0.3em] text-sm block mb-4'>
+          <div className='order-1 lg:order-2'>
+            <span className='text-emerald-600 font-bold uppercase tracking-[0.3em] text-xs sm:text-sm block mb-4'>
               Why Train With AOCA
             </span>
-            <h2 className='text-fluid-h2 font-serif font-bold text-luxury-black mb-8'>
-              More Than a Language School
+            <h2 className='text-[clamp(2rem,5vw,3.8rem)] font-serif font-bold text-luxury-black mb-6 sm:mb-8 leading-tight'>
+              We're More Than a Language School
             </h2>
-            <p className='text-xl text-gray-500 font-light leading-relaxed mb-12'>
-              We've trained and equipped over 5,000 students across Nigeria. Our
-              approach combines rigorous language instruction with practical
-              pathways to employment and relocation in Germany.
+            <p className='text-base sm:text-xl text-gray-500 font-light leading-relaxed mb-10 sm:mb-12'>
+              Over 5,000 students trained. 530+ now living and working in
+              Germany. We've built the most complete Nigeria-to-Germany pathway
+              in the country — and we improve it every year.
             </p>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8'>
               {features.map((f, i) => (
-                <div key={i} className='space-y-3'>
-                  <h4 className='text-xl font-serif font-bold text-luxury-black'>
-                    {f.title}
-                  </h4>
-                  <p className='text-gray-500 font-light leading-relaxed'>
+                <div key={i} className='space-y-2'>
+                  <div className='flex items-center gap-2'>
+                    <CheckCircle className='h-4 w-4 text-emerald-500 shrink-0' />
+                    <h4 className='text-base sm:text-xl font-serif font-bold text-luxury-black'>
+                      {f.title}
+                    </h4>
+                  </div>
+                  <p className='text-gray-500 font-light leading-relaxed text-sm pl-6'>
                     {f.desc}
                   </p>
                 </div>
@@ -869,9 +1101,9 @@ function WhyAOCASection() {
             </div>
             <Link
               to='/about'
-              className='inline-flex items-center gap-3 mt-12 text-luxury-black font-bold uppercase tracking-widest text-sm hover:text-emerald-600 transition-colors'
+              className='inline-flex items-center gap-3 mt-10 sm:mt-12 text-luxury-black font-bold uppercase tracking-widest text-xs sm:text-sm hover:text-emerald-600 transition-colors'
             >
-              Our Full Story <ArrowRight className='h-5 w-5' />
+              Read Our Full Story <ArrowRight className='h-5 w-5' />
             </Link>
           </div>
         </div>
@@ -882,75 +1114,94 @@ function WhyAOCASection() {
 
 // ─── WHY GERMANY ──────────────────────────────────────────────────────────────
 function WhyGermanySection() {
-  const reasonsRow1 = [
+  const cards = [
     {
       title: 'Tuition-Free University',
-      desc: 'Public universities in Germany charge no tuition fees — even for international students from Nigeria.',
+      desc: 'Public universities in Germany charge zero tuition — even for Nigerians. A world-class education for the cost of living expenses only.',
+      tooltip:
+        'Semester fees average just €250–€400. No tuition fees for international students at public universities.',
     },
     {
-      title: 'Nursing Demand',
-      desc: 'Germany faces a critical shortage of nurses. Qualified B2-certified nurses from Nigeria are actively recruited.',
+      title: 'Nursing Shortage — Your Advantage',
+      desc: 'Germany has a critical shortage of 80,000+ nurses. B2-certified Nigerian nurses are being actively recruited right now.',
+      tooltip:
+        'Nurses in Germany earn €2,500–€3,800/month. Most hospitals provide relocation and accommodation support.',
     },
     {
-      title: 'Ausbildung Pays You',
-      desc: 'Unlike internships, German Ausbildung apprentices receive a monthly salary while they train.',
+      title: 'Ausbildung Pays You Monthly',
+      desc: 'German vocational training pays you €700–€1,200 per month while you learn. No loans. No tuition. You train and earn simultaneously.',
+      tooltip:
+        'After Ausbildung, most trainees receive a permanent job offer from the same company.',
     },
     {
-      title: 'High Earning Potential',
-      desc: 'Average salaries in Germany are 3–5x higher than comparable roles in Nigeria across most professions.',
-    },
-  ];
-
-  const reasonsRow2 = [
-    {
-      title: 'Permanent Residency Path',
-      desc: 'Germany offers a clear path to permanent residency after just a few years of working there.',
+      title: '3–5x Higher Salaries',
+      desc: 'Average salaries in Germany are 3 to 5 times higher than equivalent roles in Nigeria — across healthcare, IT, trades, and engineering.',
+      tooltip:
+        'Minimum wage in Germany is €12.41/hour. IT professionals typically earn €4,000–€7,000/month.',
     },
     {
-      title: 'Family Reunification',
-      desc: 'Most German work visas allow you to bring your spouse and children to Germany with you.',
+      title: 'Clear Path to Permanent Residency',
+      desc: 'Germany offers one of the most structured paths to permanent residency in Europe — achievable after just 4–5 years of legal work.',
+      tooltip:
+        'The EU Blue Card can lead to permanent residency in just 2 years for high earners.',
     },
     {
-      title: 'Strong Economy',
-      desc: "Europe's largest economy with booming demand for healthcare, IT, and skilled trades.",
+      title: 'Bring Your Family',
+      desc: "Most German work visas allow family reunification. Bring your spouse and children to Germany once you're settled.",
+      tooltip:
+        'Spouses of skilled workers can also get work permits immediately upon arrival.',
+    },
+    {
+      title: 'Booming Economy',
+      desc: "Europe's largest economy, with consistent demand for skilled workers in healthcare, IT, engineering, and the trades.",
+      tooltip:
+        'Germany has the 4th largest economy in the world and faces a shortage of 400,000+ skilled workers.',
     },
     {
       title: 'Safety & Stability',
-      desc: "Consistently ranked among the world's safest and most politically stable countries.",
+      desc: 'Consistently rated among the safest, most politically stable countries in the world. An excellent environment for raising a family.',
+      tooltip:
+        'Germany ranks in the top 20 globally on the Global Peace Index and has universal healthcare.',
     },
   ];
 
+  const row1 = cards.slice(0, 4);
+  const row2 = cards.slice(4, 8);
+
   return (
-    <section className='py-32 bg-white relative overflow-hidden'>
-      <div className='container mx-auto px-6 relative z-10 mb-20'>
+    <section className='py-24 sm:py-32 bg-white relative overflow-hidden'>
+      <div className='container mx-auto px-5 sm:px-8 relative z-10 mb-14 sm:mb-20'>
         <div className='max-w-3xl'>
-          <span className='text-emerald-600 font-bold uppercase tracking-[0.3em] text-sm block mb-4'>
+          <span className='text-emerald-600 font-bold uppercase tracking-[0.3em] text-xs sm:text-sm block mb-4'>
             Why Germany?
           </span>
-          <h2 className='text-fluid-h2 font-serif font-bold text-luxury-black mb-8'>
-            The Opportunity is Real.
+          <h2 className='text-[clamp(2rem,5vw,3.8rem)] font-serif font-bold text-luxury-black mb-6 sm:mb-8 leading-tight'>
+            The Opportunity Is Real.
             <br />
-            The Door is German Language.
+            The Door Is German Language.
           </h2>
-          <p className='text-xl text-gray-500 font-light leading-relaxed'>
-            Germany is actively seeking skilled workers from abroad. Whether
-            you're a nurse, engineer, IT expert, or trade professional —
-            speaking German is the single key that unlocks every opportunity.
+          <p className='text-base sm:text-xl text-gray-500 font-light leading-relaxed'>
+            Germany isn't just a visa destination — it's a career, a family
+            future, and a quality of life upgrade. Every reason below is backed
+            by real numbers.
           </p>
         </div>
       </div>
 
-      {/* Mobile: Static grid */}
-      <div className='md:hidden container mx-auto px-6'>
-        <div className='grid grid-cols-1 gap-6'>
-          {[...reasonsRow1, ...reasonsRow2].map((r, i) => (
+      {/* Mobile: grid */}
+      <div className='md:hidden container mx-auto px-5'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 gap-5'>
+          {cards.map((r, i) => (
             <div
               key={i}
-              className='p-8 rounded-[2rem] bg-luxury-cream border border-gray-100'
+              className='p-6 rounded-2xl bg-luxury-cream border border-gray-100'
             >
-              <h4 className='text-xl font-serif font-bold mb-3 text-emerald-600'>
-                {r.title}
-              </h4>
+              <div className='flex items-start gap-2 mb-2'>
+                <h4 className='text-base font-serif font-bold text-emerald-600'>
+                  {r.title}
+                </h4>
+                <InfoBadge text={r.tooltip} />
+              </div>
               <p className='text-sm text-gray-500 font-light leading-relaxed'>
                 {r.desc}
               </p>
@@ -959,44 +1210,50 @@ function WhyGermanySection() {
         </div>
       </div>
 
-      {/* Desktop: Infinite scroll */}
-      <div className='hidden md:block relative'>
+      {/* Desktop: infinite marquee */}
+      <div className='hidden md:block relative overflow-hidden'>
         <div className='flex overflow-hidden'>
           <motion.div
-            animate={{ x: [0, -1920] }}
-            transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
-            className='flex gap-8 whitespace-nowrap'
+            animate={{ x: [0, '-50%'] }}
+            transition={{ duration: 38, repeat: Infinity, ease: 'linear' }}
+            className='flex gap-6 shrink-0'
           >
-            {[...reasonsRow1, ...reasonsRow1, ...reasonsRow1].map((r, i) => (
+            {[...row1, ...row1].map((r, i) => (
               <div
                 key={i}
-                className='w-[400px] p-10 rounded-[2.5rem] bg-luxury-cream border border-gray-100 shrink-0'
+                className='w-[360px] p-9 rounded-[2.5rem] bg-luxury-cream border border-gray-100 shrink-0'
               >
-                <h4 className='text-2xl font-serif font-bold mb-4 text-emerald-600'>
-                  {r.title}
-                </h4>
-                <p className='text-base text-gray-500 font-light leading-relaxed whitespace-normal'>
+                <div className='flex items-start gap-2 mb-3'>
+                  <h4 className='text-xl font-serif font-bold text-emerald-600'>
+                    {r.title}
+                  </h4>
+                  <InfoBadge text={r.tooltip} />
+                </div>
+                <p className='text-sm text-gray-500 font-light leading-relaxed'>
                   {r.desc}
                 </p>
               </div>
             ))}
           </motion.div>
         </div>
-        <div className='flex overflow-hidden mt-8'>
+        <div className='flex overflow-hidden mt-6'>
           <motion.div
-            animate={{ x: [-1920, 0] }}
-            transition={{ duration: 45, repeat: Infinity, ease: 'linear' }}
-            className='flex gap-8 whitespace-nowrap'
+            animate={{ x: ['-50%', 0] }}
+            transition={{ duration: 42, repeat: Infinity, ease: 'linear' }}
+            className='flex gap-6 shrink-0'
           >
-            {[...reasonsRow2, ...reasonsRow2, ...reasonsRow2].map((r, i) => (
+            {[...row2, ...row2].map((r, i) => (
               <div
                 key={i}
-                className='w-[400px] p-10 rounded-[2.5rem] bg-luxury-cream border border-gray-100 shrink-0'
+                className='w-[360px] p-9 rounded-[2.5rem] bg-luxury-cream border border-gray-100 shrink-0'
               >
-                <h4 className='text-2xl font-serif font-bold mb-4 text-emerald-600'>
-                  {r.title}
-                </h4>
-                <p className='text-base text-gray-500 font-light leading-relaxed whitespace-normal'>
+                <div className='flex items-start gap-2 mb-3'>
+                  <h4 className='text-xl font-serif font-bold text-emerald-600'>
+                    {r.title}
+                  </h4>
+                  <InfoBadge text={r.tooltip} />
+                </div>
+                <p className='text-sm text-gray-500 font-light leading-relaxed'>
                   {r.desc}
                 </p>
               </div>
@@ -1005,17 +1262,17 @@ function WhyGermanySection() {
         </div>
       </div>
 
-      <div className='container mx-auto px-6 mt-24'>
+      <div className='container mx-auto px-5 sm:px-8 mt-16 sm:mt-24'>
         <div className='flex justify-center'>
           <Link
             to='/services/german'
             className='group flex items-center gap-4 text-luxury-black hover:text-emerald-600 transition-colors'
           >
-            <span className='text-sm uppercase tracking-[0.3em] font-bold'>
+            <span className='text-xs sm:text-sm uppercase tracking-[0.3em] font-bold'>
               Start Your German Journey
             </span>
-            <div className='w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center group-hover:border-emerald-500 transition-colors'>
-              <ArrowRight className='h-5 w-5 group-hover:translate-x-1 transition-transform' />
+            <div className='w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-gray-200 flex items-center justify-center group-hover:border-emerald-500 transition-colors'>
+              <ArrowRight className='h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform' />
             </div>
           </Link>
         </div>
@@ -1024,99 +1281,114 @@ function WhyGermanySection() {
   );
 }
 
-// ─── IN-DEMAND SERVICES ────────────────────────────────────────────────────────
+// ─── SERVICES ─────────────────────────────────────────────────────────────────
 function ServicesSection() {
   const services = [
     {
       id: 'exam-prep',
-      title: 'Goethe Exam Preparation',
+      title: 'Goethe Exam Prep',
       description:
-        'Targeted prep for A1 through C1 Goethe exams. Practice tests, past questions, and expert coaching.',
+        'Targeted prep for A1–C1 Goethe exams. Past questions, mock tests, and expert coaching. Pass on your first attempt.',
       icon: Award,
       color: 'bg-blue-500',
+      tooltip:
+        'Goethe certificates are required for German visas, nursing recognition, and university admission.',
     },
     {
       id: 'german',
       title: 'German Language (A1–C1)',
       description:
-        'Our flagship program. Full-curriculum German courses from beginner to advanced, delivered by certified instructors.',
+        'Our flagship program. Full-curriculum German courses taught by certified instructors with real Germany experience.',
       icon: BookOpen,
       color: 'bg-emerald-500',
+      tooltip:
+        'We offer both standard pace and intensive fast-track options. Classes run online and in-person.',
     },
     {
       id: 'document-translation',
       title: 'Document Translation',
       description:
-        'Professional German ↔ English translation for certificates, contracts, medical records, and official documents.',
+        'Certified German ↔ English translation for certificates, contracts, medical records, and all official documents.',
       icon: FileText,
       color: 'bg-purple-500',
+      tooltip:
+        'Our translations are accepted by German embassies and government offices.',
     },
     {
       id: 'data-analysis',
       title: 'Data Analysis',
       description:
-        "Transform raw data into strategic business insights. Ideal for professionals targeting Germany's data-driven industries.",
+        "Turn raw data into business insights. Ideal for professionals targeting Germany's data-driven industries.",
       icon: BarChart,
       color: 'bg-orange-500',
+      tooltip:
+        'Data analysts earn €3,500–€6,000/month in Germany. Pair with B2 German for strong job prospects.',
     },
     {
       id: 'cyber-security',
       title: 'Cyber Security',
       description:
-        'Advanced protection strategies for the digital age. Pair with German B1+ for IT roles in Germany.',
+        'Advanced cybersecurity training aligned with global standards. Pair with German B1+ for IT roles in Germany.',
       icon: Shield,
       color: 'bg-rose-500',
+      tooltip:
+        'Cybersecurity professionals are in high demand across Germany — especially in Frankfurt and Munich.',
     },
     {
       id: 'project-management',
       title: 'Project Management',
       description:
-        'Lead complex initiatives with precision. PMP-aligned curriculum built for international professionals.',
+        'PMP-aligned curriculum for professionals who want to lead teams and projects in international environments.',
       icon: Briefcase,
       color: 'bg-cyan-500',
+      tooltip:
+        'PMP certification is globally recognised. Combine with German language for management roles in Germany.',
     },
   ];
 
   return (
-    <section className='py-32 bg-white'>
-      <div className='container mx-auto px-6'>
-        <div className='flex flex-col lg:flex-row justify-between items-end mb-20 gap-8'>
+    <section className='py-24 sm:py-32 bg-white'>
+      <div className='container mx-auto px-5 sm:px-8'>
+        <div className='flex flex-col lg:flex-row justify-between items-start lg:items-end mb-14 sm:mb-20 gap-8'>
           <div className='max-w-2xl'>
-            <span className='text-emerald-600 font-bold uppercase tracking-[0.3em] text-sm block mb-4'>
-              In-Demand Services
+            <span className='text-emerald-600 font-bold uppercase tracking-[0.3em] text-xs sm:text-sm block mb-4'>
+              All Services
             </span>
-            <h2 className='text-fluid-h2 font-serif font-bold text-luxury-black'>
-              Everything You Need to
+            <h2 className='text-[clamp(2rem,5vw,3.8rem)] font-serif font-bold text-luxury-black leading-tight'>
+              Everything You Need
               <br />
-              Work & Thrive in Germany
+              to Work in Germany
             </h2>
           </div>
-          <p className='text-lg md:text-xl text-gray-500 max-w-md font-light leading-relaxed'>
-            From your first German lesson to your first day in a German
-            workplace — AOCA covers the full journey.
+          <p className='text-base sm:text-xl text-gray-500 max-w-md font-light leading-relaxed'>
+            From your first German lesson to your first salary in Germany — AOCA
+            covers the full journey.
           </p>
         </div>
 
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8'>
           {services.map((service, i) => (
             <motion.div
               key={i}
-              whileHover={{ y: -10 }}
-              className='group relative bg-white p-8 md:p-10 rounded-[2.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-100 overflow-hidden'
+              whileHover={{ y: -8 }}
+              className='group relative bg-white p-7 sm:p-10 rounded-2xl sm:rounded-[2.5rem] shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 overflow-hidden'
             >
               <div
-                className={`absolute top-0 right-0 w-32 h-32 ${service.color} opacity-[0.03] rounded-bl-full transition-all duration-500 group-hover:scale-150`}
+                className={`absolute top-0 right-0 w-28 h-28 ${service.color} opacity-[0.04] rounded-bl-full transition-all duration-500 group-hover:scale-150`}
               />
               <div className='relative z-10'>
                 <div
-                  className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl ${service.color} flex items-center justify-center mb-8 shadow-lg`}
+                  className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl ${service.color} flex items-center justify-center mb-6 shadow-md`}
                 >
-                  <service.icon className='h-7 w-7 md:h-8 md:w-8 text-white' />
+                  <service.icon className='h-6 w-6 sm:h-7 sm:w-7 text-white' />
                 </div>
-                <h3 className='text-2xl font-serif font-bold text-luxury-black mb-4'>
-                  {service.title}
-                </h3>
-                <p className='text-gray-500 font-light mb-8 leading-relaxed'>
+                <div className='flex items-center gap-2 mb-3 sm:mb-4'>
+                  <h3 className='text-xl sm:text-2xl font-serif font-bold text-luxury-black'>
+                    {service.title}
+                  </h3>
+                  <InfoBadge text={service.tooltip} />
+                </div>
+                <p className='text-gray-500 font-light mb-6 sm:mb-8 leading-relaxed text-sm sm:text-base'>
                   {service.description}
                 </p>
                 <Link
@@ -1124,7 +1396,7 @@ function ServicesSection() {
                   className='inline-flex items-center gap-2 text-luxury-black font-bold uppercase tracking-widest text-xs group-hover:text-emerald-600 transition-colors'
                 >
                   Learn More{' '}
-                  <ArrowRight className='h-4 w-4 transition-transform group-hover:translate-x-2' />
+                  <ArrowRight className='h-4 w-4 transition-transform group-hover:translate-x-1' />
                 </Link>
               </div>
             </motion.div>
@@ -1135,73 +1407,153 @@ function ServicesSection() {
   );
 }
 
-// ─── TESTIMONIALS ─────────────────────────────────────────────────────────────
+// ─── TESTIMONIALS CAROUSEL ────────────────────────────────────────────────────
 function TestimonialsSection() {
   const testimonials = [
     {
       name: 'Chioma A.',
       role: 'Registered Nurse — Now in Berlin',
-      text: 'AOCA took me from zero German to B2 in under 8 months. I passed the Goethe exam, got placed in a Berlin hospital, and my work contract was handled completely by their team. The process was seamless.',
+      text: "AOCA took me from zero German to B2 in under 8 months. I passed the Goethe exam, got placed in a Berlin hospital, and my entire work contract was handled by their team. The process was seamless — I didn't have to figure anything out alone.",
       image:
         'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=80&w=200',
+      rating: 5,
     },
     {
       name: 'Emmanuel O.',
       role: 'IT Professional — Now in Munich',
-      text: "I thought learning German would take years. AOCA's intensive B1–B2 program changed that belief completely. Six months later I was on a plane to Munich with a tech job already lined up.",
+      text: "I thought learning German would take years. AOCA's intensive B1–B2 program changed that completely. Six months later I was on a plane to Munich with a tech job already lined up. I'm earning 4x what I made in Lagos.",
       image:
         'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=200',
+      rating: 5,
     },
     {
       name: 'Blessing M.',
       role: 'Ausbildung Trainee — Frankfurt',
-      text: "I didn't even know what Ausbildung was before I came to AOCA. They explained everything, got me to B1, and connected me with a German company. I'm now earning and training in Frankfurt.",
+      text: "I didn't even know what Ausbildung was before I came to AOCA. They explained the whole process, helped me reach B1, and connected me with a German company. I'm now earning €900/month while I train in Frankfurt. Life-changing.",
       image:
         'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
+      rating: 5,
+    },
+    {
+      name: 'Tunde B.',
+      role: 'University Student — Hamburg',
+      text: "I'm paying almost nothing for a world-class education at the University of Hamburg. AOCA got me to C1 German, handled my application, and walked me through the visa. I started university 8 months after I started German.",
+      image:
+        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200',
+      rating: 5,
     },
   ];
 
+  const [current, setCurrent] = useState(0);
+  const total = testimonials.length;
+
+  useEffect(() => {
+    const t = setInterval(() => setCurrent((p) => (p + 1) % total), 5500);
+    return () => clearInterval(t);
+  }, [total]);
+
   return (
-    <section className='py-32 bg-luxury-cream'>
-      <div className='container mx-auto px-6'>
-        <div className='text-center max-w-3xl mx-auto mb-20'>
-          <span className='text-emerald-600 font-bold uppercase tracking-[0.3em] text-sm block mb-4'>
-            Success Stories
+    <section className='py-24 sm:py-32 bg-luxury-cream'>
+      <div className='container mx-auto px-5 sm:px-8'>
+        <div className='text-center max-w-3xl mx-auto mb-14 sm:mb-16'>
+          <span className='text-emerald-600 font-bold uppercase tracking-[0.3em] text-xs sm:text-sm block mb-4'>
+            Real Students. Real Results.
           </span>
-          <h2 className='text-fluid-h2 font-serif font-bold text-luxury-black'>
-            They Learned German. Now They Live in Germany.
+          <h2 className='text-[clamp(2rem,5vw,3.8rem)] font-serif font-bold text-luxury-black leading-tight'>
+            They Learned German.
+            <br />
+            Now They Live in Germany.
           </h2>
         </div>
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12'>
+
+        {/* Desktop: 3-column grid */}
+        <div className='hidden md:grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8'>
           {testimonials.map((t, i) => (
             <motion.div
               key={i}
-              whileHover={{ y: -10 }}
-              className='p-10 rounded-[2.5rem] bg-white border border-gray-100 relative'
+              whileHover={{ y: -8 }}
+              className='p-7 sm:p-9 rounded-2xl sm:rounded-[2.5rem] bg-white border border-gray-100 relative flex flex-col'
             >
-              <div className='text-6xl font-serif text-emerald-500/20 absolute top-6 left-6'>
-                "
+              <div className='flex gap-1 mb-4'>
+                {Array.from({ length: t.rating }).map((_, j) => (
+                  <Star
+                    key={j}
+                    className='h-4 w-4 fill-emerald-500 text-emerald-500'
+                  />
+                ))}
               </div>
-              <p className='text-lg text-gray-600 font-light leading-relaxed mb-8 relative z-10 italic'>
-                {t.text}
+              <p className='text-sm sm:text-base text-gray-600 font-light leading-relaxed mb-7 flex-1 italic'>
+                "{t.text}"
               </p>
-              <div className='flex items-center gap-4'>
+              <div className='flex items-center gap-3'>
                 <img
                   src={t.image}
                   alt={t.name}
-                  className='w-14 h-14 rounded-full object-cover border-2 border-white shadow-md'
+                  className='w-12 h-12 rounded-full object-cover border-2 border-white shadow-md'
                 />
                 <div>
-                  <h4 className='font-serif font-bold text-luxury-black'>
+                  <h4 className='font-serif font-bold text-luxury-black text-sm'>
                     {t.name}
                   </h4>
-                  <p className='text-xs uppercase tracking-widest text-emerald-600 font-bold'>
+                  <p className='text-[10px] uppercase tracking-widest text-emerald-600 font-bold leading-tight'>
                     {t.role}
                   </p>
                 </div>
               </div>
             </motion.div>
           ))}
+        </div>
+
+        {/* Mobile: carousel */}
+        <div className='md:hidden relative overflow-hidden'>
+          <AnimatePresence mode='wait'>
+            <motion.div
+              key={current}
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -30 }}
+              transition={{ duration: 0.45 }}
+              className='p-7 rounded-2xl bg-white border border-gray-100'
+            >
+              <div className='flex gap-1 mb-4'>
+                {Array.from({ length: testimonials[current].rating }).map(
+                  (_, j) => (
+                    <Star
+                      key={j}
+                      className='h-4 w-4 fill-emerald-500 text-emerald-500'
+                    />
+                  ),
+                )}
+              </div>
+              <p className='text-sm text-gray-600 font-light leading-relaxed mb-6 italic'>
+                "{testimonials[current].text}"
+              </p>
+              <div className='flex items-center gap-3'>
+                <img
+                  src={testimonials[current].image}
+                  alt={testimonials[current].name}
+                  className='w-12 h-12 rounded-full object-cover border-2 border-white shadow-md'
+                />
+                <div>
+                  <h4 className='font-serif font-bold text-luxury-black text-sm'>
+                    {testimonials[current].name}
+                  </h4>
+                  <p className='text-[10px] uppercase tracking-widest text-emerald-600 font-bold'>
+                    {testimonials[current].role}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+          <div className='flex justify-center gap-2 mt-5'>
+            {testimonials.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrent(i)}
+                className={`h-1.5 rounded-full transition-all duration-300 ${current === i ? 'w-8 bg-emerald-500' : 'w-3 bg-gray-300'}`}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>
@@ -1211,68 +1563,79 @@ function TestimonialsSection() {
 // ─── GLOBAL REACH ─────────────────────────────────────────────────────────────
 function GlobalReach() {
   return (
-    <section className='py-32 bg-luxury-cream'>
-      <div className='container mx-auto px-6'>
-        <div className='flex flex-col lg:flex-row items-center gap-20'>
-          <div className='flex-1'>
-            <span className='text-emerald-600 font-bold uppercase tracking-[0.3em] text-sm block mb-4'>
+    <section className='py-24 sm:py-32 bg-luxury-cream'>
+      <div className='container mx-auto px-5 sm:px-8'>
+        <div className='flex flex-col lg:flex-row items-center gap-14 sm:gap-20'>
+          <div className='flex-1 w-full'>
+            <span className='text-emerald-600 font-bold uppercase tracking-[0.3em] text-xs sm:text-sm block mb-4'>
               Our Locations
             </span>
-            <h2 className='text-fluid-h2 font-serif font-bold text-luxury-black mb-8'>
+            <h2 className='text-[clamp(2rem,5vw,3.8rem)] font-serif font-bold text-luxury-black mb-6 sm:mb-8 leading-tight'>
               Based in Nigeria.
               <br />
               Connected to Germany.
             </h2>
-            <p className='text-xl text-gray-500 font-light leading-relaxed mb-12'>
-              With training centers in Lagos and Port Harcourt and strategic
-              employer partners across Germany, we bridge the gap between your
-              current location and your desired destination.
+            <p className='text-base sm:text-xl text-gray-500 font-light leading-relaxed mb-10 sm:mb-12'>
+              Training centers in Lagos and Port Harcourt, with direct employer
+              and hospital partnerships across Germany. We bridge the gap from
+              where you are to where you want to be.
             </p>
-            <div className='space-y-6'>
+            <div className='space-y-4'>
               {[
                 {
                   city: 'Lagos, Nigeria',
-                  role: 'Headquarters & German Language Training Center',
+                  role: 'Headquarters — German Language Training & Placement',
+                  flag: '🇳🇬',
                 },
                 {
                   city: 'Port Harcourt, Nigeria',
-                  role: 'Regional German Courses & Consultancy Hub',
+                  role: 'Regional German Classes & Consultancy Hub',
+                  flag: '🇳🇬',
                 },
                 {
                   city: 'Berlin, Germany',
-                  role: 'Employer Partnerships & Visa Support',
+                  role: 'Employer Partnerships & Visa Support Office',
+                  flag: '🇩🇪',
                 },
               ].map((loc, i) => (
                 <div
                   key={i}
-                  className='flex items-center gap-4 p-6 rounded-2xl bg-white border border-gray-100'
+                  className='flex items-center gap-4 p-5 sm:p-6 rounded-2xl bg-white border border-gray-100 shadow-sm'
                 >
-                  <div className='w-3 h-3 rounded-full bg-emerald-500' />
+                  <span className='text-2xl shrink-0'>{loc.flag}</span>
                   <div>
-                    <h4 className='font-serif font-bold text-luxury-black'>
+                    <h4 className='font-serif font-bold text-luxury-black text-sm sm:text-base'>
                       {loc.city}
                     </h4>
-                    <p className='text-sm text-gray-400'>{loc.role}</p>
+                    <p className='text-xs sm:text-sm text-gray-400 font-light'>
+                      {loc.role}
+                    </p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-          <div className='flex-1 relative'>
-            <div className='aspect-square rounded-[3rem] overflow-hidden shadow-2xl bg-luxury-black flex items-center justify-center p-12'>
-              <div className='relative w-full h-full opacity-60'>
-                <img
-                  src='https://res.cloudinary.com/dejeplzpv/image/upload/v1744418391/m5tgp0rr8ihaqinxyoxd.jpg'
-                  alt='Global Map'
-                  className='w-full h-full object-cover'
-                />
-              </div>
+          <div className='flex-1 w-full relative'>
+            <div className='aspect-square rounded-[2rem] sm:rounded-[3rem] overflow-hidden shadow-2xl bg-luxury-black flex items-center justify-center'>
+              <img
+                src='https://res.cloudinary.com/dejeplzpv/image/upload/v1744418391/m5tgp0rr8ihaqinxyoxd.jpg'
+                alt='Nigeria to Germany map'
+                className='w-full h-full object-cover opacity-60'
+              />
               <div className='absolute inset-0 flex items-center justify-center'>
-                <div className='relative'>
-                  <div className='absolute -top-12 -left-12 w-4 h-4 bg-emerald-500 rounded-full animate-ping' />
-                  <div className='absolute -top-12 -left-12 w-4 h-4 bg-emerald-500 rounded-full' />
-                  <div className='absolute top-24 left-32 w-4 h-4 bg-emerald-500 rounded-full animate-ping' />
-                  <div className='absolute top-24 left-32 w-4 h-4 bg-emerald-500 rounded-full' />
+                <div className='relative w-full h-full'>
+                  <div className='absolute top-1/3 left-1/4'>
+                    <div className='relative'>
+                      <div className='w-4 h-4 bg-emerald-500 rounded-full animate-ping absolute' />
+                      <div className='w-4 h-4 bg-emerald-500 rounded-full relative' />
+                    </div>
+                  </div>
+                  <div className='absolute top-1/4 right-1/3'>
+                    <div className='relative'>
+                      <div className='w-4 h-4 bg-emerald-300 rounded-full animate-ping absolute' />
+                      <div className='w-4 h-4 bg-emerald-300 rounded-full relative' />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1287,61 +1650,92 @@ function GlobalReach() {
 function FAQSection() {
   const faqs = [
     {
-      q: 'Do I need any prior knowledge of German to enroll?',
-      a: "Not at all. Our A1 program is designed for complete beginners — whether you've never heard German before or only dabbled on Duolingo. We start from scratch and take you all the way.",
+      q: 'Do I need any German knowledge to enroll?',
+      a: "Not at all. Our A1 program is for complete beginners — even if you've never heard German before. We assess you first, then you start at the right level.",
     },
     {
       q: 'How long does it take to reach B2 from zero?',
-      a: 'With our standard program, most students reach B2 in 12–18 months. With our intensive fast-track option, dedicated students have achieved B2 in as little as 6–8 months.',
+      a: "With our standard program: 12–18 months. With our intensive fast-track option, dedicated students have reached B2 in as little as 6–8 months. We'll recommend the right pace for your goals.",
     },
     {
-      q: 'What is the Goethe examination and do I need it?',
-      a: "The Goethe Institut is Germany's official language certification body. Their certificates are recognized by German embassies, employers, and universities worldwide. Yes — you will need a Goethe certificate for virtually every Germany pathway.",
+      q: 'What exactly is the Goethe certificate and why do I need it?',
+      a: "The Goethe Institut is Germany's official language certification body. Their certificates are the standard accepted by German embassies, hospitals, companies, and universities. You need a Goethe certificate for virtually every German visa and employment pathway.",
     },
     {
-      q: 'Do I need B2 for nursing or can I go with B1?',
-      a: "For direct nursing employment in Germany, B2 is required. B1 is sufficient for Ausbildung (vocational training) programs. We'll advise you on the exact requirement for your specific pathway.",
+      q: 'Do nurses need B2 or can they go with B1?',
+      a: "Nursing recognition in Germany specifically requires B2. For Ausbildung (vocational training), B1 is sufficient. We'll always advise you on exactly what's required for your specific pathway.",
     },
     {
-      q: 'Do you handle the visa application too?',
-      a: "Yes. Once you've obtained your certificate and been matched with an employer or program, our team supports your complete visa application — from document preparation to embassy interview coaching.",
+      q: 'Do you help with the visa application?',
+      a: "Yes — completely. Once you've obtained your certificate and been matched with an employer or program, our team handles your full visa process: document preparation, embassy appointment coaching, and follow-up.",
+    },
+    {
+      q: 'Can I study online or do I have to attend in person?',
+      a: 'Both options are available. Our online classes are live and interactive — not pre-recorded videos. In-person classes run in Lagos and Port Harcourt. Many students combine both for flexibility.',
     },
   ];
 
+  const [openIndex, setOpenIndex] = useState(null);
+
   return (
-    <section id='faq' className='py-32 bg-luxury-cream'>
-      <div className='container mx-auto px-6'>
-        <div className='grid grid-cols-1 lg:grid-cols-2 gap-20'>
+    <section id='faq' className='py-24 sm:py-32 bg-luxury-cream'>
+      <div className='container mx-auto px-5 sm:px-8'>
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-14 sm:gap-20'>
           <div>
-            <span className='text-emerald-600 font-bold uppercase tracking-[0.3em] text-sm block mb-4'>
+            <span className='text-emerald-600 font-bold uppercase tracking-[0.3em] text-xs sm:text-sm block mb-4'>
               Common Questions
             </span>
-            <h2 className='text-fluid-h2 font-serif font-bold text-luxury-black mb-8'>
-              Frequently Asked Questions
+            <h2 className='text-[clamp(2rem,5vw,3.8rem)] font-serif font-bold text-luxury-black mb-6 sm:mb-8 leading-tight'>
+              Got Questions? We've Got Answers.
             </h2>
-            <p className='text-xl text-gray-500 font-light leading-relaxed mb-12'>
-              Everything you need to know about our German programs and Germany
-              pathways. Can't find your answer? Talk to our team directly.
+            <p className='text-base sm:text-xl text-gray-500 font-light leading-relaxed mb-10 sm:mb-12'>
+              These are the questions we get most often from Nigerians who are
+              serious about getting to Germany. Can't find yours here? Talk to
+              us directly.
             </p>
             <Link
               to='/contact'
-              className='px-10 py-5 bg-luxury-black text-white rounded-full text-sm uppercase tracking-widest font-bold hover:bg-emerald-600 transition-all'
+              className='inline-flex items-center gap-2 px-8 sm:px-10 py-4 sm:py-5 bg-luxury-black text-white rounded-full text-xs sm:text-sm uppercase tracking-widest font-bold hover:bg-emerald-600 transition-all'
             >
-              Ask a Question
+              Ask a Counsellor <ArrowRight className='h-4 w-4' />
             </Link>
           </div>
-          <div className='space-y-8'>
+          <div className='space-y-4'>
             {faqs.map((faq, i) => (
               <div
                 key={i}
-                className='p-8 bg-white rounded-[2rem] shadow-sm border border-gray-100'
+                className='bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden'
               >
-                <h4 className='text-xl font-serif font-bold text-luxury-black mb-4'>
-                  {faq.q}
-                </h4>
-                <p className='text-gray-500 font-light leading-relaxed'>
-                  {faq.a}
-                </p>
+                <button
+                  onClick={() => setOpenIndex(openIndex === i ? null : i)}
+                  className='w-full p-6 sm:p-7 text-left flex items-start gap-4 justify-between'
+                >
+                  <h4 className='text-sm sm:text-base font-serif font-bold text-luxury-black pr-4'>
+                    {faq.q}
+                  </h4>
+                  <div
+                    className={`w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center shrink-0 transition-all duration-200 ${openIndex === i ? 'bg-emerald-600 border-emerald-600 rotate-90' : ''}`}
+                  >
+                    <ChevronRight
+                      className={`h-3.5 w-3.5 transition-colors ${openIndex === i ? 'text-white' : 'text-gray-400'}`}
+                    />
+                  </div>
+                </button>
+                <AnimatePresence>
+                  {openIndex === i && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.28 }}
+                      className='overflow-hidden'
+                    >
+                      <p className='px-6 sm:px-7 pb-6 text-sm text-gray-500 font-light leading-relaxed'>
+                        {faq.a}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             ))}
           </div>
@@ -1353,30 +1747,53 @@ function FAQSection() {
 
 // ─── NEWSLETTER ───────────────────────────────────────────────────────────────
 function Newsletter() {
+  const [email, setEmail] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (email) setSubmitted(true);
+  };
+
   return (
-    <section className='py-32 bg-white'>
-      <div className='container mx-auto px-6'>
-        <div className='bg-luxury-black rounded-[3rem] p-12 md:p-24 relative overflow-hidden'>
-          <div className='absolute top-0 right-0 w-96 h-96 bg-emerald-600/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl' />
+    <section className='py-24 sm:py-32 bg-white'>
+      <div className='container mx-auto px-5 sm:px-8'>
+        <div className='bg-luxury-black rounded-[2rem] sm:rounded-[3rem] p-10 sm:p-16 md:p-24 relative overflow-hidden'>
+          <div className='absolute top-0 right-0 w-80 h-80 bg-emerald-600/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none' />
           <div className='relative z-10 max-w-2xl'>
-            <h2 className='text-4xl md:text-6xl font-serif font-bold text-white mb-8'>
+            <h2 className='text-[clamp(1.8rem,4vw,3.5rem)] font-serif font-bold text-white mb-5 sm:mb-8 leading-tight'>
               Get Germany-Ready Updates
             </h2>
-            <p className='text-xl text-white/60 font-light mb-12'>
-              New German cohort dates, Goethe exam tips, job offers from
-              Germany, and visa news — delivered straight to your inbox. No
-              spam.
+            <p className='text-base sm:text-xl text-white/60 font-light mb-10 sm:mb-12'>
+              New cohort dates, Goethe tips, job offers from Germany, and visa
+              news — straight to your inbox. No spam. Unsubscribe anytime.
             </p>
-            <form className='flex flex-col md:flex-row gap-4'>
-              <input
-                type='email'
-                placeholder='Your email address'
-                className='flex-1 bg-white/10 border border-white/20 rounded-full px-8 py-5 text-white placeholder:text-white/30 focus:outline-none focus:border-emerald-500 transition-colors'
-              />
-              <button className='px-10 py-5 bg-emerald-600 text-white rounded-full font-bold uppercase tracking-widest text-sm hover:bg-emerald-500 transition-all'>
-                Subscribe
-              </button>
-            </form>
+            {submitted ? (
+              <div className='flex items-center gap-3 text-emerald-400 font-bold text-base sm:text-lg'>
+                <CheckCircle className='h-6 w-6' />
+                You're in! Watch your inbox for Germany updates.
+              </div>
+            ) : (
+              <form
+                onSubmit={handleSubmit}
+                className='flex flex-col sm:flex-row gap-3 sm:gap-4'
+              >
+                <input
+                  type='email'
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder='Your email address'
+                  required
+                  className='flex-1 bg-white/10 border border-white/20 rounded-full px-6 sm:px-8 py-4 sm:py-5 text-white placeholder:text-white/30 focus:outline-none focus:border-emerald-500 transition-colors text-sm sm:text-base'
+                />
+                <button
+                  type='submit'
+                  className='px-8 sm:px-10 py-4 sm:py-5 bg-emerald-600 text-white rounded-full font-bold uppercase tracking-widest text-xs sm:text-sm hover:bg-emerald-500 transition-all whitespace-nowrap'
+                >
+                  Subscribe Free
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </div>
@@ -1387,15 +1804,17 @@ function Newsletter() {
 // ─── FOOTER ───────────────────────────────────────────────────────────────────
 function Footer() {
   return (
-    <footer className='bg-luxury-black text-white pt-32 pb-12'>
-      <div className='container mx-auto px-6'>
-        {/* Brand row */}
-        <div className='mb-16 pb-16 border-b border-white/10 flex flex-col md:flex-row md:items-end justify-between gap-10'>
+    <footer className='bg-luxury-black text-white pt-20 sm:pt-32 pb-10 sm:pb-12'>
+      <div className='container mx-auto px-5 sm:px-8'>
+        <div className='mb-14 sm:mb-16 pb-14 sm:pb-16 border-b border-white/10 flex flex-col md:flex-row md:items-end justify-between gap-10'>
           <div className='max-w-md'>
-            <Link to='/' className='text-4xl font-serif font-bold mb-6 block'>
+            <Link
+              to='/'
+              className='text-3xl sm:text-4xl font-serif font-bold mb-5 sm:mb-6 block'
+            >
               AOCA<span className='text-emerald-500'>.</span>
             </Link>
-            <p className='text-lg text-white/50 font-light leading-relaxed mb-6'>
+            <p className='text-base sm:text-lg text-white/50 font-light leading-relaxed mb-5 sm:mb-6'>
               Nigeria's premier German language school and Germany placement
               consultancy. From A1 to your first day in Germany — we handle it
               all.
@@ -1404,39 +1823,42 @@ function Footer() {
               German Language · Ausbildung · Nursing · Job Seeker Visa
             </p>
           </div>
-          <div className='flex gap-4'>
-            {[Instagram, Twitter, Facebook, Linkedin].map((Icon, i) => (
+          <div className='flex gap-3 sm:gap-4'>
+            {[
+              { Icon: Instagram, href: '#' },
+              { Icon: Twitter, href: '#' },
+              { Icon: Facebook, href: '#' },
+              { Icon: Linkedin, href: '#' },
+            ].map(({ Icon, href }, i) => (
               <a
                 key={i}
-                href='#'
-                className='p-4 rounded-full border border-white/10 hover:bg-emerald-600 hover:border-emerald-600 transition-all'
+                href={href}
+                className='p-3 sm:p-4 rounded-full border border-white/10 hover:bg-emerald-600 hover:border-emerald-600 transition-all'
               >
-                <Icon className='h-5 w-5' />
+                <Icon className='h-4 w-4 sm:h-5 sm:w-5' />
               </a>
             ))}
           </div>
         </div>
 
-        {/* Links grid */}
-        <div className='grid grid-cols-2 md:grid-cols-4 gap-10 mb-20'>
-          {/* German Programs */}
+        <div className='grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10 mb-16 sm:mb-20'>
           <div>
-            <h4 className='text-xs uppercase tracking-[0.3em] font-bold mb-6 text-emerald-500'>
+            <h4 className='text-xs uppercase tracking-[0.3em] font-bold mb-5 sm:mb-6 text-emerald-500'>
               German Programs
             </h4>
             <ul className='space-y-3'>
               {[
-                { label: 'A1 German — Beginner', to: '/services/german' },
-                { label: 'A2 German — Elementary', to: '/services/german' },
-                { label: 'B1 German — Intermediate', to: '/services/german' },
-                { label: 'B2 German — Upper Inter.', to: '/services/german' },
-                { label: 'C1 German — Advanced', to: '/services/german' },
+                { label: 'A1 — Absolute Beginner', to: '/services/german' },
+                { label: 'A2 — Elementary', to: '/services/german' },
+                { label: 'B1 — Intermediate', to: '/services/german' },
+                { label: 'B2 — Upper Intermediate', to: '/services/german' },
+                { label: 'C1 — Advanced', to: '/services/german' },
                 { label: 'Goethe Exam Prep', to: '/services/exam-prep' },
               ].map((item) => (
                 <li key={item.label}>
                   <Link
                     to={item.to}
-                    className='text-white/50 hover:text-emerald-400 transition-colors text-sm font-light leading-relaxed block'
+                    className='text-white/50 hover:text-emerald-400 transition-colors text-xs sm:text-sm font-light block leading-relaxed'
                   >
                     {item.label}
                   </Link>
@@ -1445,9 +1867,8 @@ function Footer() {
             </ul>
           </div>
 
-          {/* Germany Pathways */}
           <div>
-            <h4 className='text-xs uppercase tracking-[0.3em] font-bold mb-6 text-emerald-500'>
+            <h4 className='text-xs uppercase tracking-[0.3em] font-bold mb-5 sm:mb-6 text-emerald-500'>
               Germany Pathways
             </h4>
             <ul className='space-y-3'>
@@ -1468,7 +1889,7 @@ function Footer() {
                 <li key={item.label}>
                   <Link
                     to={item.to}
-                    className='text-white/50 hover:text-emerald-400 transition-colors text-sm font-light leading-relaxed block'
+                    className='text-white/50 hover:text-emerald-400 transition-colors text-xs sm:text-sm font-light block leading-relaxed'
                   >
                     {item.label}
                   </Link>
@@ -1477,9 +1898,8 @@ function Footer() {
             </ul>
           </div>
 
-          {/* Other Services */}
           <div>
-            <h4 className='text-xs uppercase tracking-[0.3em] font-bold mb-6 text-emerald-500'>
+            <h4 className='text-xs uppercase tracking-[0.3em] font-bold mb-5 sm:mb-6 text-emerald-500'>
               Other Services
             </h4>
             <ul className='space-y-3'>
@@ -1500,7 +1920,7 @@ function Footer() {
                 <li key={item.label}>
                   <Link
                     to={item.to}
-                    className='text-white/50 hover:text-emerald-400 transition-colors text-sm font-light leading-relaxed block'
+                    className='text-white/50 hover:text-emerald-400 transition-colors text-xs sm:text-sm font-light block leading-relaxed'
                   >
                     {item.label}
                   </Link>
@@ -1509,36 +1929,44 @@ function Footer() {
             </ul>
           </div>
 
-          {/* Contact */}
           <div>
-            <h4 className='text-xs uppercase tracking-[0.3em] font-bold mb-6 text-emerald-500'>
+            <h4 className='text-xs uppercase tracking-[0.3em] font-bold mb-5 sm:mb-6 text-emerald-500'>
               Contact Us
             </h4>
-            <ul className='space-y-5'>
-              <li className='flex items-start gap-3 text-white/50 font-light text-sm'>
-                <MapPin className='h-5 w-5 text-emerald-500 shrink-0 mt-0.5' />
+            <ul className='space-y-4'>
+              <li className='flex items-start gap-3 text-white/50 text-xs sm:text-sm font-light'>
+                <MapPin className='h-4 w-4 text-emerald-500 shrink-0 mt-0.5' />
                 <span>
                   8 Bayo Adetuna Street off Sangotedo, Lagos, Nigeria.
                 </span>
               </li>
-              <li className='flex items-start gap-3 text-white/50 font-light text-sm'>
-                <MapPin className='h-5 w-5 text-emerald-500 shrink-0 mt-0.5' />
+              <li className='flex items-start gap-3 text-white/50 text-xs sm:text-sm font-light'>
+                <MapPin className='h-4 w-4 text-emerald-500 shrink-0 mt-0.5' />
                 <span>Port Harcourt, Rivers State, Nigeria.</span>
               </li>
-              <li className='flex items-center gap-3 text-white/50 font-light text-sm'>
-                <Phone className='h-5 w-5 text-emerald-500 shrink-0' />
-                <span>+234 803 886 5466</span>
+              <li className='flex items-center gap-3 text-white/50 text-xs sm:text-sm font-light'>
+                <Phone className='h-4 w-4 text-emerald-500 shrink-0' />
+                <a
+                  href='tel:+2348038865466'
+                  className='hover:text-emerald-400 transition-colors'
+                >
+                  +234 803 886 5466
+                </a>
               </li>
-              <li className='flex items-center gap-3 text-white/50 font-light text-sm'>
-                <Mail className='h-5 w-5 text-emerald-500 shrink-0' />
-                <span>info@aocaresourcesltd.com</span>
+              <li className='flex items-center gap-3 text-white/50 text-xs sm:text-sm font-light'>
+                <Mail className='h-4 w-4 text-emerald-500 shrink-0' />
+                <a
+                  href='mailto:info@aocaresourcesltd.com'
+                  className='hover:text-emerald-400 transition-colors'
+                >
+                  info@aocaresourcesltd.com
+                </a>
               </li>
             </ul>
-
-            <div className='mt-8'>
+            <div className='mt-7'>
               <Link
                 to='/contact'
-                className='inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-full text-xs uppercase tracking-widest font-bold hover:bg-emerald-500 transition-all'
+                className='inline-flex items-center gap-2 px-5 sm:px-6 py-3 bg-emerald-600 text-white rounded-full text-xs uppercase tracking-widest font-bold hover:bg-emerald-500 transition-all'
               >
                 Get in Touch <ArrowRight className='h-3 w-3' />
               </Link>
@@ -1546,13 +1974,12 @@ function Footer() {
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className='pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-white/30 text-sm font-light'>
+        <div className='pt-7 sm:pt-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-5 text-white/30 text-xs font-light'>
           <p>
             © {new Date().getFullYear()} AOCA Resources Limited. All Rights
             Reserved.
           </p>
-          <div className='flex gap-8'>
+          <div className='flex flex-wrap justify-center gap-5 sm:gap-8'>
             <a href='#' className='hover:text-white transition-colors'>
               Privacy Policy
             </a>
@@ -1589,36 +2016,43 @@ function HomePage() {
       <GlobalReach />
       <FAQSection />
 
-      {/* Closing CTA Image Section */}
-      <section className='relative h-[70vh] md:h-[80vh] w-full overflow-hidden'>
-        <div className='absolute inset-0 bg-black/50 z-10' />
+      {/* Closing CTA */}
+      <section className='relative h-[60vh] sm:h-[70vh] md:h-[80vh] w-full overflow-hidden'>
+        <div className='absolute inset-0 bg-black/55 z-10' />
         <img
           src='https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=2000'
           alt='Career in Germany'
           className='h-full w-full object-cover'
         />
-        <div className='absolute inset-0 z-20 flex items-center justify-center text-center'>
-          <div className='container mx-auto px-6'>
+        <div className='absolute inset-0 z-20 flex items-center justify-center text-center px-5'>
+          <div className='container mx-auto'>
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className='max-w-4xl mx-auto'
             >
-              <h2 className='text-fluid-h2 font-serif font-bold text-white mb-8'>
+              <h2 className='text-[clamp(2rem,5vw,4rem)] font-serif font-bold text-white mb-6 sm:mb-8 leading-tight'>
                 Your German Journey Starts With One Step
               </h2>
-              <p className='text-lg md:text-xl text-white/80 font-light mb-12'>
-                Thousands of Nigerians are already working, studying, and
-                building lives in Germany — because they learned the language
-                first. Your turn starts today.
+              <p className='text-base sm:text-lg md:text-xl text-white/80 font-light mb-8 sm:mb-12 max-w-2xl mx-auto'>
+                Hundreds of Nigerians are already building lives in Germany —
+                because they made this one decision. Your turn starts today.
               </p>
-              <Link
-                to='/register'
-                className='px-10 md:px-12 py-5 md:py-6 bg-emerald-600 text-white rounded-full text-xs md:text-sm uppercase tracking-widest font-bold hover:bg-emerald-500 transition-all duration-500 shadow-[0_10px_30px_rgba(16,185,129,0.3)]'
-              >
-                Start Learning German Today
-              </Link>
+              <div className='flex flex-col sm:flex-row gap-3 justify-center items-center'>
+                <Link
+                  to='/register'
+                  className='px-9 sm:px-12 py-4 sm:py-5 bg-emerald-600 text-white rounded-full text-xs sm:text-sm uppercase tracking-widest font-bold hover:bg-emerald-500 transition-all duration-300 shadow-[0_10px_30px_rgba(16,185,129,0.3)] hover:scale-105'
+                >
+                  Start Learning German Today
+                </Link>
+                <Link
+                  to='/contact'
+                  className='px-9 sm:px-12 py-4 sm:py-5 bg-white/10 backdrop-blur border border-white/25 text-white rounded-full text-xs sm:text-sm uppercase tracking-widest font-bold hover:bg-white/20 transition-all'
+                >
+                  Talk to a Counsellor First
+                </Link>
+              </div>
             </motion.div>
           </div>
         </div>
