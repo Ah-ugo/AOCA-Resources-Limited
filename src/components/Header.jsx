@@ -203,7 +203,7 @@ function ContactBadge({ isScrolled }) {
               </div>
               <div className='p-2 space-y-1'>
                 <a
-                  href='tel:+2348038865466'
+                  href='tel:+2349038013105'
                   className='flex items-center gap-2 p-2 rounded-xl hover:bg-gray-50 transition-all'
                 >
                   <div className='w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center text-green-600'>
@@ -212,7 +212,7 @@ function ContactBadge({ isScrolled }) {
                   <div className='flex-1 min-w-0'>
                     <p className='text-[10px] text-gray-500'>Call us</p>
                     <p className='text-xs font-medium text-luxury-black'>
-                      +234 803 886 5466
+                      +234 903 801 3105
                     </p>
                   </div>
                 </a>
@@ -231,7 +231,7 @@ function ContactBadge({ isScrolled }) {
                   </div>
                 </a>
                 <a
-                  href='https://wa.me/2348038865466'
+                  href='https://wa.me/4915901149844'
                   target='_blank'
                   rel='noopener noreferrer'
                   className='flex items-center gap-2 p-2 rounded-xl hover:bg-gray-50 transition-all'
@@ -265,7 +265,7 @@ function QuickActions({ isScrolled }) {
     { icon: Mail, href: 'mailto:info@aocaresourcesltd.com', label: 'Email' },
     {
       icon: MessageCircle,
-      href: 'https://wa.me/2348038865466',
+      href: 'https://wa.me/4915901149844',
       label: 'WhatsApp',
       target: '_blank',
     },
@@ -325,7 +325,7 @@ function FloatingContactButton() {
       icon: MessageCircle,
       label: 'WhatsApp',
       value: 'Chat with us',
-      action: 'https://wa.me/2348038865466',
+      action: 'https://wa.me/4915901149844',
       color: 'bg-emerald-500',
     },
   ];
@@ -625,14 +625,14 @@ function Header() {
                 {/* Quick contact icons */}
                 <div className='mb-8 grid grid-cols-3 gap-2'>
                   {[
-                    { href: 'tel:+2348038865466', Icon: Phone, label: 'Call' },
+                    { href: 'tel:+2349038013105', Icon: Phone, label: 'Call' },
                     {
                       href: 'mailto:info@aocaresourcesltd.com',
                       Icon: Mail,
                       label: 'Email',
                     },
                     {
-                      href: 'https://wa.me/2348038865466',
+                      href: 'https://wa.me/4915901149844',
                       Icon: MessageCircle,
                       label: 'WhatsApp',
                       target: '_blank',

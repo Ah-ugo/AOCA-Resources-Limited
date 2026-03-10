@@ -43,6 +43,8 @@ import {
   TrendingUp,
   Users,
   Zap,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
 import {
   BrowserRouter as Router,
@@ -101,6 +103,384 @@ import ApplicationDetails from './pages/admin/careers/ApplicationDetails';
 import PathwayDetail from './pages/PathwayDetail';
 import ServiceDetail from './pages/ServiceDetail';
 import ScrollToTop from './components/ScrollToTop';
+import AdmissionLandingPage from './pages/admissionad';
+
+// ─── ADMISSION POPUP COMPONENT ───────────────────────────────────────────────
+function AdmissionPopup() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    first_name: '',
+    last_name: '',
+    email: '',
+    phone: '',
+    program: '',
+    location: '',
+    message: '',
+  });
+  const [status, setStatus] = useState('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    // Check if user has seen the popup before
+    const hasSeenPopup = localStorage.getItem('hasSeenAdmissionPopup');
+
+    if (!hasSeenPopup) {
+      // Show popup after 2 seconds
+      const timer = setTimeout(() => {
+        setIsOpen(true);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const handleClose = () => {
+    setIsOpen(false);
+    localStorage.setItem('hasSeenAdmissionPopup', 'true');
+  };
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus('loading');
+    setErrorMessage('');
+
+    try {
+      const response = await fetch(
+        'https://aoca-resources-backend.onrender.com/admission-inquiry',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        },
+      );
+
+      if (response.ok) {
+        setStatus('success');
+        setFormData({
+          first_name: '',
+          last_name: '',
+          email: '',
+          phone: '',
+          program: '',
+          location: '',
+          message: '',
+        });
+
+        // Close popup after 3 seconds on success
+        setTimeout(() => {
+          handleClose();
+          setStatus('idle');
+        }, 3000);
+      } else {
+        const data = await response.json();
+        throw new Error(data.message || 'Failed to send inquiry');
+      }
+    } catch (error) {
+      setStatus('error');
+      setErrorMessage(
+        error.message || 'Something went wrong. Please try again later.',
+      );
+    }
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={handleClose}
+            className='fixed inset-0 bg-black/70 z-50 backdrop-blur-sm'
+          />
+
+          {/* Popup */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ type: 'spring', duration: 0.5 }}
+            className='fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[95%] max-w-4xl max-h-[90vh] overflow-y-auto'
+          >
+            <div className='relative bg-white rounded-[2rem] shadow-2xl overflow-hidden'>
+              {/* Close Button */}
+              <button
+                onClick={handleClose}
+                className='absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center transition-all'
+              >
+                <X className='h-5 w-5' />
+              </button>
+
+              {/* Content Grid */}
+              <div className='grid grid-cols-1 md:grid-cols-2'>
+                {/* Left Side - Image & Text */}
+                <div className='relative h-64 md:h-auto bg-emerald-600 overflow-hidden'>
+                  <img
+                    src='/study-group.jpg'
+                    alt='Admission Open'
+                    className='absolute inset-0 w-full h-full object-cover opacity-20'
+                  />
+                  <div className='absolute inset-0 bg-gradient-to-br from-emerald-600 to-emerald-800 mix-blend-multiply' />
+
+                  <div className='relative h-full p-8 md:p-10 flex flex-col justify-between text-white'>
+                    <div>
+                      <img
+                        src='/aoca-logo-white.png'
+                        alt='AOCA Resources'
+                        className='h-8 mb-6'
+                        onError={(e) => (e.target.style.display = 'none')}
+                      />
+                      <h2 className='text-3xl md:text-4xl font-serif font-bold mb-2'>
+                        THE INTAKE
+                      </h2>
+                      <p className='text-lg md:text-xl font-light mb-6'>
+                        Smart Students Are Choosing AOCA
+                      </p>
+                      <div className='space-y-4'>
+                        <div className='flex items-start gap-3'>
+                          <div className='w-8 h-8 rounded-full bg-white/20 flex items-center justify-center shrink-0'>
+                            <GraduationCap className='h-4 w-4' />
+                          </div>
+                          <div>
+                            <p className='font-bold text-sm uppercase tracking-wider mb-1'>
+                              Professional Examination Preparation
+                            </p>
+                            <p className='text-sm text-white/80'>
+                              IELTS, GMAT, SAT, GRE, GCSE & TOEFL
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className='flex items-start gap-3'>
+                          <div className='w-8 h-8 rounded-full bg-white/20 flex items-center justify-center shrink-0'>
+                            <Laptop className='h-4 w-4' />
+                          </div>
+                          <div>
+                            <p className='font-bold text-sm uppercase tracking-wider mb-1'>
+                              Computer Programming
+                            </p>
+                            <p className='text-sm text-white/80'>
+                              Scratch • Python • Web Development
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className='mt-6 space-y-3 text-sm'>
+                      <div className='flex items-center gap-2'>
+                        <Phone className='h-4 w-4 shrink-0' />
+                        <span>09038013105, 08038713612</span>
+                      </div>
+                      <div className='flex items-center gap-2'>
+                        <Mail className='h-4 w-4 shrink-0' />
+                        <span>info@aocaresourcesltd.com</span>
+                      </div>
+                      <div className='flex items-start gap-2'>
+                        <MapPin className='h-4 w-4 shrink-0 mt-0.5' />
+                        <span>
+                          No 70 Eligbolo Road, Rumudumaya, Port Harcourt
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Side - Form */}
+                <div className='p-8 md:p-10 bg-white'>
+                  <h3 className='text-2xl md:text-3xl font-serif font-bold text-luxury-black mb-2'>
+                    Apply Now
+                  </h3>
+                  <p className='text-gray-500 text-sm mb-6'>
+                    Fill in your details and we'll contact you with next steps
+                  </p>
+
+                  {status === 'success' ? (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className='text-center py-8'
+                    >
+                      <div className='w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4'>
+                        <CheckCircle className='h-8 w-8 text-emerald-600' />
+                      </div>
+                      <h4 className='text-lg font-serif font-bold text-luxury-black mb-2'>
+                        Application Submitted!
+                      </h4>
+                      <p className='text-sm text-gray-500'>
+                        Thank you for your interest. Our admissions team will
+                        contact you shortly.
+                      </p>
+                    </motion.div>
+                  ) : (
+                    <form onSubmit={handleSubmit} className='space-y-4'>
+                      <div className='grid grid-cols-2 gap-3'>
+                        <div>
+                          <label className='text-[10px] uppercase tracking-wider font-bold text-gray-400 ml-2'>
+                            First Name
+                          </label>
+                          <input
+                            required
+                            type='text'
+                            name='first_name'
+                            value={formData.first_name}
+                            onChange={handleChange}
+                            placeholder='John'
+                            className='w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:outline-none focus:border-emerald-500 transition-colors text-sm'
+                          />
+                        </div>
+                        <div>
+                          <label className='text-[10px] uppercase tracking-wider font-bold text-gray-400 ml-2'>
+                            Last Name
+                          </label>
+                          <input
+                            required
+                            type='text'
+                            name='last_name'
+                            value={formData.last_name}
+                            onChange={handleChange}
+                            placeholder='Doe'
+                            className='w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:outline-none focus:border-emerald-500 transition-colors text-sm'
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className='text-[10px] uppercase tracking-wider font-bold text-gray-400 ml-2'>
+                          Email Address
+                        </label>
+                        <input
+                          required
+                          type='email'
+                          name='email'
+                          value={formData.email}
+                          onChange={handleChange}
+                          placeholder='john@example.com'
+                          className='w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:outline-none focus:border-emerald-500 transition-colors text-sm'
+                        />
+                      </div>
+
+                      <div>
+                        <label className='text-[10px] uppercase tracking-wider font-bold text-gray-400 ml-2'>
+                          Phone Number
+                        </label>
+                        <input
+                          required
+                          type='tel'
+                          name='phone'
+                          value={formData.phone}
+                          onChange={handleChange}
+                          placeholder='+234 ...'
+                          className='w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:outline-none focus:border-emerald-500 transition-colors text-sm'
+                        />
+                      </div>
+
+                      <div>
+                        <label className='text-[10px] uppercase tracking-wider font-bold text-gray-400 ml-2'>
+                          Program of Interest
+                        </label>
+                        <select
+                          name='program'
+                          value={formData.program}
+                          onChange={handleChange}
+                          required
+                          className='w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:outline-none focus:border-emerald-500 transition-colors text-sm'
+                        >
+                          <option value=''>Select a program</option>
+                          <option value='ielts'>IELTS Preparation</option>
+                          <option value='gmat'>GMAT Preparation</option>
+                          <option value='sat'>SAT Preparation</option>
+                          <option value='gre'>GRE Preparation</option>
+                          <option value='gcse'>GCSE Preparation</option>
+                          <option value='toefl'>TOEFL Preparation</option>
+                          <option value='scratch'>Scratch Programming</option>
+                          <option value='python'>Python Programming</option>
+                          <option value='web'>Web Development</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className='text-[10px] uppercase tracking-wider font-bold text-gray-400 ml-2'>
+                          Preferred Location
+                        </label>
+                        <select
+                          name='location'
+                          value={formData.location}
+                          onChange={handleChange}
+                          required
+                          className='w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:outline-none focus:border-emerald-500 transition-colors text-sm'
+                        >
+                          <option value=''>Select location</option>
+                          <option value='lagos'>Lagos (Physical)</option>
+                          <option value='port-harcourt'>
+                            Port Harcourt (Physical)
+                          </option>
+                          <option value='online'>Online</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className='text-[10px] uppercase tracking-wider font-bold text-gray-400 ml-2'>
+                          Additional Message (Optional)
+                        </label>
+                        <textarea
+                          name='message'
+                          value={formData.message}
+                          onChange={handleChange}
+                          rows={2}
+                          placeholder='Any specific questions?'
+                          className='w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:outline-none focus:border-emerald-500 transition-colors text-sm resize-none'
+                        />
+                      </div>
+
+                      {status === 'error' && (
+                        <div className='flex items-center gap-2 p-3 rounded-lg bg-red-50 text-red-600 text-xs'>
+                          <AlertCircle className='h-4 w-4 shrink-0' />
+                          {errorMessage}
+                        </div>
+                      )}
+
+                      <button
+                        type='submit'
+                        disabled={status === 'loading'}
+                        className='w-full py-4 bg-emerald-600 text-white rounded-xl font-bold uppercase tracking-wider text-sm hover:bg-emerald-500 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed'
+                      >
+                        {status === 'loading' ? (
+                          <>
+                            <Loader2 className='h-4 w-4 animate-spin' />
+                            Submitting...
+                          </>
+                        ) : (
+                          'Apply Now'
+                        )}
+                      </button>
+
+                      <p className='text-[10px] text-gray-400 text-center mt-3'>
+                        By submitting, you agree to be contacted by our
+                        admissions team
+                      </p>
+                    </form>
+                  )}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
 
 // ─── TOOLTIP COMPONENT ───────────────────────────────────────────────────────
 function Tooltip({ text, children }) {
@@ -147,234 +527,9 @@ function Layout({ children, hideHeaderFooter = false }) {
       {!hideHeaderFooter && <Header />}
       {children}
       {!hideHeaderFooter && <Footer />}
+      <AdmissionPopup />
     </>
   );
-}
-
-function App() {
-  return (
-    <Router>
-      <ScrollToTop />
-      <AuthProvider>
-        <Routes>
-          <Route
-            path='/'
-            element={
-              <Layout>
-                <HomePage />
-              </Layout>
-            }
-          />
-          <Route
-            path='/login'
-            element={
-              <Layout>
-                <Login />
-              </Layout>
-            }
-          />
-          <Route
-            path='/register'
-            element={
-              <Layout>
-                <Register />
-              </Layout>
-            }
-          />
-          <Route
-            path='/faq'
-            element={
-              <Layout>
-                <FAQ />
-              </Layout>
-            }
-          />
-          <Route
-            path='/about'
-            element={
-              <Layout>
-                <AboutUs />
-              </Layout>
-            }
-          />
-          <Route
-            path='/pathways/:id'
-            element={
-              <Layout>
-                <PathwayDetail />
-              </Layout>
-            }
-          />
-          <Route
-            path='/services/:id'
-            element={
-              <Layout>
-                <ServiceDetail />
-              </Layout>
-            }
-          />
-          <Route
-            path='/contact'
-            element={
-              <Layout>
-                <ContactUs />
-              </Layout>
-            }
-          />
-          <Route
-            path='/careers'
-            element={
-              <Layout>
-                <Careers />
-              </Layout>
-            }
-          />
-          <Route
-            path='/careers/:id'
-            element={
-              <Layout>
-                <CareerDetail />
-              </Layout>
-            }
-          />
-          <Route
-            path='/blogs'
-            element={
-              <Layout>
-                <Blog />
-              </Layout>
-            }
-          />
-          <Route
-            path='/blog/:slug'
-            element={
-              <Layout>
-                <BlogPost />
-              </Layout>
-            }
-          />
-          <Route
-            path='/dashboard/*'
-            element={
-              <PrivateRoute>
-                <Layout hideHeaderFooter={true}>
-                  <Dashboard />
-                </Layout>
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path='/admin'
-            element={<Navigate to='/admin/dashboard' replace />}
-          />
-          <Route
-            path='/admin/*'
-            element={
-              <AdminRoute>
-                <Layout hideHeaderFooter={true}>
-                  <AdminLayout>
-                    <Routes>
-                      <Route path='dashboard' element={<AdminDashboard />} />
-                      <Route path='users' element={<UsersList />} />
-                      <Route path='users/new' element={<UserForm />} />
-                      <Route path='users/:id' element={<UserDetail />} />
-                      <Route path='users/:id/edit' element={<UserForm />} />
-                      <Route path='careers/jobs' element={<JobsList />} />
-                      <Route path='careers/jobs/new' element={<JobForm />} />
-                      <Route
-                        path='careers/jobs/:id/edit'
-                        element={<JobForm />}
-                      />
-                      <Route
-                        path='careers/applications'
-                        element={<ApplicationsList />}
-                      />
-                      <Route
-                        path='careers/applications/:id'
-                        element={<ApplicationDetails />}
-                      />
-                      <Route
-                        path='careers/categories'
-                        element={<JobCategoriesList />}
-                      />
-                      <Route path='blogs' element={<BlogsList />} />
-                      <Route path='blogs/new' element={<BlogForm />} />
-                      <Route path='blogs/:id/edit' element={<BlogForm />} />
-                      <Route
-                        path='blogs/categories'
-                        element={<CategoriesList />}
-                      />
-                      <Route path='courses' element={<CoursesList />} />
-                      <Route path='courses/new' element={<CourseForm />} />
-                      <Route path='courses/:id' element={<CourseDetail />} />
-                      <Route path='courses/:id/edit' element={<CourseForm />} />
-                      <Route path='classes' element={<ClassesList />} />
-                      <Route path='lessons' element={<ClassesList />} />
-                      <Route path='classes/new' element={<ClassCreate />} />
-                      <Route path='classes/:id' element={<ClassPreview />} />
-                      <Route path='classes/:id/edit' element={<ClassEdit />} />
-                      <Route
-                        path='courses/:courseId/lessons'
-                        element={<LessonsList />}
-                      />
-                      <Route
-                        path='courses/:courseId/lessons/new'
-                        element={<LessonForm />}
-                      />
-                      <Route
-                        path='courses/:courseId/lessons/:lessonId'
-                        element={<LessonDetail />}
-                      />
-                      <Route
-                        path='courses/:courseId/lessons/:lessonId/edit'
-                        element={<LessonForm />}
-                      />
-                      <Route
-                        path='messages'
-                        element={<AdminContactSubmissions />}
-                      />
-                      <Route path='*' element={<NotFound />} />
-                    </Routes>
-                  </AdminLayout>
-                </Layout>
-              </AdminRoute>
-            }
-          />
-          <Route
-            path='/not-found'
-            element={
-              <Layout>
-                <NotFound />
-              </Layout>
-            }
-          />
-          <Route
-            path='*'
-            element={
-              <Layout>
-                <Navigate to='/not-found' replace />
-              </Layout>
-            }
-          />
-        </Routes>
-      </AuthProvider>
-    </Router>
-  );
-}
-
-function PrivateRoute({ children }) {
-  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-  if (!isAuthenticated) return <Navigate to='/login' replace />;
-  return children;
-}
-
-function AdminRoute({ children }) {
-  const isAuthenticated = authService.isAuthenticated();
-  const currentUser = authService.getCurrentUser();
-  const isAdmin = currentUser?.role === 'admin';
-  if (!isAuthenticated) return <Navigate to='/login' replace />;
-  if (!isAdmin) return <Navigate to='/dashboard' replace />;
-  return children;
 }
 
 // ─── HERO CAROUSEL ────────────────────────────────────────────────────────────
@@ -1950,7 +2105,7 @@ function Footer() {
                   href='tel:+2348038865466'
                   className='hover:text-emerald-400 transition-colors'
                 >
-                  +234 803 886 5466
+                  +234 903 801 3105
                 </a>
               </li>
               <li className='flex items-center gap-3 text-white/50 text-xs sm:text-sm font-light'>
@@ -2061,6 +2216,240 @@ function HomePage() {
       <Newsletter />
     </main>
   );
+}
+
+function App() {
+  return (
+    <Router>
+      <ScrollToTop />
+      <AuthProvider>
+        <Routes>
+          <Route
+            path='/'
+            element={
+              <Layout>
+                <HomePage />
+              </Layout>
+            }
+          />
+          <Route
+            path='/login'
+            element={
+              <Layout>
+                <Login />
+              </Layout>
+            }
+          />
+          <Route
+            path='/register'
+            element={
+              <Layout>
+                <Register />
+              </Layout>
+            }
+          />
+          <Route
+            path='/faq'
+            element={
+              <Layout>
+                <FAQ />
+              </Layout>
+            }
+          />
+          <Route
+            path='/about'
+            element={
+              <Layout>
+                <AboutUs />
+              </Layout>
+            }
+          />
+          <Route
+            path='/pathways/:id'
+            element={
+              <Layout>
+                <PathwayDetail />
+              </Layout>
+            }
+          />
+          <Route
+            path='/services/:id'
+            element={
+              <Layout>
+                <ServiceDetail />
+              </Layout>
+            }
+          />
+          <Route
+            path='/contact'
+            element={
+              <Layout>
+                <ContactUs />
+              </Layout>
+            }
+          />
+          <Route
+            path='/careers'
+            element={
+              <Layout>
+                <Careers />
+              </Layout>
+            }
+          />
+          <Route
+            path='/admissionAd'
+            element={
+              <Layout>
+                <AdmissionLandingPage />
+              </Layout>
+            }
+          />
+          <Route
+            path='/careers/:id'
+            element={
+              <Layout>
+                <CareerDetail />
+              </Layout>
+            }
+          />
+          <Route
+            path='/blogs'
+            element={
+              <Layout>
+                <Blog />
+              </Layout>
+            }
+          />
+          <Route
+            path='/blog/:slug'
+            element={
+              <Layout>
+                <BlogPost />
+              </Layout>
+            }
+          />
+          <Route
+            path='/dashboard/*'
+            element={
+              <PrivateRoute>
+                <Layout hideHeaderFooter={true}>
+                  <Dashboard />
+                </Layout>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path='/admin'
+            element={<Navigate to='/admin/dashboard' replace />}
+          />
+          <Route
+            path='/admin/*'
+            element={
+              <AdminRoute>
+                <Layout hideHeaderFooter={true}>
+                  <AdminLayout>
+                    <Routes>
+                      <Route path='dashboard' element={<AdminDashboard />} />
+                      <Route path='users' element={<UsersList />} />
+                      <Route path='users/new' element={<UserForm />} />
+                      <Route path='users/:id' element={<UserDetail />} />
+                      <Route path='users/:id/edit' element={<UserForm />} />
+                      <Route path='careers/jobs' element={<JobsList />} />
+                      <Route path='careers/jobs/new' element={<JobForm />} />
+                      <Route
+                        path='careers/jobs/:id/edit'
+                        element={<JobForm />}
+                      />
+                      <Route
+                        path='careers/applications'
+                        element={<ApplicationsList />}
+                      />
+                      <Route
+                        path='careers/applications/:id'
+                        element={<ApplicationDetails />}
+                      />
+                      <Route
+                        path='careers/categories'
+                        element={<JobCategoriesList />}
+                      />
+                      <Route path='blogs' element={<BlogsList />} />
+                      <Route path='blogs/new' element={<BlogForm />} />
+                      <Route path='blogs/:id/edit' element={<BlogForm />} />
+                      <Route
+                        path='blogs/categories'
+                        element={<CategoriesList />}
+                      />
+                      <Route path='courses' element={<CoursesList />} />
+                      <Route path='courses/new' element={<CourseForm />} />
+                      <Route path='courses/:id' element={<CourseDetail />} />
+                      <Route path='courses/:id/edit' element={<CourseForm />} />
+                      <Route path='classes' element={<ClassesList />} />
+                      <Route path='lessons' element={<ClassesList />} />
+                      <Route path='classes/new' element={<ClassCreate />} />
+                      <Route path='classes/:id' element={<ClassPreview />} />
+                      <Route path='classes/:id/edit' element={<ClassEdit />} />
+                      <Route
+                        path='courses/:courseId/lessons'
+                        element={<LessonsList />}
+                      />
+                      <Route
+                        path='courses/:courseId/lessons/new'
+                        element={<LessonForm />}
+                      />
+                      <Route
+                        path='courses/:courseId/lessons/:lessonId'
+                        element={<LessonDetail />}
+                      />
+                      <Route
+                        path='courses/:courseId/lessons/:lessonId/edit'
+                        element={<LessonForm />}
+                      />
+                      <Route
+                        path='messages'
+                        element={<AdminContactSubmissions />}
+                      />
+                      <Route path='*' element={<NotFound />} />
+                    </Routes>
+                  </AdminLayout>
+                </Layout>
+              </AdminRoute>
+            }
+          />
+          <Route
+            path='/not-found'
+            element={
+              <Layout>
+                <NotFound />
+              </Layout>
+            }
+          />
+          <Route
+            path='*'
+            element={
+              <Layout>
+                <Navigate to='/not-found' replace />
+              </Layout>
+            }
+          />
+        </Routes>
+      </AuthProvider>
+    </Router>
+  );
+}
+
+function PrivateRoute({ children }) {
+  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+  if (!isAuthenticated) return <Navigate to='/login' replace />;
+  return children;
+}
+
+function AdminRoute({ children }) {
+  const isAuthenticated = authService.isAuthenticated();
+  const currentUser = authService.getCurrentUser();
+  const isAdmin = currentUser?.role === 'admin';
+  if (!isAuthenticated) return <Navigate to='/login' replace />;
+  if (!isAdmin) return <Navigate to='/dashboard' replace />;
+  return children;
 }
 
 export default App;

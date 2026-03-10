@@ -19,13 +19,14 @@ import { FaWhatsapp } from 'react-icons/fa';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
-    name: '',
+    first_name: '',
+    last_name: '',
     email: '',
     phone: '',
     service: 'General Inquiry',
     message: '',
   });
-  const [status, setStatus] = useState();
+  const [status, setStatus] = useState('idle');
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = async (e) => {
@@ -47,7 +48,8 @@ export default function Contact() {
       if (response.ok) {
         setStatus('success');
         setFormData({
-          name: '',
+          first_name: '',
+          last_name: '',
           email: '',
           phone: '',
           service: 'General Inquiry',
@@ -63,6 +65,13 @@ export default function Contact() {
         error.message || 'Something went wrong. Please try again later.',
       );
     }
+  };
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   return (
@@ -161,11 +170,11 @@ export default function Contact() {
                       <Phone className='h-4 w-4' />
                     </div>
                     <span className='text-gray-600 font-light'>
-                      +234 803 886 5466
+                      +234 903 801 3105
                     </span>
                   </a>
                   <a
-                    href='https://wa.me/2348038865466'
+                    href='https://wa.me/4915901149844'
                     className='flex items-center gap-4 group'
                   >
                     <div className='w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center group-hover:bg-green-500 group-hover:text-white transition-all'>
@@ -251,31 +260,29 @@ export default function Contact() {
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
                       <div className='space-y-2'>
                         <label className='text-[10px] uppercase tracking-[0.2em] font-bold text-gray-400 ml-4'>
-                          Full Name
+                          First Name
                         </label>
                         <input
                           required
                           type='text'
-                          value={formData.name}
-                          onChange={(e) =>
-                            setFormData({ ...formData, name: e.target.value })
-                          }
-                          placeholder='John Doe'
+                          name='first_name'
+                          value={formData.first_name}
+                          onChange={handleChange}
+                          placeholder='John'
                           className='w-full px-8 py-5 rounded-2xl bg-gray-50 border border-gray-100 focus:outline-none focus:border-emerald-500 transition-colors'
                         />
                       </div>
                       <div className='space-y-2'>
                         <label className='text-[10px] uppercase tracking-[0.2em] font-bold text-gray-400 ml-4'>
-                          Email Address
+                          Last Name
                         </label>
                         <input
                           required
-                          type='email'
-                          value={formData.email}
-                          onChange={(e) =>
-                            setFormData({ ...formData, email: e.target.value })
-                          }
-                          placeholder='john@example.com'
+                          type='text'
+                          name='last_name'
+                          value={formData.last_name}
+                          onChange={handleChange}
+                          placeholder='Doe'
                           className='w-full px-8 py-5 rounded-2xl bg-gray-50 border border-gray-100 focus:outline-none focus:border-emerald-500 transition-colors'
                         />
                       </div>
@@ -284,39 +291,49 @@ export default function Contact() {
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
                       <div className='space-y-2'>
                         <label className='text-[10px] uppercase tracking-[0.2em] font-bold text-gray-400 ml-4'>
-                          Phone Number
+                          Email Address
                         </label>
                         <input
-                          type='tel'
-                          value={formData.phone}
-                          onChange={(e) =>
-                            setFormData({ ...formData, phone: e.target.value })
-                          }
-                          placeholder='+234 ...'
+                          required
+                          type='email'
+                          name='email'
+                          value={formData.email}
+                          onChange={handleChange}
+                          placeholder='john@example.com'
                           className='w-full px-8 py-5 rounded-2xl bg-gray-50 border border-gray-100 focus:outline-none focus:border-emerald-500 transition-colors'
                         />
                       </div>
                       <div className='space-y-2'>
                         <label className='text-[10px] uppercase tracking-[0.2em] font-bold text-gray-400 ml-4'>
-                          Service of Interest
+                          Phone Number
                         </label>
-                        <select
-                          value={formData.service}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              service: e.target.value,
-                            })
-                          }
-                          className='w-full px-8 py-5 rounded-2xl bg-gray-50 border border-gray-100 focus:outline-none focus:border-emerald-500 transition-colors appearance-none'
-                        >
-                          <option>General Inquiry</option>
-                          <option>Nursing Work Contract</option>
-                          <option>Ausbildung Training</option>
-                          <option>German Language Course</option>
-                          <option>Professional Exam Prep</option>
-                        </select>
+                        <input
+                          type='tel'
+                          name='phone'
+                          value={formData.phone}
+                          onChange={handleChange}
+                          placeholder='+234 ...'
+                          className='w-full px-8 py-5 rounded-2xl bg-gray-50 border border-gray-100 focus:outline-none focus:border-emerald-500 transition-colors'
+                        />
                       </div>
+                    </div>
+
+                    <div className='space-y-2'>
+                      <label className='text-[10px] uppercase tracking-[0.2em] font-bold text-gray-400 ml-4'>
+                        Service of Interest
+                      </label>
+                      <select
+                        name='service'
+                        value={formData.service}
+                        onChange={handleChange}
+                        className='w-full px-8 py-5 rounded-2xl bg-gray-50 border border-gray-100 focus:outline-none focus:border-emerald-500 transition-colors appearance-none'
+                      >
+                        <option>General Inquiry</option>
+                        <option>Nursing Work Contract</option>
+                        <option>Ausbildung Training</option>
+                        <option>German Language Course</option>
+                        <option>Professional Exam Prep</option>
+                      </select>
                     </div>
 
                     <div className='space-y-2'>
@@ -326,10 +343,9 @@ export default function Contact() {
                       <textarea
                         required
                         rows={6}
+                        name='message'
                         value={formData.message}
-                        onChange={(e) =>
-                          setFormData({ ...formData, message: e.target.value })
-                        }
+                        onChange={handleChange}
                         placeholder='How can we help you?'
                         className='w-full px-8 py-5 rounded-2xl bg-gray-50 border border-gray-100 focus:outline-none focus:border-emerald-500 transition-colors resize-none'
                       ></textarea>
