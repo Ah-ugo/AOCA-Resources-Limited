@@ -32,7 +32,7 @@ export default function Careers() {
         setLoading(true);
         // Use the imported function from your careers service
         const response = await getJobListings({
-          limit: 100,
+          limit: 50,
         });
 
         // Extract the jobs array from the response
