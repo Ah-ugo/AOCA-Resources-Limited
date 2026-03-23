@@ -44,28 +44,11 @@ const ClassesList = () => {
       const data = await adminService.getClasses({
         page: currentPage,
         search: searchTerm,
+        course_id: courseFilter,
       });
 
-      // Format classes data to match your API response
-      const formattedClasses = data.classes.map((cls) => ({
-        ...cls,
-        course: { id: cls.id, title: cls.name },
-        instructor: {
-          _id: cls.id,
-          name: cls.name,
-          email: cls.email,
-        },
-      }));
-
-      // Filter classes by course if filter is applied
-      let filteredClasses = data.classes;
-      if (courseFilter) {
-        filteredClasses = formattedClasses.filter(
-          (cls) => cls.course_id === courseFilter,
-        );
-      }
-
-      setClasses(filteredClasses);
+      // Backend returns classes with course and instructor populated
+      setClasses(data.classes || []);
       setTotalClasses(data.total || 0);
       setTotalPages(data.totalPages || 1);
     } catch (err) {
@@ -112,14 +95,16 @@ const ClassesList = () => {
     }
   };
 
-  const formatTime = (time) => {
-    if (!time) return 'N/A';
+  const formatDateTime = (dateStr, duration) => {
+    if (!dateStr) return 'N/A';
     try {
-      const [hours, minutes] = time.split(':');
-      const hour = parseInt(hours, 10);
-      const period = hour >= 12 ? 'PM' : 'AM';
-      const formattedHour = hour % 12 || 12;
-      return `${formattedHour}:${minutes} ${period}`;
+      const date = new Date(dateStr);
+      const timeStr = date.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      const dateStrFormatted = date.toLocaleDateString();
+      return `${dateStrFormatted} at ${timeStr} (${duration} mins)`;
     } catch (err) {
       return time;
     }
@@ -258,13 +243,8 @@ const ClassesList = () => {
                       <td className='px-6 py-4 whitespace-nowrap'>
                         <div className='text-sm text-gray-900'>
                           <div className='flex items-center'>
-                            <FiCalendar className='mr-1 h-4 w-4 text-gray-400' />
-                            {cls.days?.join(', ') || 'N/A'}
-                          </div>
-                          <div className='flex items-center mt-1'>
-                            <FiClock className='mr-1 h-4 w-4 text-gray-400' />
-                            {formatTime(cls.created_at)} -{' '}
-                            {formatTime(cls.date)}
+                            <FiCalendar className='mr-2 h-4 w-4 text-gray-400' />
+                            {formatDateTime(cls.date, cls.duration)}
                           </div>
                         </div>
                       </td>

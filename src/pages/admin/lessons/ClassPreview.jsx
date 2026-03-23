@@ -37,14 +37,7 @@ const ClassPreview = () => {
       setLoading(true);
       const data = await adminService.getClassById(id);
 
-      // Format the class data based on your API response
-      // const formattedClass = {
-      //   ...data.class,
-      //   course: data.course || null,
-      //   instructor: data.instructor || null,
-      //   students_count: data.students_count || 0,
-      // };
-      console.log(data, 'class data');
+      // Backend returns the class object directly with embedded course and instructor
       setClassData(data);
     } catch (err) {
       console.error('Error fetching class:', err);
@@ -150,12 +143,10 @@ const ClassPreview = () => {
             <div className='flex items-start justify-between mb-4'>
               <div>
                 <h1 className='text-2xl font-bold text-gray-800'>
-                  {classData.class.title || 'Unnamed Class'}
+                  {classData.title || 'Unnamed Class'}
                 </h1>
-                {classData.class.description && (
-                  <p className='text-gray-600'>
-                    Section: {classData.class.description}
-                  </p>
+                {classData.description && (
+                  <p className='text-gray-600'>{classData.description}</p>
                 )}
               </div>
               <div className='bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm'>
@@ -173,10 +164,10 @@ const ClassPreview = () => {
                     <span className='font-medium'>Course:</span>{' '}
                     {classData.course?.name || 'Not assigned'}
                   </p>
-                  {classData.class.description && (
+                  {classData.description && (
                     <p>
                       <span className='font-medium'>Description:</span>{' '}
-                      {classData.class.description}
+                      {classData.description}
                     </p>
                   )}
                 </div>
@@ -207,14 +198,19 @@ const ClassPreview = () => {
                 <div className='space-y-2'>
                   <p>
                     <span className='font-medium'>Days:</span>{' '}
-                    {classData.days?.join(', ') || 'Not scheduled'}
+                    {classData.date
+                      ? new Date(classData.date).toLocaleDateString(undefined, {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        })
+                      : 'Not scheduled'}
                   </p>
                   <p>
                     <span className='font-medium'>Time:</span>{' '}
-                    {classData.start_time && classData.end_time
-                      ? `${formatTime(classData.start_time)} - ${formatTime(
-                          classData.end_time,
-                        )}`
+                    {classData.date
+                      ? `${new Date(classData.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} (${classData.duration} mins)`
                       : 'N/A'}
                   </p>
                 </div>
@@ -231,7 +227,10 @@ const ClassPreview = () => {
                   </p>
                   <p>
                     <span className='font-medium'>Enrolled:</span>{' '}
-                    {classData?.students?.length} students
+                    {classData?.students_count ||
+                      classData?.students?.length ||
+                      0}{' '}
+                    students
                   </p>
                 </div>
               </div>
@@ -248,24 +247,30 @@ const ClassPreview = () => {
 
             {students.length > 0 ? (
               <div className='space-y-4'>
-                {students.map((student) => (
-                  <div
-                    key={student._id}
-                    className='flex items-center p-2 hover:bg-gray-50 rounded'
-                  >
-                    <div className='h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500'>
-                      {student.name?.charAt(0) || 'U'}
+                {students.map((student) => {
+                  const displayName =
+                    student.name ||
+                    `${student.first_name || ''} ${student.last_name || ''}`.trim() ||
+                    'Unknown Student';
+                  return (
+                    <div
+                      key={student._id}
+                      className='flex items-center p-2 hover:bg-gray-50 rounded'
+                    >
+                      <div className='h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500'>
+                        {displayName.charAt(0).toUpperCase()}
+                      </div>
+                      <div className='ml-3'>
+                        <p className='text-sm font-medium text-gray-900'>
+                          {displayName}
+                        </p>
+                        <p className='text-xs text-gray-500'>
+                          {student.email || 'No email'}
+                        </p>
+                      </div>
                     </div>
-                    <div className='ml-3'>
-                      <p className='text-sm font-medium text-gray-900'>
-                        {student.name || 'Unknown Student'}
-                      </p>
-                      <p className='text-xs text-gray-500'>
-                        {student.email || 'No email'}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <p className='text-gray-500 text-center py-4'>

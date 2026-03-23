@@ -64,7 +64,7 @@ export default function Login() {
 
         // Fetch user details
         const userResponse = await apiClient.get('/dashboard/profile');
-        const userData = userResponse.data;
+        const userData = userResponse.data.user;
 
         localStorage.setItem('user', JSON.stringify(userData));
         localStorage.setItem('userRole', userData.role);

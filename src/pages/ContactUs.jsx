@@ -150,7 +150,8 @@ export default function Contact() {
                         Port Harcourt Office
                       </h4>
                       <p className='text-gray-500 font-light leading-relaxed'>
-                        Regional Consultancy Hub, Port Harcourt, Nigeria.
+                        No 70 Eligbolo Rd, Rumudumaya, Port Harcourt, Rivers
+                        State, Nigeria.
                       </p>
                     </div>
                   </div>
@@ -163,7 +164,7 @@ export default function Contact() {
                 </h3>
                 <div className='space-y-6'>
                   <a
-                    href='tel:+2348038865466'
+                    href='tel:+2349038013105'
                     className='flex items-center gap-4 group'
                   >
                     <div className='w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all'>
@@ -174,14 +175,14 @@ export default function Contact() {
                     </span>
                   </a>
                   <a
-                    href='https://wa.me/4915901149844'
+                    href='https://wa.me/2348038865466'
                     className='flex items-center gap-4 group'
                   >
                     <div className='w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center group-hover:bg-green-500 group-hover:text-white transition-all'>
                       <FaWhatsapp size={16} />
                     </div>
                     <span className='text-gray-600 font-light'>
-                      WhatsApp Support
+                      +234 803 886 5466
                     </span>
                   </a>
                   <a

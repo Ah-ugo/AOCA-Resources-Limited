@@ -50,20 +50,20 @@ const ClassEdit = () => {
       const data = await adminService.getClassById(id);
 
       // Format the date for datetime-local input
-      const classDate = data.class.date
-        ? new Date(data.class.date).toISOString().slice(0, 16)
+      const classDate = data.date
+        ? new Date(data.date).toISOString().slice(0, 16)
         : new Date().toISOString().slice(0, 16);
 
       setFormData({
-        course_id: data.class.course_id || '',
-        title: data.class.title || '',
-        description: data.class.description || '',
+        course_id: data.course_id || '',
+        title: data.title || '',
+        description: data.description || '',
         date: classDate,
-        duration: data.class.duration || 60,
-        meet_link: data.class.meet_link || '',
-        instructor_id: data.class.instructor_id || '',
-        recording_link: data.class.recording_link || '',
-        materials: data.class.materials || [],
+        duration: data.duration || 60,
+        meet_link: data.meet_link || '',
+        instructor_id: data.instructor_id || '',
+        recording_link: data.recording_link || '',
+        materials: data.materials || [],
       });
     } catch (err) {
       console.error('Error fetching class:', err);

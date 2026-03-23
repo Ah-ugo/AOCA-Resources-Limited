@@ -34,6 +34,9 @@ import {
   Zap,
   CheckCircle2,
   X,
+  Languages,
+  Plane,
+  BriefcaseBusiness,
 } from 'lucide-react';
 
 // ─── FONTS ───────────────────────────────────────────────────────────────────
@@ -90,6 +93,12 @@ const FontLoader = () => (
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
+    .gradient-text-gold {
+      background: linear-gradient(135deg, #f59e0b, #fbbf24);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
     .section-line::before {
       content: '';
       display: inline-block;
@@ -117,19 +126,91 @@ const AdmissionPopup = ({ isOpen, onClose }) => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const programs = [
-    { value: 'ielts', label: 'IELTS Preparation' },
-    { value: 'gmat', label: 'GMAT Preparation' },
-    { value: 'sat', label: 'SAT Preparation' },
-    { value: 'gre', label: 'GRE Preparation' },
-    { value: 'gcse', label: 'GCSE Preparation' },
-    { value: 'toefl', label: 'TOEFL Preparation' },
-    { value: 'scratch', label: 'Scratch Programming' },
-    { value: 'python', label: 'Python Programming' },
-    { value: 'web', label: 'Web Development' },
-    { value: 'cyber-security', label: 'Cyber Security' },
-    { value: 'data-analysis', label: 'Data Analysis' },
-    { value: 'project-management', label: 'Project Management' },
+    // Exam Prep
+    { value: 'ielts', label: 'IELTS Preparation', group: 'Exam Preparation' },
+    { value: 'gmat', label: 'GMAT Preparation', group: 'Exam Preparation' },
+    { value: 'sat', label: 'SAT Preparation', group: 'Exam Preparation' },
+    { value: 'gre', label: 'GRE Preparation', group: 'Exam Preparation' },
+    { value: 'gcse', label: 'GCSE Preparation', group: 'Exam Preparation' },
+    { value: 'toefl', label: 'TOEFL Preparation', group: 'Exam Preparation' },
+    // German Language
+    {
+      value: 'german-a1',
+      label: 'German Language — A1 (Beginner)',
+      group: 'German Language',
+    },
+    {
+      value: 'german-a2',
+      label: 'German Language — A2 (Elementary)',
+      group: 'German Language',
+    },
+    {
+      value: 'german-b1',
+      label: 'German Language — B1 (Intermediate)',
+      group: 'German Language',
+    },
+    {
+      value: 'german-b2',
+      label: 'German Language — B2 (Upper Intermediate)',
+      group: 'German Language',
+    },
+    {
+      value: 'german-c1',
+      label: 'German Language — C1 (Advanced)',
+      group: 'German Language',
+    },
+    // Travel & Visa
+    {
+      value: 'travel-visa',
+      label: 'Travel & Visa Counselling',
+      group: 'Travel & Migration',
+    },
+    {
+      value: 'study-abroad',
+      label: 'Study Abroad Placement',
+      group: 'Travel & Migration',
+    },
+    {
+      value: 'relocation',
+      label: 'Relocation & Settlement Support',
+      group: 'Travel & Migration',
+    },
+    // Jobs & Career
+    {
+      value: 'job-placement',
+      label: 'Job Placement Assistance',
+      group: 'Jobs & Career',
+    },
+    {
+      value: 'cv-interview',
+      label: 'CV Writing & Interview Prep',
+      group: 'Jobs & Career',
+    },
+    {
+      value: 'career-counselling',
+      label: 'Career Counselling',
+      group: 'Jobs & Career',
+    },
+    // Programming
+    { value: 'scratch', label: 'Scratch Programming', group: 'Programming' },
+    { value: 'python', label: 'Python Programming', group: 'Programming' },
+    { value: 'web', label: 'Web Development', group: 'Programming' },
+    // Tech Skills
+    { value: 'cyber-security', label: 'Cyber Security', group: 'Tech Skills' },
+    { value: 'data-analysis', label: 'Data Analysis', group: 'Tech Skills' },
+    {
+      value: 'project-management',
+      label: 'Project Management',
+      group: 'Professional',
+    },
   ];
+
+  // Group programs for optgroup rendering
+  const grouped = programs.reduce((acc, p) => {
+    if (!acc[p.group]) acc[p.group] = [];
+    acc[p.group].push(p);
+    return acc;
+  }, {});
 
   const locations = [
     { value: 'lagos', label: 'Lagos (Physical)' },
@@ -184,7 +265,6 @@ const AdmissionPopup = ({ isOpen, onClose }) => {
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop — clicks anywhere to close */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -194,7 +274,6 @@ const AdmissionPopup = ({ isOpen, onClose }) => {
             style={{ zIndex: 9998 }}
           />
 
-          {/* Scroll container — sits above backdrop */}
           <div
             className='fixed inset-0 overflow-y-auto'
             style={{ zIndex: 9999 }}
@@ -211,7 +290,6 @@ const AdmissionPopup = ({ isOpen, onClose }) => {
                 className='relative w-full max-w-4xl'
                 onClick={(e) => e.stopPropagation()}
               >
-                {/* Close button — fixed above card, large touch target */}
                 <button
                   onClick={onClose}
                   aria-label='Close'
@@ -250,7 +328,8 @@ const AdmissionPopup = ({ isOpen, onClose }) => {
                               INTAKE
                             </h2>
                             <p className='text-white/60 text-sm font-light'>
-                              Smart students are choosing AOCA for their future.
+                              Smart students & ambitious professionals choose
+                              AOCA for their future.
                             </p>
                           </div>
 
@@ -262,24 +341,29 @@ const AdmissionPopup = ({ isOpen, onClose }) => {
                                 sub: 'IELTS · GMAT · SAT · GRE · GCSE · TOEFL',
                               },
                               {
+                                icon: Languages,
+                                label: 'German Language',
+                                sub: 'A1 · A2 · B1 · B2 · C1 Levels',
+                              },
+                              {
+                                icon: Plane,
+                                label: 'Travel & Migration',
+                                sub: 'Visa · Study Abroad · Relocation',
+                              },
+                              {
+                                icon: BriefcaseBusiness,
+                                label: 'Jobs & Career',
+                                sub: 'Placement · CV Writing · Counselling',
+                              },
+                              {
                                 icon: Code,
                                 label: 'Programming',
                                 sub: 'Scratch · Python · Web Development',
                               },
                               {
                                 icon: Shield,
-                                label: 'Cyber Security',
-                                sub: 'Network · Ethical Hacking · Risk Mgmt',
-                              },
-                              {
-                                icon: BarChart,
-                                label: 'Data Analysis',
-                                sub: 'Excel · SQL · Visualisation',
-                              },
-                              {
-                                icon: Briefcase,
-                                label: 'Project Management',
-                                sub: 'Planning · Agile · Risk Management',
+                                label: 'Cyber Security & Data',
+                                sub: 'Network · Hacking · Analysis · BI',
                               },
                             ].map((item, i) => (
                               <div key={i} className='flex items-start gap-3'>
@@ -414,11 +498,17 @@ const AdmissionPopup = ({ isOpen, onClose }) => {
                                 className='w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all text-sm'
                               >
                                 <option value=''>Select program</option>
-                                {programs.map((p) => (
-                                  <option key={p.value} value={p.value}>
-                                    {p.label}
-                                  </option>
-                                ))}
+                                {Object.entries(grouped).map(
+                                  ([group, items]) => (
+                                    <optgroup key={group} label={`── ${group}`}>
+                                      {items.map((p) => (
+                                        <option key={p.value} value={p.value}>
+                                          {p.label}
+                                        </option>
+                                      ))}
+                                    </optgroup>
+                                  ),
+                                )}
                               </select>
                             </div>
                             <div>
@@ -535,7 +625,7 @@ const AdmissionLandingPage = () => {
   }, []);
 
   const stats = [
-    { value: '5000', suffix: '+', label: 'Students Trained' },
+    { value: '5000', suffix: '+', label: 'Students & Professionals' },
     { value: '25', suffix: '+', label: 'Expert Tutors' },
     { value: '94', suffix: '%', label: 'Success Rate' },
     { value: '15', suffix: '+', label: 'Years Experience' },
@@ -543,6 +633,8 @@ const AdmissionLandingPage = () => {
 
   const categories = [
     { id: 'exams', label: 'Exam Prep', icon: Award },
+    { id: 'german', label: 'German Language', icon: Languages },
+    { id: 'travel', label: 'Travel & Jobs', icon: Plane },
     { id: 'programming', label: 'Programming', icon: Code },
     { id: 'tech', label: 'Cyber & Data', icon: Shield },
     { id: 'management', label: 'Project Mgmt', icon: Briefcase },
@@ -603,6 +695,150 @@ const AdmissionLandingPage = () => {
         duration: '8 weeks',
         icon: Globe,
         color: 'from-cyan-500 to-cyan-600',
+      },
+    ],
+    german: [
+      {
+        name: 'German A1',
+        sub: 'Complete beginner — greetings, introductions, everyday phrases',
+        level: 'Beginner',
+        duration: '8 weeks',
+        icon: Languages,
+        color: 'from-yellow-400 to-amber-500',
+        modules: [
+          'Alphabet & Pronunciation',
+          'Greetings & Introductions',
+          'Numbers & Dates',
+          'Basic Sentences',
+        ],
+      },
+      {
+        name: 'German A2',
+        sub: 'Elementary — shopping, transport, simple conversations',
+        level: 'Elementary',
+        duration: '8 weeks',
+        icon: Languages,
+        color: 'from-amber-500 to-orange-500',
+        modules: [
+          'Daily Routines',
+          'Shopping & Money',
+          'Travel Phrases',
+          'Past Tense (Perfekt)',
+        ],
+      },
+      {
+        name: 'German B1',
+        sub: 'Intermediate — work, studies, opinions, longer conversations',
+        level: 'Intermediate',
+        duration: '10 weeks',
+        icon: Languages,
+        color: 'from-orange-500 to-red-500',
+        modules: [
+          'Work & Career Talk',
+          'Expressing Opinions',
+          'Letters & Emails',
+          'Subordinate Clauses',
+        ],
+      },
+      {
+        name: 'German B2',
+        sub: 'Upper Intermediate — fluent conversations, academic & professional use',
+        level: 'Upper Intermediate',
+        duration: '12 weeks',
+        icon: Languages,
+        color: 'from-red-500 to-rose-600',
+        modules: [
+          'Complex Grammar',
+          'Academic Writing',
+          'Debates & Presentations',
+          'Professional German',
+        ],
+      },
+      {
+        name: 'German C1',
+        sub: 'Advanced — near-native fluency for work and university in Germany',
+        level: 'Advanced',
+        duration: '14 weeks',
+        icon: Languages,
+        color: 'from-rose-600 to-purple-600',
+        modules: [
+          'Nuanced Expression',
+          'Academic Texts',
+          'Native Media',
+          'TestDaF / DSH Prep',
+        ],
+      },
+    ],
+    travel: [
+      {
+        name: 'Travel & Visa Counselling',
+        sub: 'Expert guidance for Schengen, UK, US, Canada and more',
+        level: 'All Profiles',
+        duration: 'Flexible',
+        icon: Plane,
+        color: 'from-sky-500 to-blue-600',
+        modules: [
+          'Visa Application Support',
+          'Document Checklist',
+          'Embassy Interview Prep',
+          'Travel Insurance Guidance',
+        ],
+      },
+      {
+        name: 'Study Abroad Placement',
+        sub: 'We help you find, apply to, and land a spot in top foreign universities',
+        level: 'Students',
+        duration: 'Ongoing',
+        icon: GraduationCap,
+        color: 'from-emerald-500 to-teal-600',
+        modules: [
+          'School Selection',
+          'Application Essays',
+          'Scholarship Search',
+          'Pre-Departure Briefing',
+        ],
+      },
+      {
+        name: 'Job Placement Assistance',
+        sub: 'Connecting Nigerian professionals with verified jobs in Nigeria and abroad',
+        level: 'Professionals',
+        duration: 'Ongoing',
+        icon: BriefcaseBusiness,
+        color: 'from-violet-500 to-purple-600',
+        modules: [
+          'CV & LinkedIn Optimisation',
+          'Interview Coaching',
+          'Job Board Access',
+          'Employer Referrals',
+        ],
+      },
+      {
+        name: 'CV Writing & Interview Prep',
+        sub: 'Stand out from the crowd with a professional CV and confident interview skills',
+        level: 'All Levels',
+        duration: '2 weeks',
+        icon: Briefcase,
+        color: 'from-slate-500 to-gray-600',
+        modules: [
+          'ATS-Optimised CV',
+          'Cover Letter Writing',
+          'Mock Interviews',
+          'Salary Negotiation',
+        ],
+      },
+      {
+        name: 'Career Counselling',
+        sub: 'Clarity on your career direction — personalized 1-on-1 sessions',
+        level: 'All Levels',
+        duration: 'Flexible',
+        icon: Target,
+        color: 'from-pink-500 to-rose-500',
+        modules: [
+          'Skills Assessment',
+          'Career Roadmap',
+          'Industry Insights',
+          'Goal Setting',
+        ],
       },
     ],
     programming: [
@@ -685,7 +921,15 @@ const AdmissionLandingPage = () => {
   const faqs = [
     {
       q: 'Do I need prior experience to enroll?',
-      a: 'No prior experience is needed for our beginner courses. For exam prep, basic English proficiency is recommended. We assess each student during registration to ensure proper placement.',
+      a: 'No prior experience is needed for our beginner courses. For exam prep, basic English proficiency is recommended. For German, we start from absolute zero at A1. We assess each student during registration to ensure proper placement.',
+    },
+    {
+      q: 'What German language levels do you offer?',
+      a: "We offer German from A1 (complete beginner) through C1 (advanced/near-native). Each level is certified-aligned and prepares you for Goethe Institut or TELC exams. Whether you're learning for travel, work, or relocating to Germany, we have the right level for you.",
+    },
+    {
+      q: 'Can you help me get a visa or find a job abroad?',
+      a: 'Yes — our Travel & Migration team provides end-to-end visa counselling, study abroad placement, and job placement assistance. We guide you through applications, documentation, embassy preparation, and employer connections in Nigeria and internationally.',
     },
     {
       q: 'Do you offer online classes?',
@@ -693,7 +937,7 @@ const AdmissionLandingPage = () => {
     },
     {
       q: 'What is the maximum class size?',
-      a: 'We keep classes small — maximum 15 students — to ensure every student gets personalized attention from the instructor.',
+      a: 'We keep classes small — maximum 15 students — to ensure every student and professional gets personalized attention from the instructor.',
     },
     {
       q: 'Are study materials included?',
@@ -701,7 +945,7 @@ const AdmissionLandingPage = () => {
     },
     {
       q: 'What happens after I complete a course?',
-      a: 'You receive an AOCA certificate of completion. For exam prep students, we also provide post-course support during your actual exam registration and preparation.',
+      a: 'You receive an AOCA certificate of completion. For exam prep students, we provide post-course support during your actual exam registration. For German language graduates, we connect you with our Travel & Migration team for next steps toward studying or working in German-speaking countries.',
     },
   ];
 
@@ -709,7 +953,7 @@ const AdmissionLandingPage = () => {
     {
       icon: Users,
       title: 'Small Class Sizes',
-      desc: 'Maximum 15 students per class. Every student gets direct attention from the instructor, not a lecture hall experience.',
+      desc: 'Maximum 15 students per class. Every student and professional gets direct attention from the instructor, not a lecture hall experience.',
     },
     {
       icon: Wifi,
@@ -719,12 +963,12 @@ const AdmissionLandingPage = () => {
     {
       icon: Target,
       title: '94% Pass Rate',
-      desc: 'The results speak for themselves. Most of our students hit their target scores on the very first attempt.',
+      desc: 'The results speak for themselves. Most of our students and professionals hit their target scores and goals on the very first attempt.',
     },
     {
-      icon: BookOpen,
-      title: 'Materials Included',
-      desc: 'Practice tests, past questions, and all learning resources come with your enrollment — no hidden costs.',
+      icon: Globe,
+      title: 'End-to-End Support',
+      desc: "From language training to visa counselling to job placement — AOCA takes you from learning to landing, wherever in the world you're headed.",
     },
   ];
 
@@ -735,12 +979,10 @@ const AdmissionLandingPage = () => {
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <section className='relative min-h-screen bg-[#050e08] overflow-hidden flex items-center noise'>
-        {/* Background layers */}
         <div className='absolute inset-0 diagonal-stripe opacity-40' />
         <div className='absolute top-0 right-0 w-[600px] h-[600px] bg-emerald-500/8 rounded-full blur-3xl -translate-y-1/3 translate-x-1/4' />
         <div className='absolute bottom-0 left-0 w-[400px] h-[400px] bg-emerald-400/6 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4' />
 
-        {/* Grid lines */}
         <div
           className='absolute inset-0 opacity-[0.04]'
           style={{
@@ -752,7 +994,6 @@ const AdmissionLandingPage = () => {
 
         <div className='relative z-10 container mx-auto px-6 py-24 lg:py-32'>
           <div className='grid grid-cols-1 lg:grid-cols-12 gap-12 items-center'>
-            {/* Left content */}
             <div className='lg:col-span-7'>
               <motion.div
                 initial={{ opacity: 0, y: 24 }}
@@ -778,18 +1019,22 @@ const AdmissionLandingPage = () => {
                 </div>
 
                 <p className='text-xl text-white/60 font-light max-w-xl leading-relaxed mb-10'>
-                  Smart students are choosing AOCA. Nigeria's most trusted
-                  centre for exam preparation, computer programming, cyber
-                  security, data analysis, and project management.
+                  Nigeria's most trusted centre for students and professionals.
+                  Exam prep, German language, travel & visa support, job
+                  placement, programming, cyber security, data analysis, and
+                  project management.
                 </p>
 
-                {/* Program pills */}
+                {/* Program pills — updated */}
                 <div className='flex flex-wrap gap-2 mb-10'>
                   {[
                     'IELTS',
                     'GMAT',
                     'SAT',
                     'GRE',
+                    'German A1–C1',
+                    'Travel & Visa',
+                    'Job Placement',
                     'Python',
                     'Cyber Security',
                     'Data Analysis',
@@ -821,8 +1066,7 @@ const AdmissionLandingPage = () => {
                   </a>
                 </div>
 
-                {/* Delivery modes */}
-                <div className='flex items-center gap-6 mt-8'>
+                <div className='flex flex-wrap items-center gap-6 mt-8'>
                   {[
                     { icon: Building2, label: 'Lagos Campus' },
                     { icon: Building2, label: 'Port Harcourt' },
@@ -840,7 +1084,6 @@ const AdmissionLandingPage = () => {
               </motion.div>
             </div>
 
-            {/* Right — stats cards */}
             <div className='lg:col-span-5'>
               <motion.div
                 initial={{ opacity: 0, x: 30 }}
@@ -885,12 +1128,369 @@ const AdmissionLandingPage = () => {
         </div>
       </section>
 
+      {/* ── GERMAN LANGUAGE SPOTLIGHT ─────────────────────────────────────── */}
+      <section className='py-28 bg-[#1a1200] relative overflow-hidden noise'>
+        <div
+          className='absolute inset-0 opacity-20'
+          style={{
+            background:
+              'repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(251,191,36,0.06) 8px, rgba(251,191,36,0.06) 9px)',
+          }}
+        />
+        <div className='absolute top-0 right-0 w-[500px] h-[500px] bg-amber-500/8 rounded-full blur-3xl -translate-y-1/3 translate-x-1/3' />
+        <div className='absolute bottom-0 left-0 w-[300px] h-[300px] bg-amber-400/6 rounded-full blur-3xl' />
+
+        <div className='relative z-10 container mx-auto px-6'>
+          <div className='grid grid-cols-1 lg:grid-cols-2 gap-16 items-center'>
+            <div>
+              <div className='inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8 border border-amber-500/30 bg-amber-500/10'>
+                <span className='w-2 h-2 bg-amber-400 rounded-full animate-pulse' />
+                <span className='text-amber-400 text-xs font-bold uppercase tracking-[0.3em]'>
+                  Neue Sprache · New Language
+                </span>
+              </div>
+              <h2 className='font-display text-[clamp(3.5rem,9vw,7rem)] text-white leading-none mb-6'>
+                LEARN
+                <br />
+                <span className='gradient-text-gold'>GERMAN.</span>
+                <br />
+                GO FURTHER.
+              </h2>
+              <p className='text-white/50 text-lg font-light leading-relaxed mb-8 max-w-md'>
+                German is the gateway to Europe's largest economy — and the #1
+                skill for Nigerians relocating, studying, or working in Germany,
+                Austria, and Switzerland. We teach A1 to C1, all levels, all
+                goals.
+              </p>
+
+              {/* Level pills */}
+              <div className='flex flex-wrap gap-3 mb-10'>
+                {[
+                  'A1 Beginner',
+                  'A2 Elementary',
+                  'B1 Intermediate',
+                  'B2 Upper-Int.',
+                  'C1 Advanced',
+                ].map((lvl, i) => (
+                  <span
+                    key={i}
+                    className='px-4 py-2 rounded-full text-xs font-bold border border-amber-500/30 bg-amber-500/10 text-amber-300'
+                  >
+                    {lvl}
+                  </span>
+                ))}
+              </div>
+
+              <div className='grid grid-cols-2 gap-4 mb-10'>
+                {[
+                  {
+                    icon: GraduationCap,
+                    label: 'University in Germany',
+                    sub: 'B2–C1 required by most universities',
+                  },
+                  {
+                    icon: Plane,
+                    label: 'Work Permit / Visa',
+                    sub: 'A1–B1 for most visa categories',
+                  },
+                  {
+                    icon: BriefcaseBusiness,
+                    label: 'Jobs Abroad',
+                    sub: 'German fluency = higher salary',
+                  },
+                  {
+                    icon: Globe,
+                    label: 'Goethe / TELC Exam',
+                    sub: 'Internationally recognised certificate',
+                  },
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    className='flex items-start gap-3 p-4 rounded-xl bg-white/5 border border-white/10'
+                  >
+                    <item.icon className='h-4 w-4 text-amber-400 mt-0.5 shrink-0' />
+                    <div>
+                      <p className='text-white text-xs font-bold'>
+                        {item.label}
+                      </p>
+                      <p className='text-white/40 text-xs'>{item.sub}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <button
+                onClick={() => setShowPopup(true)}
+                className='group inline-flex items-center gap-3 px-8 py-4 bg-amber-500 text-black rounded-2xl font-bold text-sm hover:bg-amber-400 transition-all shadow-[0_8px_32px_rgba(251,191,36,0.3)]'
+              >
+                Start German Today
+                <ArrowRight className='h-4 w-4 group-hover:translate-x-1 transition-transform' />
+              </button>
+            </div>
+
+            {/* Right: level cards */}
+            <div className='space-y-3'>
+              {[
+                {
+                  level: 'A1',
+                  label: 'Beginner',
+                  desc: 'Greetings, numbers, basic introductions. Perfect starting point.',
+                  weeks: '8 weeks',
+                  color: 'border-amber-500/20 bg-amber-500/5',
+                },
+                {
+                  level: 'A2',
+                  label: 'Elementary',
+                  desc: 'Shopping, transport, simple conversations about daily life.',
+                  weeks: '8 weeks',
+                  color: 'border-amber-500/20 bg-amber-500/5',
+                },
+                {
+                  level: 'B1',
+                  label: 'Intermediate',
+                  desc: 'Work & study discussions, opinions, longer interactions.',
+                  weeks: '10 weeks',
+                  color: 'border-orange-500/20 bg-orange-500/5',
+                },
+                {
+                  level: 'B2',
+                  label: 'Upper-Intermediate',
+                  desc: 'Fluent conversation, academic & professional use.',
+                  weeks: '12 weeks',
+                  color: 'border-orange-500/20 bg-orange-500/5',
+                },
+                {
+                  level: 'C1',
+                  label: 'Advanced',
+                  desc: 'Near-native fluency. Uni-ready. TestDaF / DSH exam prep.',
+                  weeks: '14 weeks',
+                  color: 'border-red-500/20 bg-red-500/5',
+                },
+              ].map((item, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.08 }}
+                  className={`flex items-center gap-5 p-5 rounded-2xl border ${item.color}`}
+                >
+                  <div className='w-14 h-14 rounded-xl bg-amber-500/15 border border-amber-500/20 flex items-center justify-center shrink-0'>
+                    <span className='font-display text-amber-400 text-xl'>
+                      {item.level}
+                    </span>
+                  </div>
+                  <div className='flex-1'>
+                    <div className='flex items-center justify-between mb-1'>
+                      <p className='text-white font-bold text-sm'>
+                        {item.label}
+                      </p>
+                      <span className='text-white/30 text-xs flex items-center gap-1'>
+                        <Clock className='h-3 w-3' />
+                        {item.weeks}
+                      </span>
+                    </div>
+                    <p className='text-white/40 text-xs leading-relaxed'>
+                      {item.desc}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── TRAVEL & JOBS SPOTLIGHT ───────────────────────────────────────── */}
+      <section className='py-28 bg-white'>
+        <div className='container mx-auto px-6'>
+          <div className='mb-16'>
+            <p className='section-line text-emerald-600 text-xs uppercase tracking-[0.3em] font-bold mb-4'>
+              Beyond the Classroom
+            </p>
+            <div className='flex flex-col lg:flex-row lg:items-end justify-between gap-6'>
+              <h2 className='font-serif-dm text-5xl md:text-6xl text-gray-900 leading-tight max-w-xl'>
+                Travel, Work &<br />
+                <em>Build Your Future</em>
+              </h2>
+              <p className='text-gray-500 max-w-sm leading-relaxed'>
+                AOCA doesn't just train you — we take you all the way. Visa
+                counselling, job placement, study abroad, and career coaching
+                under one roof.
+              </p>
+            </div>
+          </div>
+
+          <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8'>
+            {/* Travel & Visa */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className='lg:col-span-1 relative rounded-3xl overflow-hidden bg-sky-950 p-8 text-white'
+            >
+              <div className='absolute top-0 right-0 w-40 h-40 bg-sky-500/10 rounded-full blur-2xl' />
+              <div className='relative z-10'>
+                <div className='w-12 h-12 bg-sky-500/20 border border-sky-500/30 rounded-xl flex items-center justify-center mb-6'>
+                  <Plane className='h-6 w-6 text-sky-400' />
+                </div>
+                <h3 className='font-display text-4xl text-white mb-3 leading-none'>
+                  TRAVEL &<br />
+                  <span className='text-sky-400'>VISA</span>
+                </h3>
+                <p className='text-white/50 text-sm mb-6'>
+                  Schengen · UK · US · Canada · Germany. We guide you through
+                  every step of your visa journey.
+                </p>
+                <ul className='space-y-2 mb-8'>
+                  {[
+                    'Visa Application Support',
+                    'Document Checklist',
+                    'Embassy Interview Prep',
+                    'Travel Planning',
+                  ].map((m) => (
+                    <li
+                      key={m}
+                      className='flex items-center gap-2 text-xs text-white/60'
+                    >
+                      <CheckCircle2 className='h-3.5 w-3.5 text-sky-400 shrink-0' />
+                      {m}
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  onClick={() => setShowPopup(true)}
+                  className='w-full py-3 bg-sky-500 text-white rounded-xl text-sm font-bold hover:bg-sky-400 transition-colors'
+                >
+                  Get Visa Guidance
+                </button>
+              </div>
+            </motion.div>
+
+            {/* Jobs & Career — wider */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className='lg:col-span-2 relative rounded-3xl overflow-hidden bg-[#120a1f] p-8 text-white'
+            >
+              <div className='absolute top-0 right-0 w-64 h-64 bg-violet-500/10 rounded-full blur-3xl' />
+              <div className='relative z-10'>
+                <div className='flex items-center gap-3 mb-6'>
+                  <div className='w-12 h-12 bg-violet-500/20 border border-violet-500/30 rounded-xl flex items-center justify-center'>
+                    <BriefcaseBusiness className='h-6 w-6 text-violet-400' />
+                  </div>
+                  <div>
+                    <p className='text-white/40 text-xs uppercase tracking-wider'>
+                      For Professionals
+                    </p>
+                    <h3 className='text-white font-bold text-lg'>
+                      Jobs & Career Services
+                    </h3>
+                  </div>
+                </div>
+                <h2 className='font-display text-5xl text-white mb-4 leading-none'>
+                  LAND THE JOB.
+                  <br />
+                  <span className='text-violet-400'>ANYWHERE.</span>
+                </h2>
+                <p className='text-white/50 text-sm mb-8 max-w-lg'>
+                  Whether you're targeting roles in Nigeria or abroad — we help
+                  professionals craft winning CVs, ace interviews, and connect
+                  with employers who are hiring.
+                </p>
+                <div className='grid grid-cols-3 gap-3 mb-8'>
+                  {[
+                    {
+                      icon: Briefcase,
+                      label: 'CV Optimisation',
+                      sub: 'ATS-ready, recruiter-approved',
+                    },
+                    {
+                      icon: Users,
+                      label: 'Mock Interviews',
+                      sub: 'Real questions, expert feedback',
+                    },
+                    {
+                      icon: Globe,
+                      label: 'Employer Network',
+                      sub: 'Nigeria + international roles',
+                    },
+                  ].map((item, i) => (
+                    <div
+                      key={i}
+                      className='p-4 rounded-xl bg-white/5 border border-white/10 text-center'
+                    >
+                      <item.icon className='h-5 w-5 text-violet-400 mx-auto mb-2' />
+                      <p className='text-white text-xs font-bold mb-1'>
+                        {item.label}
+                      </p>
+                      <p className='text-white/40 text-xs'>{item.sub}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className='flex gap-3'>
+                  <button
+                    onClick={() => setShowPopup(true)}
+                    className='px-6 py-3 bg-violet-600 text-white rounded-xl text-sm font-bold hover:bg-violet-500 transition-colors'
+                  >
+                    Job Placement Help
+                  </button>
+                  <button
+                    onClick={() => setShowPopup(true)}
+                    className='px-6 py-3 bg-white/10 border border-white/20 text-white rounded-xl text-sm font-bold hover:bg-white/15 transition-colors'
+                  >
+                    CV & Interview Prep
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Study Abroad Banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className='relative rounded-3xl overflow-hidden bg-emerald-600 p-8 md:p-10 text-white'
+          >
+            <div className='absolute inset-0 diagonal-stripe opacity-30' />
+            <div className='absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl' />
+            <div className='relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6'>
+              <div>
+                <div className='flex items-center gap-2 mb-3'>
+                  <GraduationCap className='h-5 w-5 text-emerald-200' />
+                  <span className='text-emerald-200 text-xs font-bold uppercase tracking-wider'>
+                    Study Abroad Placement
+                  </span>
+                </div>
+                <h3 className='font-display text-4xl md:text-5xl text-white leading-none mb-2'>
+                  GET INTO A FOREIGN UNIVERSITY.
+                </h3>
+                <p className='text-white/70 text-sm max-w-lg'>
+                  School selection, application essays, scholarship search, and
+                  full pre-departure briefing. We've placed students in
+                  universities across Europe, the UK, Canada, and more.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowPopup(true)}
+                className='shrink-0 inline-flex items-center gap-2 px-8 py-4 bg-white text-emerald-700 rounded-2xl font-bold text-sm hover:bg-emerald-50 transition-all shadow-lg'
+              >
+                Start Study Abroad <ArrowRight className='h-4 w-4' />
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* ── PROGRAMS ─────────────────────────────────────────────────────── */}
       <section id='programs' className='py-28 bg-[#fafaf7]'>
         <div className='container mx-auto px-6'>
           <div className='mb-16'>
             <p className='section-line text-emerald-600 text-xs uppercase tracking-[0.3em] font-bold mb-4'>
-              Our Programs
+              All Programs
             </p>
             <div className='flex flex-col lg:flex-row lg:items-end justify-between gap-6'>
               <h2 className='font-serif-dm text-5xl md:text-6xl text-gray-900 leading-tight max-w-xl'>
@@ -899,9 +1499,8 @@ const AdmissionLandingPage = () => {
                 <em>Path to Success</em>
               </h2>
               <p className='text-gray-500 max-w-sm leading-relaxed'>
-                Whether you're preparing for professional exams, learning to
-                code, or building tech skills — AOCA has the right program for
-                you.
+                For students, working professionals, and anyone ready to level
+                up — AOCA has the right program for every goal.
               </p>
             </div>
           </div>
@@ -942,7 +1541,6 @@ const AdmissionLandingPage = () => {
                   transition={{ delay: i * 0.08 }}
                   className='group bg-white rounded-3xl border border-gray-100 overflow-hidden card-hover'
                 >
-                  {/* Card header */}
                   <div
                     className={`bg-gradient-to-br ${prog.color} p-6 relative overflow-hidden`}
                   >
@@ -957,8 +1555,7 @@ const AdmissionLandingPage = () => {
                   </div>
 
                   <div className='p-6'>
-                    {/* Stats row */}
-                    <div className='flex gap-4 mb-5'>
+                    <div className='flex gap-4 mb-5 flex-wrap'>
                       {prog.students && (
                         <div className='flex items-center gap-1.5 text-xs text-gray-500'>
                           <Users className='h-3.5 w-3.5 text-emerald-500' />
@@ -983,7 +1580,6 @@ const AdmissionLandingPage = () => {
                       </div>
                     </div>
 
-                    {/* Modules if available */}
                     {prog.modules && (
                       <div className='mb-5 space-y-1.5'>
                         {prog.modules.map((m, mi) => (
@@ -1027,23 +1623,20 @@ const AdmissionLandingPage = () => {
         <div className='relative z-10 container mx-auto px-6'>
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-16 items-center'>
             <div>
-              <p
-                className='section-line text-emerald-400 text-xs uppercase tracking-[0.3em] font-bold mb-6'
-                style={{ '--tw-content': '' }}
-              >
+              <p className='section-line text-emerald-400 text-xs uppercase tracking-[0.3em] font-bold mb-6'>
                 Now Open
               </p>
               <h2 className='font-display text-[clamp(4rem,10vw,8rem)] text-white leading-none mb-6'>
-                SMART
+                STUDENTS.
                 <br />
-                STUDENTS
+                PROFESSIONALS.
                 <br />
-                <span className='gradient-text'>CHOOSE AOCA</span>
+                <span className='gradient-text'>CHOOSE AOCA.</span>
               </h2>
               <p className='text-white/50 text-lg font-light leading-relaxed mb-10 max-w-md'>
-                Join thousands of students who've transformed their exam scores,
-                built coding skills, and launched professional careers through
-                AOCA's expert-led programs.
+                Whether you're a student chasing an exam score, a professional
+                building new skills, or someone ready to relocate abroad — AOCA
+                has the program that gets you there.
               </p>
               <button
                 onClick={() => setShowPopup(true)}
@@ -1063,6 +1656,39 @@ const AdmissionLandingPage = () => {
                   color: 'border-blue-500/30 bg-blue-500/5',
                 },
                 {
+                  icon: Languages,
+                  title: 'German Language',
+                  items: [
+                    'A1 Beginner',
+                    'A2 Elementary',
+                    'B1 Intermediate',
+                    'B2 Upper-Int.',
+                    'C1 Advanced',
+                  ],
+                  color: 'border-amber-500/30 bg-amber-500/5',
+                },
+                {
+                  icon: Plane,
+                  title: 'Travel & Migration',
+                  items: [
+                    'Visa Counselling',
+                    'Study Abroad',
+                    'Relocation Support',
+                  ],
+                  color: 'border-sky-500/30 bg-sky-500/5',
+                },
+                {
+                  icon: BriefcaseBusiness,
+                  title: 'Jobs & Career',
+                  items: [
+                    'Job Placement',
+                    'CV Writing',
+                    'Interview Prep',
+                    'Career Counselling',
+                  ],
+                  color: 'border-violet-500/30 bg-violet-500/5',
+                },
+                {
                   icon: Code,
                   title: 'Programming',
                   items: ['Scratch', 'Python', 'Web Development'],
@@ -1070,19 +1696,9 @@ const AdmissionLandingPage = () => {
                 },
                 {
                   icon: Shield,
-                  title: 'Cyber Security',
-                  items: [
-                    'Network Security',
-                    'Ethical Hacking',
-                    'Risk Management',
-                  ],
+                  title: 'Cyber & Data',
+                  items: ['Cyber Security', 'Data Analysis', 'Project Mgmt'],
                   color: 'border-red-500/30 bg-red-500/5',
-                },
-                {
-                  icon: BarChart,
-                  title: 'Data Analysis',
-                  items: ['Excel', 'SQL', 'Visualisation', 'BI Tools'],
-                  color: 'border-purple-500/30 bg-purple-500/5',
                 },
               ].map((card, i) => (
                 <motion.div
@@ -1090,7 +1706,7 @@ const AdmissionLandingPage = () => {
                   initial={{ opacity: 0, scale: 0.95 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
+                  transition={{ delay: i * 0.08 }}
                   className={`rounded-2xl border p-5 ${card.color}`}
                 >
                   <card.icon className='h-5 w-5 text-emerald-400 mb-3' />
@@ -1119,7 +1735,6 @@ const AdmissionLandingPage = () => {
       <section className='py-28 bg-white'>
         <div className='container mx-auto px-6'>
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
-            {/* Cyber Security Card */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -1178,7 +1793,6 @@ const AdmissionLandingPage = () => {
               </div>
             </motion.div>
 
-            {/* Data Analysis Card */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -1246,7 +1860,7 @@ const AdmissionLandingPage = () => {
           <div className='grid grid-cols-1 lg:grid-cols-12 gap-12 items-center'>
             <div className='lg:col-span-5'>
               <p className='section-line text-emerald-600 text-xs uppercase tracking-[0.3em] font-bold mb-6'>
-                Professional Skills
+                For Professionals
               </p>
               <h2 className='font-serif-dm text-5xl md:text-6xl text-gray-900 leading-tight mb-6'>
                 Learn Project
@@ -1345,8 +1959,9 @@ const AdmissionLandingPage = () => {
               The AOCA Advantage
             </h2>
             <p className='text-gray-500 leading-relaxed'>
-              We don't just teach — we deliver results. Here's what makes AOCA
-              different from every other training centre in Nigeria.
+              We don't just teach — we deliver results. For students and
+              professionals alike. Here's what makes AOCA different from every
+              other training centre in Nigeria.
             </p>
           </div>
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
@@ -1382,7 +1997,7 @@ const AdmissionLandingPage = () => {
               Success Stories
             </p>
             <h2 className='font-serif-dm text-5xl text-gray-900'>
-              What Our Students Say
+              Students & Professionals Who Made It
             </h2>
           </div>
           <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
@@ -1394,9 +2009,10 @@ const AdmissionLandingPage = () => {
                 text: 'I passed my IELTS on the first attempt thanks to AOCA. The instructors were incredibly patient and the practice materials were more thorough than anything I found elsewhere.',
               },
               {
-                name: 'Michael Okonkwo',
-                program: 'Python Programming',
-                text: 'I came in with zero coding experience. Three months later I was building my own web applications. The practical project-based approach really changes how you learn.',
+                name: 'Emeka Nwosu',
+                program: 'German B1 + Study Abroad',
+                score: 'Now studying in Germany',
+                text: 'I started with German A1 knowing nothing. A year later, AOCA helped me get a German B2 certificate and placed me into a university in Berlin. They handled everything — the language, the application, even the visa.',
               },
               {
                 name: 'Chioma Eze',
@@ -1529,8 +2145,9 @@ const AdmissionLandingPage = () => {
               <span className='gradient-text'>IT'S FREE.</span>
             </h2>
             <p className='text-white/50 text-xl font-light max-w-xl mx-auto mb-12'>
-              Join thousands of successful AOCA graduates. Limited seats for the
-              2026 intake — enrollment closes once full.
+              Join thousands of successful AOCA graduates — students,
+              professionals, and everyone in between. Limited seats for the 2026
+              intake — enrollment closes once full.
             </p>
             <div className='flex flex-col sm:flex-row gap-4 justify-center'>
               <button

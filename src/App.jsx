@@ -45,6 +45,9 @@ import {
   Zap,
   Loader2,
   AlertCircle,
+  Languages,
+  Plane,
+  BriefcaseBusiness,
 } from 'lucide-react';
 import {
   BrowserRouter as Router,
@@ -104,6 +107,9 @@ import PathwayDetail from './pages/PathwayDetail';
 import ServiceDetail from './pages/ServiceDetail';
 import ScrollToTop from './components/ScrollToTop';
 import AdmissionLandingPage from './pages/admissionad';
+import InstructorDashboard from './pages/instructor/Dashboard';
+import InstructorCourseCreate from './pages/instructor/CourseCreate';
+import Messages from './pages/instructor/Messages';
 
 // ─── ADMISSION POPUP COMPONENT ───────────────────────────────────────────────
 function AdmissionPopup() {
@@ -121,15 +127,11 @@ function AdmissionPopup() {
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    // Check if user has seen the popup before
     const hasSeenPopup = localStorage.getItem('hasSeenAdmissionPopup');
-
     if (!hasSeenPopup) {
-      // Show popup after 2 seconds
       const timer = setTimeout(() => {
         setIsOpen(true);
       }, 2000);
-
       return () => clearTimeout(timer);
     }
   }, []);
@@ -140,29 +142,22 @@ function AdmissionPopup() {
   };
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus('loading');
     setErrorMessage('');
-
     try {
       const response = await fetch(
         'https://aoca-resources-backend.onrender.com/admission-inquiry',
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData),
         },
       );
-
       if (response.ok) {
         setStatus('success');
         setFormData({
@@ -174,8 +169,6 @@ function AdmissionPopup() {
           location: '',
           message: '',
         });
-
-        // Close popup after 3 seconds on success
         setTimeout(() => {
           handleClose();
           setStatus('idle');
@@ -224,7 +217,7 @@ function AdmissionPopup() {
 
               {/* Content Grid */}
               <div className='grid grid-cols-1 md:grid-cols-2'>
-                {/* Left Side - Image & Text */}
+                {/* Left Side */}
                 <div className='relative h-64 md:h-auto bg-emerald-600 overflow-hidden'>
                   <img
                     src='/study-group.jpg'
@@ -245,7 +238,7 @@ function AdmissionPopup() {
                         THE INTAKE
                       </h2>
                       <p className='text-lg md:text-xl font-light mb-6'>
-                        Smart Students Are Choosing AOCA
+                        Smart Students & Professionals Choose AOCA
                       </p>
                       <div className='space-y-4'>
                         <div className='flex items-start gap-3'>
@@ -254,10 +247,52 @@ function AdmissionPopup() {
                           </div>
                           <div>
                             <p className='font-bold text-sm uppercase tracking-wider mb-1'>
-                              Professional Examination Preparation
+                              Exam Preparation
                             </p>
                             <p className='text-sm text-white/80'>
-                              IELTS, GMAT, SAT, GRE, GCSE & TOEFL
+                              IELTS · GMAT · SAT · GRE · GCSE · TOEFL
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className='flex items-start gap-3'>
+                          <div className='w-8 h-8 rounded-full bg-white/20 flex items-center justify-center shrink-0'>
+                            <Languages className='h-4 w-4' />
+                          </div>
+                          <div>
+                            <p className='font-bold text-sm uppercase tracking-wider mb-1'>
+                              German Language
+                            </p>
+                            <p className='text-sm text-white/80'>
+                              A1 · A2 · B1 · B2 · C1 — All Levels
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className='flex items-start gap-3'>
+                          <div className='w-8 h-8 rounded-full bg-white/20 flex items-center justify-center shrink-0'>
+                            <Plane className='h-4 w-4' />
+                          </div>
+                          <div>
+                            <p className='font-bold text-sm uppercase tracking-wider mb-1'>
+                              Travel & Migration
+                            </p>
+                            <p className='text-sm text-white/80'>
+                              Visa Counselling · Study Abroad · Relocation
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className='flex items-start gap-3'>
+                          <div className='w-8 h-8 rounded-full bg-white/20 flex items-center justify-center shrink-0'>
+                            <BriefcaseBusiness className='h-4 w-4' />
+                          </div>
+                          <div>
+                            <p className='font-bold text-sm uppercase tracking-wider mb-1'>
+                              Jobs & Career
+                            </p>
+                            <p className='text-sm text-white/80'>
+                              Placement · CV Writing · Interview Prep
                             </p>
                           </div>
                         </div>
@@ -268,10 +303,10 @@ function AdmissionPopup() {
                           </div>
                           <div>
                             <p className='font-bold text-sm uppercase tracking-wider mb-1'>
-                              Computer Programming
+                              Tech & Programming
                             </p>
                             <p className='text-sm text-white/80'>
-                              Scratch • Python • Web Development
+                              Python · Web Dev · Cyber Security · Data Analysis
                             </p>
                           </div>
                         </div>
@@ -290,7 +325,8 @@ function AdmissionPopup() {
                       <div className='flex items-start gap-2'>
                         <MapPin className='h-4 w-4 shrink-0 mt-0.5' />
                         <span>
-                          No 70 Eligbolo Road, Rumudumaya, Port Harcourt
+                          No 70 Eligbolo Rd, Rumudumaya, Port Harcourt, Rivers
+                          State, Nigeria.
                         </span>
                       </div>
                     </div>
@@ -386,6 +422,7 @@ function AdmissionPopup() {
                         />
                       </div>
 
+                      {/* ── PROGRAM SELECT — grouped with optgroup ── */}
                       <div>
                         <label className='text-[10px] uppercase tracking-wider font-bold text-gray-400 ml-2'>
                           Program of Interest
@@ -398,15 +435,76 @@ function AdmissionPopup() {
                           className='w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:outline-none focus:border-emerald-500 transition-colors text-sm'
                         >
                           <option value=''>Select a program</option>
-                          <option value='ielts'>IELTS Preparation</option>
-                          <option value='gmat'>GMAT Preparation</option>
-                          <option value='sat'>SAT Preparation</option>
-                          <option value='gre'>GRE Preparation</option>
-                          <option value='gcse'>GCSE Preparation</option>
-                          <option value='toefl'>TOEFL Preparation</option>
-                          <option value='scratch'>Scratch Programming</option>
-                          <option value='python'>Python Programming</option>
-                          <option value='web'>Web Development</option>
+
+                          <optgroup label='── Exam Preparation'>
+                            <option value='ielts'>IELTS Preparation</option>
+                            <option value='gmat'>GMAT Preparation</option>
+                            <option value='sat'>SAT Preparation</option>
+                            <option value='gre'>GRE Preparation</option>
+                            <option value='gcse'>GCSE Preparation</option>
+                            <option value='toefl'>TOEFL Preparation</option>
+                          </optgroup>
+
+                          <optgroup label='── German Language'>
+                            <option value='german-a1'>
+                              German Language — A1 (Beginner)
+                            </option>
+                            <option value='german-a2'>
+                              German Language — A2 (Elementary)
+                            </option>
+                            <option value='german-b1'>
+                              German Language — B1 (Intermediate)
+                            </option>
+                            <option value='german-b2'>
+                              German Language — B2 (Upper Intermediate)
+                            </option>
+                            <option value='german-c1'>
+                              German Language — C1 (Advanced)
+                            </option>
+                          </optgroup>
+
+                          <optgroup label='── Travel & Migration'>
+                            <option value='travel-visa'>
+                              Travel & Visa Counselling
+                            </option>
+                            <option value='study-abroad'>
+                              Study Abroad Placement
+                            </option>
+                            <option value='relocation'>
+                              Relocation & Settlement Support
+                            </option>
+                          </optgroup>
+
+                          <optgroup label='── Jobs & Career'>
+                            <option value='job-placement'>
+                              Job Placement Assistance
+                            </option>
+                            <option value='cv-interview'>
+                              CV Writing & Interview Prep
+                            </option>
+                            <option value='career-counselling'>
+                              Career Counselling
+                            </option>
+                          </optgroup>
+
+                          <optgroup label='── Programming'>
+                            <option value='scratch'>Scratch Programming</option>
+                            <option value='python'>Python Programming</option>
+                            <option value='web'>Web Development</option>
+                          </optgroup>
+
+                          <optgroup label='── Tech Skills'>
+                            <option value='cyber-security'>
+                              Cyber Security
+                            </option>
+                            <option value='data-analysis'>Data Analysis</option>
+                          </optgroup>
+
+                          <optgroup label='── Professional'>
+                            <option value='project-management'>
+                              Project Management
+                            </option>
+                          </optgroup>
                         </select>
                       </div>
 
@@ -678,7 +776,7 @@ function HeroCarousel() {
         </div>
       </div>
 
-      {/* Trust bar at very bottom */}
+      {/* Trust bar */}
       <div className='absolute bottom-0 left-0 right-0 z-30 bg-black/60 backdrop-blur-sm border-t border-white/10 hidden md:block'>
         <div className='container mx-auto px-8 py-3 flex items-center justify-center gap-10 text-white/50 text-xs uppercase tracking-widest font-bold'>
           <span>✓ Goethe-Certified Training</span>
@@ -698,7 +796,7 @@ function HeroCarousel() {
 function StatsSection() {
   const stats = [
     {
-      label: 'Students Trained',
+      label: 'Students & Professionals Trained',
       value: '5,000+',
       tooltip: 'Across Lagos, Port Harcourt, and online — since 2009',
       icon: Users,
@@ -1235,9 +1333,10 @@ function WhyAOCASection() {
               We're More Than a Language School
             </h2>
             <p className='text-base sm:text-xl text-gray-500 font-light leading-relaxed mb-10 sm:mb-12'>
-              Over 5,000 students trained. 530+ now living and working in
-              Germany. We've built the most complete Nigeria-to-Germany pathway
-              in the country — and we improve it every year.
+              Over 5,000 students and professionals trained. 530+ now living and
+              working in Germany. We've built the most complete
+              Nigeria-to-Germany pathway in the country — and we improve it
+              every year.
             </p>
             <div className='grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8'>
               {features.map((f, i) => (
@@ -1621,7 +1720,7 @@ function TestimonialsSection() {
           </h2>
         </div>
 
-        {/* Desktop: 3-column grid */}
+        {/* Desktop: grid */}
         <div className='hidden md:grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8'>
           {testimonials.map((t, i) => (
             <motion.div
@@ -1975,7 +2074,8 @@ function Footer() {
               all.
             </p>
             <p className='text-xs text-emerald-500 font-bold uppercase tracking-widest'>
-              German Language · Ausbildung · Nursing · Job Seeker Visa
+              German Language · Ausbildung · Nursing · Job Seeker Visa · Travel
+              & Migration
             </p>
           </div>
           <div className='flex gap-3 sm:gap-4'>
@@ -2059,6 +2159,12 @@ function Footer() {
             </h4>
             <ul className='space-y-3'>
               {[
+                {
+                  label: 'Travel & Visa Counselling',
+                  to: '/services/travel-visa',
+                },
+                { label: 'Job Placement', to: '/services/job-placement' },
+                { label: 'CV & Interview Prep', to: '/services/cv-interview' },
                 { label: 'Data Analysis', to: '/services/data-analysis' },
                 { label: 'Cyber Security', to: '/services/cyber-security' },
                 {
@@ -2069,8 +2175,6 @@ function Footer() {
                   label: 'Document Translation',
                   to: '/services/document-translation',
                 },
-                { label: 'IELTS / Exam Prep', to: '/services/exam-prep' },
-                { label: 'Programming', to: '/services/programming' },
               ].map((item) => (
                 <li key={item.label}>
                   <Link
@@ -2097,15 +2201,27 @@ function Footer() {
               </li>
               <li className='flex items-start gap-3 text-white/50 text-xs sm:text-sm font-light'>
                 <MapPin className='h-4 w-4 text-emerald-500 shrink-0 mt-0.5' />
-                <span>Port Harcourt, Rivers State, Nigeria.</span>
+                <span>
+                  No 70 Eligbolo Rd, Rumudumaya, Port Harcourt, Rivers State,
+                  Nigeria.
+                </span>
               </li>
               <li className='flex items-center gap-3 text-white/50 text-xs sm:text-sm font-light'>
                 <Phone className='h-4 w-4 text-emerald-500 shrink-0' />
                 <a
-                  href='tel:+2348038865466'
+                  href='tel:+2349038013105'
                   className='hover:text-emerald-400 transition-colors'
                 >
                   +234 903 801 3105
+                </a>
+              </li>
+              <li className='flex items-center gap-3 text-white/50 text-xs sm:text-sm font-light'>
+                <MessageSquare className='h-4 w-4 text-emerald-500 shrink-0' />
+                <a
+                  href='https://wa.me/2348038865466'
+                  className='hover:text-emerald-400 transition-colors'
+                >
+                  +234 803 886 5466
                 </a>
               </li>
               <li className='flex items-center gap-3 text-white/50 text-xs sm:text-sm font-light'>
@@ -2339,6 +2455,16 @@ function App() {
             }
           />
           <Route
+            path='/messages'
+            element={
+              <PrivateRoute>
+                <Layout>
+                  <Messages />
+                </Layout>
+              </PrivateRoute>
+            }
+          />
+          <Route
             path='/admin'
             element={<Navigate to='/admin/dashboard' replace />}
           />
@@ -2416,6 +2542,29 @@ function App() {
             }
           />
           <Route
+            path='/instructor/*'
+            element={
+              <InstructorRoute>
+                <Layout hideHeaderFooter={true}>
+                  {/* You can create a specific InstructorLayout later */}
+                  <div className='min-h-screen bg-gray-50'>
+                    <Routes>
+                      <Route
+                        path='dashboard'
+                        element={<InstructorDashboard />}
+                      />
+                      <Route
+                        path='courses/create'
+                        element={<InstructorCourseCreate />}
+                      />
+                      <Route path='messages' element={<Messages />} />
+                    </Routes>
+                  </div>
+                </Layout>
+              </InstructorRoute>
+            }
+          />
+          <Route
             path='/not-found'
             element={
               <Layout>
@@ -2440,6 +2589,16 @@ function App() {
 function PrivateRoute({ children }) {
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
   if (!isAuthenticated) return <Navigate to='/login' replace />;
+  return children;
+}
+
+function InstructorRoute({ children }) {
+  const isAuthenticated = authService.isAuthenticated();
+  const currentUser = authService.getCurrentUser();
+  const isInstructor =
+    currentUser?.role === 'instructor' || currentUser?.role === 'admin';
+  if (!isAuthenticated) return <Navigate to='/login' replace />;
+  if (!isInstructor) return <Navigate to='/dashboard' replace />;
   return children;
 }
 
