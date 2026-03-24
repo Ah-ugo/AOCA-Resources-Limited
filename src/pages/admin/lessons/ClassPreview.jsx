@@ -13,10 +13,13 @@ import {
   FiClock,
   FiCalendar,
   FiUser,
+  FiUserPlus,
+  FiX,
 } from 'react-icons/fi';
 import AdminLayout from '../../../components/admin/AdminLayout';
 import { Loader } from 'lucide-react';
 import { adminService } from '../../../services/admin-service';
+import { authService } from '../../../services/auth-service';
 
 const ClassPreview = () => {
   const { id } = useParams();
@@ -26,6 +29,10 @@ const ClassPreview = () => {
   const [error, setError] = useState(null);
   const [students, setStudents] = useState([]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showAddStudentModal, setShowAddStudentModal] = useState(false);
+  const [availableUsers, setAvailableUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState('');
+  const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     fetchClass();
@@ -49,10 +56,8 @@ const ClassPreview = () => {
 
   const fetchStudents = async () => {
     try {
-      // Assuming you have an endpoint to get students enrolled in a class
-      const data = await adminService.getUsers({ enrolled_in: id });
-      console.log(data, 'students');
-      setStudents(data.users || []);
+      const data = await adminService.getClassStudents(id);
+      setStudents(data.students || []);
     } catch (err) {
       console.error('Error fetching students:', err);
     }
@@ -70,16 +75,51 @@ const ClassPreview = () => {
     }
   };
 
-  const formatTime = (time) => {
-    if (!time) return 'N/A';
+  const fetchAvailableUsers = async () => {
     try {
-      const [hours, minutes] = time.split(':');
-      const hour = parseInt(hours, 10);
-      const period = hour >= 12 ? 'PM' : 'AM';
-      const formattedHour = hour % 12 || 12;
-      return `${formattedHour}:${minutes} ${period}`;
+      // Ideally filter for students
+      const data = await adminService.getUsers({ role: 'student' });
+      setAvailableUsers(data.users || []);
     } catch (err) {
-      return time;
+      console.error('Error fetching users:', err);
+    }
+  };
+
+  const handleAddStudent = async () => {
+    if (!selectedUser) return;
+    setProcessing(true);
+    try {
+      await adminService.assignStudentToClass({
+        user_id: selectedUser,
+        course_id: classData.course_id,
+        class_id: id,
+      });
+      setShowAddStudentModal(false);
+      fetchStudents(); // Refresh list
+    } catch (err) {
+      alert('Failed to add student: ' + (err.message || 'Unknown error'));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const formatDateTime = (dateStr, duration) => {
+    if (!dateStr) return 'N/A';
+    try {
+      const date = new Date(dateStr);
+      const timeStr = date.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      const dateStrFormatted = date.toLocaleDateString(undefined, {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+      return `${dateStrFormatted} at ${timeStr} (${duration} mins)`;
+    } catch (err) {
+      return dateStr;
     }
   };
 
@@ -87,6 +127,25 @@ const ClassPreview = () => {
     return (
       <div className='flex justify-center items-center h-64'>
         <Loader className='h-12 w-12 text-primary animate-spin' />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className='container mx-auto px-4 py-6'>
+        <div className='mb-6'>
+          <button
+            onClick={() => navigate('/admin/classes')}
+            className='flex items-center text-gray-600 hover:text-gray-800'
+          >
+            <FiArrowLeft className='mr-1' /> Back to Classes
+          </button>
+        </div>
+        <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded'>
+          <strong className='font-bold'>Error: </strong>
+          <span className='block sm:inline'>{error}</span>
+        </div>
       </div>
     );
   }
@@ -129,12 +188,6 @@ const ClassPreview = () => {
           </button>
         </div>
       </div>
-
-      {error && (
-        <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6'>
-          {error}
-        </div>
-      )}
 
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
         {/* Class Details */}
@@ -209,9 +262,7 @@ const ClassPreview = () => {
                   </p>
                   <p>
                     <span className='font-medium'>Time:</span>{' '}
-                    {classData.date
-                      ? `${new Date(classData.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} (${classData.duration} mins)`
-                      : 'N/A'}
+                    {formatDateTime(classData.date, classData.duration)}
                   </p>
                 </div>
               </div>
@@ -241,9 +292,20 @@ const ClassPreview = () => {
         {/* Students List */}
         <div>
           <div className='bg-white rounded-lg shadow-md p-6'>
-            <h2 className='text-xl font-semibold text-gray-700 mb-4'>
-              Enrolled Students ({students.length})
-            </h2>
+            <div className='flex justify-between items-center mb-4'>
+              <h2 className='text-xl font-semibold text-gray-700'>
+                Enrolled Students ({students.length})
+              </h2>
+              <button
+                onClick={() => {
+                  fetchAvailableUsers();
+                  setShowAddStudentModal(true);
+                }}
+                className='text-sm bg-green-600 text-white px-3 py-1.5 rounded flex items-center hover:bg-green-700'
+              >
+                <FiUserPlus className='mr-1' /> Add
+              </button>
+            </div>
 
             {students.length > 0 ? (
               <div className='space-y-4'>
@@ -304,6 +366,57 @@ const ClassPreview = () => {
                 className='px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700'
               >
                 Delete Class
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Student Modal */}
+      {showAddStudentModal && (
+        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50'>
+          <div className='bg-white rounded-lg shadow-xl p-6 max-w-md w-full'>
+            <div className='flex justify-between items-center mb-4'>
+              <h3 className='text-lg font-medium text-gray-900'>Add Student</h3>
+              <button
+                onClick={() => setShowAddStudentModal(false)}
+                className='text-gray-400 hover:text-gray-600'
+              >
+                <FiX className='h-5 w-5' />
+              </button>
+            </div>
+            <div className='mb-6'>
+              <label className='block text-sm font-medium text-gray-700 mb-2'>
+                Select Student
+              </label>
+              <select
+                className='w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 p-2 border'
+                value={selectedUser}
+                onChange={(e) => setSelectedUser(e.target.value)}
+              >
+                <option value=''>-- Select a user --</option>
+                {availableUsers.map((u) => (
+                  <option key={u._id} value={u._id}>
+                    {u.first_name} {u.last_name} ({u.email})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className='flex justify-end space-x-3'>
+              <button
+                onClick={() => setShowAddStudentModal(false)}
+                className='px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50'
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddStudent}
+                disabled={!selectedUser || processing}
+                className={`px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 ${
+                  processing ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                {processing ? 'Adding...' : 'Add Student'}
               </button>
             </div>
           </div>

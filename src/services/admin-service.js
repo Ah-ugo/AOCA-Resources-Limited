@@ -167,32 +167,6 @@ export const updateApplication = async (applicationId, data) => {
   }
 };
 
-// services/admin-service.js
-// export const getApplicationById = async (id) => {
-//   const response = await fetch(`https://aoca-resources-backend.onrender.com/admin/careers/applications/${id}`, {
-//     headers: {
-//       'Authorization': `Bearer ${localStorage.getItem('token')}`,
-//       'accept': 'application/json'
-//     }
-//   });
-//   if (!response.ok) throw new Error('Failed to fetch application');
-//   return await response.json();
-// };
-
-// export const updateApplication = async (id, data) => {
-//   const response = await fetch(`https://aoca-resources-backend.onrender.com/admin/careers/applications/${id}`, {
-//     method: 'PATCH',
-//     headers: {
-//       'Authorization': `Bearer ${localStorage.getItem('token')}`,
-//       'Content-Type': 'application/json',
-//       'accept': 'application/json'
-//     },
-//     body: JSON.stringify(data)
-//   });
-//   if (!response.ok) throw new Error('Failed to update application');
-//   return await response.json();
-// };
-
 // Job Categories
 export const getJobCategories = async () => {
   try {
@@ -447,17 +421,38 @@ export const removeUserFromCourse = async (courseId, userId) => {
 
 // services/admin-service.js
 export const getCourseStudents = async (courseId, skip = 0, limit = 100) => {
-  const response = await fetch(
-    `https://aoca-resources-backend.onrender.com/admin/courses/${courseId}/students?skip=${skip}&limit=${limit}`,
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-        accept: 'application/json',
+  try {
+    const response = await apiClient.get(
+      `/admin/courses/${courseId}/students`,
+      {
+        params: { skip, limit },
       },
-    },
-  );
-  if (!response.ok) throw new Error('Failed to fetch course students');
-  return await response.json();
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Get course students error:', error);
+    throw error;
+  }
+};
+
+export const getClassStudents = async (classId) => {
+  try {
+    const response = await apiClient.get(`/admin/classes/${classId}/students`);
+    return response.data;
+  } catch (error) {
+    console.error('Get class students error:', error);
+    throw error;
+  }
+};
+
+export const assignStudentToClass = async (data) => {
+  try {
+    const response = await apiClient.post('/admin/enrollments/assign', data);
+    return response.data;
+  } catch (error) {
+    console.error('Assign student to class error:', error);
+    throw error;
+  }
 };
 
 // Class Management
@@ -776,6 +771,8 @@ const adminService = {
   updateClass,
   deleteClass,
   getLessons,
+  getClassStudents,
+  assignStudentToClass,
 
   // Assignment Management
   getAssignments,
