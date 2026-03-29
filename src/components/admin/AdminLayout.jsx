@@ -29,9 +29,11 @@ import {
   ChevronRight,
   Sun,
   Moon,
+  UserPlus,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { authService } from '../../services/auth-service';
+import { adminService } from '../../services/admin-service';
 
 function AdminLayout({ children }) {
   const location = useLocation();
@@ -41,6 +43,22 @@ function AdminLayout({ children }) {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(3);
+  const [unreadInquiries, setUnreadInquiries] = useState(0);
+
+  useEffect(() => {
+    const fetchAdmissionsCount = async () => {
+      try {
+        const stats = await adminService.getAdmissionStats();
+        setUnreadInquiries(stats.unread || 0);
+      } catch (error) {
+        console.warn('Failed to fetch admissions count:', error);
+      }
+    };
+
+    fetchAdmissionsCount();
+    const interval = setInterval(fetchAdmissionsCount, 120000); // Poll every 2 minutes
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     // Close sidebar on route change on mobile
@@ -94,6 +112,12 @@ function AdminLayout({ children }) {
       icon: <FileText className='w-5 h-5' />,
       path: '/admin/careers/applications',
       badge: notifications,
+    },
+    {
+      title: 'Admissions',
+      icon: <UserPlus className='w-5 h-5' />,
+      path: '/admin/admissions',
+      badge: unreadInquiries,
     },
     {
       title: 'Messages',

@@ -110,6 +110,7 @@ import AdmissionLandingPage from './pages/admissionad';
 import InstructorDashboard from './pages/instructor/Dashboard';
 import InstructorCourseCreate from './pages/instructor/CourseCreate';
 import Messages from './pages/instructor/Messages';
+import AdmissionInquiries from './services/AdmissionInquiries';
 
 // ─── ADMISSION POPUP COMPONENT ───────────────────────────────────────────────
 function AdmissionPopup() {
@@ -2533,6 +2534,10 @@ function App() {
                       <Route
                         path='messages'
                         element={<AdminContactSubmissions />}
+                      />
+                      <Route
+                        path='admissions'
+                        element={<AdmissionInquiries />}
                       />
                       <Route path='*' element={<NotFound />} />
                     </Routes>

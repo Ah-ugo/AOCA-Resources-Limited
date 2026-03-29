@@ -651,6 +651,102 @@ export const deleteResource = async (resourceId) => {
   }
 };
 
+// Admission Inquiries
+export const getAdmissionInquiries = async (params = {}) => {
+  try {
+    const response = await apiClient.get('/admin/admission-inquiries', {
+      params,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Get admission inquiries error:', error);
+    throw error;
+  }
+};
+
+export const getAdmissionInquiryById = async (inquiryId) => {
+  try {
+    const response = await apiClient.get(
+      `/admin/admission-inquiries/${inquiryId}`,
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Get admission inquiry by ID error:', error);
+    throw error;
+  }
+};
+
+export const updateInquiryStatus = async (inquiryId, status) => {
+  try {
+    const response = await apiClient.put(
+      `/admin/admission-inquiries/${inquiryId}/status`,
+      { status },
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Update inquiry status error:', error);
+    throw error;
+  }
+};
+
+export const addInquiryNote = async (inquiryId, note) => {
+  try {
+    const response = await apiClient.post(
+      `/admin/admission-inquiries/${inquiryId}/notes`,
+      { note },
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Add inquiry note error:', error);
+    throw error;
+  }
+};
+
+export const deleteAdmissionInquiry = async (inquiryId) => {
+  try {
+    const response = await apiClient.delete(
+      `/admin/admission-inquiries/${inquiryId}`,
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Delete admission inquiry error:', error);
+    throw error;
+  }
+};
+
+export const getAdmissionStats = async () => {
+  try {
+    const response = await apiClient.get(
+      '/admin/admission-inquiries/stats/summary',
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Get admission stats error:', error);
+    throw error;
+  }
+};
+
+export const exportInquiriesCSV = async () => {
+  try {
+    const response = await apiClient.get(
+      '/admin/admission-inquiries/export/csv',
+      {
+        responseType: 'blob',
+      },
+    );
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'admission_inquiries.csv');
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  } catch (error) {
+    console.error('Export inquiries CSV error:', error);
+    throw error;
+  }
+};
+
 // File Upload
 export const uploadImage = async (file) => {
   try {
@@ -793,6 +889,15 @@ const adminService = {
   // File Upload
   uploadImage,
   uploadResume,
+
+  // Admission Inquiries
+  getAdmissionInquiries,
+  getAdmissionInquiryById,
+  updateInquiryStatus,
+  addInquiryNote,
+  deleteAdmissionInquiry,
+  getAdmissionStats,
+  exportInquiriesCSV,
 };
 
 export { adminService };
