@@ -119,12 +119,14 @@ const AdmissionInquiries = () => {
         <h1 className='text-2xl font-bold text-gray-800'>
           Admission Inquiries
         </h1>
-        <button
-          onClick={() => adminService.exportInquiriesCSV()}
-          className='bg-primary text-white px-4 py-2 rounded-md hover:opacity-90 transition shadow-sm'
-        >
-          Export CSV
-        </button>
+        {adminService && (
+          <button
+            onClick={() => adminService.exportInquiriesCSV()}
+            className='bg-primary text-black px-4 py-2 rounded-md hover:opacity-90 transition shadow-sm'
+          >
+            Export CSV
+          </button>
+        )}
       </div>
 
       {/* Stats Summary */}
