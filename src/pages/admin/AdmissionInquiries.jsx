@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { adminService } from '../../services/admin-service';
 import { format } from 'date-fns';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const AdmissionInquiries = () => {
   const [inquiries, setInquiries] = useState([]);
@@ -17,22 +18,42 @@ const AdmissionInquiries = () => {
   });
   const [newNote, setNewNote] = useState('');
   const [submittingNote, setSubmittingNote] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    total: 0,
+    skip: 0,
+    limit: 10,
+    has_more: false,
+  });
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const [inquiriesData, statsData] = await Promise.all([
-        adminService.getAdmissionInquiries(filters),
+        adminService.getAdmissionInquiries({
+          ...filters,
+          skip: (currentPage - 1) * 10,
+          limit: 10,
+        }),
         adminService.getAdmissionStats(),
       ]);
       setInquiries(inquiriesData.inquiries);
+      setPagination(inquiriesData.pagination);
       setStats(statsData);
     } catch (error) {
       console.error('Failed to fetch data', error);
     } finally {
       setLoading(false);
     }
-  });
+  }, [filters, currentPage]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleViewDetails = async (id) => {
     try {
@@ -248,6 +269,72 @@ const AdmissionInquiries = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {!loading && inquiries.length > 0 && (
+        <div className='bg-white px-6 py-4 flex items-center justify-between border border-gray-100 rounded-lg shadow-sm'>
+          <div className='flex-1 flex justify-between sm:hidden'>
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className='relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50'
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => setCurrentPage((prev) => prev + 1)}
+              disabled={!pagination?.has_more}
+              className='ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50'
+            >
+              Next
+            </button>
+          </div>
+          <div className='hidden sm:flex-1 sm:flex sm:items-center sm:justify-between'>
+            <div>
+              <p className='text-sm text-gray-700'>
+                Showing{' '}
+                <span className='font-medium'>{pagination?.skip + 1}</span> to{' '}
+                <span className='font-medium'>
+                  {Math.min(
+                    pagination?.skip + pagination?.limit,
+                    pagination?.total,
+                  )}
+                </span>{' '}
+                of <span className='font-medium'>{pagination?.total}</span>{' '}
+                results
+              </p>
+            </div>
+            <div>
+              <nav
+                className='relative z-0 inline-flex rounded-md shadow-sm -space-x-px'
+                aria-label='Pagination'
+              >
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  disabled={currentPage === 1}
+                  className='relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 transition-colors'
+                >
+                  <span className='sr-only'>Previous</span>
+                  <ChevronLeft className='h-5 w-5' />
+                </button>
+                <span className='relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700'>
+                  Page {currentPage}
+                </span>
+                <button
+                  onClick={() => setCurrentPage((prev) => prev + 1)}
+                  disabled={!pagination?.has_more}
+                  className='relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 transition-colors'
+                >
+                  <span className='sr-only'>Next</span>
+                  <ChevronRight className='h-5 w-5' />
+                </button>
+              </nav>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Detail Modal */}
       {isModalOpen && selectedInquiry && (

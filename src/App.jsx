@@ -110,7 +110,7 @@ import AdmissionLandingPage from './pages/admissionad';
 import InstructorDashboard from './pages/instructor/Dashboard';
 import InstructorCourseCreate from './pages/instructor/CourseCreate';
 import Messages from './pages/instructor/Messages';
-import AdmissionInquiries from './services/AdmissionInquiries';
+import AdmissionInquiries from './pages/admin/AdmissionInquiries';
 
 // ─── ADMISSION POPUP COMPONENT ───────────────────────────────────────────────
 function AdmissionPopup() {
