@@ -11,7 +11,7 @@ import {
   Plus,
   Loader2,
 } from 'lucide-react';
-import { authService } from '../../services/auth-service';
+import { getInstructorStats } from '../../services/instructor-service';
 import { Link } from 'react-router-dom';
 
 const StatCard = ({ title, value, icon: Icon, color, subtext }) => (
@@ -42,19 +42,9 @@ export default function InstructorDashboard() {
     // Fetch stats from the backend
     const fetchStats = async () => {
       try {
-        const token = authService.getToken();
-        // Adjust URL if your API is hosted elsewhere
-        const response = await fetch(
-          'https://aoca-resources-backend.onrender.com/instructor/dashboard/stats',
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setStats(data.stats);
-          setRecentActivity(data.recent_enrollments || []);
-        }
+        const data = await getInstructorStats();
+        setStats(data.stats);
+        setRecentActivity(data.recent_enrollments || []);
       } catch (error) {
         console.error('Failed to fetch instructor stats', error);
       } finally {

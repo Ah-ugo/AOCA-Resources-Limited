@@ -73,7 +73,8 @@ import Careers from './pages/Careers';
 import CareerDetail from './pages/CareerDetail';
 
 // User Dashboard Pages
-import Dashboard from './pages/Dashboard';
+import StudentDashboard from './pages/dashboard/StudentDashboard';
+import CoursePlayer from './pages/dashboard/CoursePlayer';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/Dashboard';
@@ -111,6 +112,7 @@ import InstructorDashboard from './pages/instructor/Dashboard';
 import InstructorCourseCreate from './pages/instructor/CourseCreate';
 import Messages from './pages/instructor/Messages';
 import AdmissionInquiries from './pages/admin/AdmissionInquiries';
+import EnrollmentManagement from './pages/admin/EnrollmentManagement';
 
 // ─── ADMISSION POPUP COMPONENT ───────────────────────────────────────────────
 function AdmissionPopup() {
@@ -2450,7 +2452,10 @@ function App() {
             element={
               <PrivateRoute>
                 <Layout hideHeaderFooter={true}>
-                  <Dashboard />
+                  <Routes>
+                    <Route path='/' element={<StudentDashboard />} />
+                    <Route path='course/:courseId' element={<CoursePlayer />} />
+                  </Routes>
                 </Layout>
               </PrivateRoute>
             }
@@ -2534,6 +2539,10 @@ function App() {
                       <Route
                         path='messages'
                         element={<AdminContactSubmissions />}
+                      />
+                      <Route
+                        path='enrollments'
+                        element={<EnrollmentManagement />}
                       />
                       <Route
                         path='admissions'

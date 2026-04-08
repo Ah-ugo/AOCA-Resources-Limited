@@ -227,8 +227,6 @@ export const getBlogs = async (params = {}) => {
   }
 };
 
-const getBlogPosts = getBlogs;
-
 export const getBlogById = async (blogId) => {
   try {
     const response = await apiClient.get(`/blog/posts/${blogId}`);
@@ -238,8 +236,6 @@ export const getBlogById = async (blogId) => {
     throw error;
   }
 };
-
-export const getBlogPostById = getBlogById;
 
 export const createBlog = async (blogData) => {
   try {
@@ -266,8 +262,6 @@ export const createBlog = async (blogData) => {
   }
 };
 
-export const createBlogPost = createBlog;
-
 export const updateBlog = async (blogId, blogData) => {
   try {
     const response = await apiClient.put(`/blog/posts/${blogId}`, blogData);
@@ -278,8 +272,6 @@ export const updateBlog = async (blogId, blogData) => {
   }
 };
 
-export const updateBlogPost = updateBlog;
-
 export const deleteBlog = async (blogId) => {
   try {
     const response = await apiClient.delete(`/blog/posts/${blogId}`);
@@ -289,8 +281,6 @@ export const deleteBlog = async (blogId) => {
     throw error;
   }
 };
-
-export const deleteBlogPost = deleteBlog;
 
 // Blog Categories
 export const getBlogCategories = async () => {
@@ -419,18 +409,26 @@ export const removeUserFromCourse = async (courseId, userId) => {
   }
 };
 
-// services/admin-service.js
 export const getCourseStudents = async (courseId, skip = 0, limit = 100) => {
   try {
     const response = await apiClient.get(
       `/admin/courses/${courseId}/students`,
-      {
-        params: { skip, limit },
-      },
+      { params: { skip, limit } },
     );
     return response.data;
   } catch (error) {
     console.error('Get course students error:', error);
+    throw error;
+  }
+};
+
+// Enrollment Actions
+export const assignStudentToClass = async (data) => {
+  try {
+    const response = await apiClient.post('/admin/enrollments/assign', data);
+    return response.data;
+  } catch (error) {
+    console.error('Assign student to class error:', error);
     throw error;
   }
 };
@@ -441,16 +439,6 @@ export const getClassStudents = async (classId) => {
     return response.data;
   } catch (error) {
     console.error('Get class students error:', error);
-    throw error;
-  }
-};
-
-export const assignStudentToClass = async (data) => {
-  try {
-    const response = await apiClient.post('/admin/enrollments/assign', data);
-    return response.data;
-  } catch (error) {
-    console.error('Assign student to class error:', error);
     throw error;
   }
 };
@@ -466,8 +454,6 @@ export const getClasses = async (params = {}) => {
     throw error;
   }
 };
-
-export const getLessons = getClasses;
 
 export const getClassById = async (classId) => {
   try {
@@ -651,6 +637,109 @@ export const deleteResource = async (resourceId) => {
   }
 };
 
+// Enrollment Management
+export const getPendingEnrollments = async (params = {}) => {
+  try {
+    const response = await apiClient.get('/admin/enrollments/pending', {
+      params,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Get pending enrollments error:', error);
+    throw error;
+  }
+};
+
+export const approveEnrollment = async (enrollmentId, data = {}) => {
+  try {
+    const response = await apiClient.post(
+      `/admin/enrollments/${enrollmentId}/approve`,
+      data,
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Approve enrollment error:', error);
+    throw error;
+  }
+};
+
+export const rejectEnrollment = async (enrollmentId, data = {}) => {
+  try {
+    const response = await apiClient.post(
+      `/admin/enrollments/${enrollmentId}/reject`,
+      data,
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Reject enrollment error:', error);
+    throw error;
+  }
+};
+
+export const reassignStudent = async (data) => {
+  try {
+    const response = await apiClient.post('/admin/enrollments/reassign', data);
+    return response.data;
+  } catch (error) {
+    console.error('Reassign student error:', error);
+    throw error;
+  }
+};
+
+export const removeStudentFromClass = async (data) => {
+  try {
+    const response = await apiClient.post('/admin/enrollments/remove', data);
+    return response.data;
+  } catch (error) {
+    console.error('Remove student error:', error);
+    throw error;
+  }
+};
+
+export const listAllEnrollments = async (params = {}) => {
+  try {
+    const response = await apiClient.get('/admin/enrollments', { params });
+    return response.data;
+  } catch (error) {
+    console.error('List enrollments error:', error);
+    throw error;
+  }
+};
+
+// Messaging System
+export const getConversations = async () => {
+  try {
+    const response = await apiClient.get('/messages/conversations');
+    return response.data;
+  } catch (error) {
+    console.error('Get conversations error:', error);
+    throw error;
+  }
+};
+
+export const getConversationMessages = async (partnerId, params = {}) => {
+  try {
+    const response = await apiClient.get(
+      `/messages/conversations/${partnerId}`,
+      { params },
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Get conversation messages error:', error);
+    throw error;
+  }
+};
+
+export const sendMessage = async (data) => {
+  try {
+    const response = await apiClient.post('/messages/send', data);
+    return response.data;
+  } catch (error) {
+    console.error('Send message error:', error);
+    throw error;
+  }
+};
+
 // Admission Inquiries
 export const getAdmissionInquiries = async (params = {}) => {
   try {
@@ -797,9 +886,8 @@ export const uploadResume = async (file) => {
     throw error;
   }
 };
-export const getAdminStats = getDashboardStats;
-export const getRecentUsers = getUsers;
 
+export const getAdminStats = getDashboardStats;
 // Export all services
 const adminService = {
   // Dashboard
@@ -838,11 +926,11 @@ const adminService = {
   createBlog,
   updateBlog,
   deleteBlog,
-  deleteBlogPost,
-  getBlogPosts,
-  getBlogPostById,
-  updateBlogPost,
-  createBlogPost,
+  deleteBlogPost: deleteBlog,
+  getBlogPosts: getBlogs,
+  getBlogPostById: getBlogById,
+  updateBlogPost: updateBlog,
+  createBlogPost: createBlog,
 
   // Blog Categories
   getBlogCategories,
@@ -866,7 +954,7 @@ const adminService = {
   createClass,
   updateClass,
   deleteClass,
-  getLessons,
+  getLessons: getClasses,
   getClassStudents,
   assignStudentToClass,
 

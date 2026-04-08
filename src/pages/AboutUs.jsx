@@ -105,7 +105,7 @@ function AboutUs() {
                 <p className='text-sm uppercase tracking-widest font-bold opacity-80 mb-2'>
                   Established
                 </p>
-                <span className='text-5xl font-serif font-bold'>2008</span>
+                <span className='text-5xl font-serif font-bold'>2020</span>
                 <p className='text-xs mt-4 opacity-70'>
                   Over a decade of transforming lives through global education.
                 </p>
@@ -125,7 +125,7 @@ function AboutUs() {
                 Empowering Ambitions Across Borders
               </h2>
               <p className='text-xl text-gray-500 font-light leading-relaxed'>
-                Founded in 2008, AOCA Resources Limited emerged from a vision to
+                Founded in 2020, AOCA Resources Limited emerged from a vision to
                 create seamless pathways for Nigerian professionals to access
                 global opportunities. We specialize in bridging the gap between
                 talent and international demand, particularly in the German

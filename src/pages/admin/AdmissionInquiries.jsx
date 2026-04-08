@@ -1,7 +1,15 @@
 /** @format */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { adminService } from '../../services/admin-service';
+import {
+  getAdmissionInquiries,
+  getAdmissionStats,
+  getAdmissionInquiryById,
+  updateInquiryStatus,
+  addInquiryNote,
+  deleteAdmissionInquiry,
+  exportInquiriesCSV,
+} from '../../services/admin-service';
 import { format } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -30,12 +38,12 @@ const AdmissionInquiries = () => {
     setLoading(true);
     try {
       const [inquiriesData, statsData] = await Promise.all([
-        adminService.getAdmissionInquiries({
+        getAdmissionInquiries({
           ...filters,
           skip: (currentPage - 1) * 10,
           limit: 10,
         }),
-        adminService.getAdmissionStats(),
+        getAdmissionStats(),
       ]);
       setInquiries(inquiriesData.inquiries);
       setPagination(inquiriesData.pagination);
@@ -57,7 +65,7 @@ const AdmissionInquiries = () => {
 
   const handleViewDetails = async (id) => {
     try {
-      const data = await adminService.getAdmissionInquiryById(id);
+      const data = await getAdmissionInquiryById(id);
       setSelectedInquiry(data);
       setIsModalOpen(true);
       // Refresh the list to show it's been read
@@ -69,7 +77,7 @@ const AdmissionInquiries = () => {
 
   const handleStatusUpdate = async (id, newStatus) => {
     try {
-      await adminService.updateInquiryStatus(id, newStatus);
+      await updateInquiryStatus(id, newStatus);
       if (selectedInquiry) {
         setSelectedInquiry({ ...selectedInquiry, status: newStatus });
       }
@@ -85,10 +93,8 @@ const AdmissionInquiries = () => {
 
     setSubmittingNote(true);
     try {
-      await adminService.addInquiryNote(selectedInquiry._id, newNote);
-      const updated = await adminService.getAdmissionInquiryById(
-        selectedInquiry._id,
-      );
+      await addInquiryNote(selectedInquiry._id, newNote);
+      const updated = await getAdmissionInquiryById(selectedInquiry._id);
       setSelectedInquiry(updated);
       setNewNote('');
     } catch (error) {
@@ -119,14 +125,12 @@ const AdmissionInquiries = () => {
         <h1 className='text-2xl font-bold text-gray-800'>
           Admission Inquiries
         </h1>
-        {adminService && (
-          <button
-            onClick={() => adminService.exportInquiriesCSV()}
-            className='bg-primary text-black px-4 py-2 rounded-md hover:opacity-90 transition shadow-sm'
-          >
-            Export CSV
-          </button>
-        )}
+        <button
+          onClick={() => exportInquiriesCSV()}
+          className='bg-emerald-600 text-white px-4 py-2 rounded-md hover:bg-emerald-700 transition shadow-sm font-medium'
+        >
+          Export CSV
+        </button>
       </div>
 
       {/* Stats Summary */}

@@ -30,10 +30,14 @@ import {
   Sun,
   Moon,
   UserPlus,
+  UserCheck,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { authService } from '../../services/auth-service';
-import { adminService } from '../../services/admin-service';
+import {
+  getAdmissionStats,
+  listAllEnrollments,
+} from '../../services/admin-service';
 
 function AdminLayout({ children }) {
   const location = useLocation();
@@ -44,19 +48,24 @@ function AdminLayout({ children }) {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(3);
   const [unreadInquiries, setUnreadInquiries] = useState(0);
+  const [pendingEnrollments, setPendingEnrollments] = useState(0);
 
   useEffect(() => {
-    const fetchAdmissionsCount = async () => {
+    const fetchDataCounts = async () => {
       try {
-        const stats = await adminService.getAdmissionStats();
-        setUnreadInquiries(stats.unread || 0);
+        const [admissions, enrollmentsData] = await Promise.all([
+          getAdmissionStats(),
+          listAllEnrollments({ limit: 1 }),
+        ]);
+        setUnreadInquiries(admissions.unread || 0);
+        setPendingEnrollments(enrollmentsData.counts?.pending || 0);
       } catch (error) {
-        console.warn('Failed to fetch admissions count:', error);
+        console.warn('Failed to fetch sidebar counts:', error);
       }
     };
 
-    fetchAdmissionsCount();
-    const interval = setInterval(fetchAdmissionsCount, 120000); // Poll every 2 minutes
+    fetchDataCounts();
+    const interval = setInterval(fetchDataCounts, 120000); // Poll every 2 minutes
     return () => clearInterval(interval);
   }, []);
 
@@ -112,6 +121,12 @@ function AdminLayout({ children }) {
       icon: <FileText className='w-5 h-5' />,
       path: '/admin/careers/applications',
       badge: notifications,
+    },
+    {
+      title: 'Enrollments',
+      icon: <UserCheck className='w-5 h-5' />,
+      path: '/admin/enrollments',
+      badge: pendingEnrollments,
     },
     {
       title: 'Admissions',
