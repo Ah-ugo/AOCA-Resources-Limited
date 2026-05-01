@@ -19,7 +19,7 @@ function AboutUs() {
   const stats = [
     { label: 'Successful Visas', value: '98%' },
     { label: 'Language Students', value: '5,000+' },
-    { label: 'Years of Experience', value: '15+' },
+    { label: 'Years of Experience', value: '5+' },
     { label: 'Global Partners', value: '120+' },
   ];
 

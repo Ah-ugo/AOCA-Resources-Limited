@@ -820,7 +820,7 @@ function StatsSection() {
     },
     {
       label: 'Years of Excellence',
-      value: '15+',
+      value: '5+',
       tooltip:
         "Nigeria's most experienced German language & Germany placement consultancy",
       icon: Star,
