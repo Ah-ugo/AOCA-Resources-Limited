@@ -17,8 +17,9 @@ function Footer2() {
               />
             </Link>
             <p className='text-gray-400 mb-4'>
-              Your trusted partner for German language training, visa
-              consultancy, and recruitment services.
+              Your trusted partner for German visa consultancy, language
+              training (German & French), ICT programs, and professional
+              development courses for all ages.
             </p>
           </div>
           <div>

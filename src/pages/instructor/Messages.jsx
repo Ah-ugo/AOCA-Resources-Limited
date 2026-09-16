@@ -157,8 +157,8 @@ export default function Messages() {
   const filtered = conversations.filter(
     (c) =>
       !searchQuery ||
-      c.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.lastMessage?.toLowerCase().includes(searchQuery.toLowerCase()),
+      (c.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (c.lastMessage || '').toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (

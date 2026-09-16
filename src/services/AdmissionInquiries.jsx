@@ -177,8 +177,15 @@ const AdmissionInquiries = () => {
             }
           >
             <option value=''>All Programs</option>
-            <option value='ielts'>IELTS</option>
-            <option value='german'>German</option>
+            <option value='german-visa'>German Visa Travel Consultancy</option>
+            <option value='german-language'>German Language & Exam Prep</option>
+            <option value='french-language'>French Language & Exam Prep</option>
+            <option value='ielts'>IELTS Preparation</option>
+            <option value='corporate-training'>Corporate & Staff Training</option>
+            <option value='ict-programs'>ICT Programs</option>
+            <option value='kids-tech'>Kids & Teens Tech</option>
+            <option value='data-analysis'>Data Analysis</option>
+            <option value='project-management'>Project Management</option>
             <option value='study-abroad'>Study Abroad</option>
           </select>
         </div>

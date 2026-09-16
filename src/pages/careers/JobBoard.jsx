@@ -100,7 +100,7 @@ const JobBoard = () => {
   };
 
   return (
-    <Container className="py-5">
+    <Container className="py-12 sm:py-16">
       <h1 className="mb-4">Career Opportunities</h1>
 
       {/* Search Bar */}
@@ -125,7 +125,7 @@ const JobBoard = () => {
       <Row>
         {/* Filters Sidebar */}
         <Col md={3}>
-          <Card className="mb-4">
+          <Card className="mb-4 bg-surface-container-lowest rounded-2xl shadow-md border border-outline-variant/30">
             <Card.Header>
               <h5 className="mb-0">Filters</h5>
             </Card.Header>
@@ -251,10 +251,10 @@ const JobBoard = () => {
               </Spinner>
             </div>
           ) : jobs.length === 0 ? (
-            <Card className="text-center p-5">
+            <Card className="text-center p-6 bg-surface-container-lowest rounded-2xl shadow-md border border-outline-variant/30">
               <Card.Body>
                 <h3>No jobs found</h3>
-                <p className="text-muted">
+                <p className="text-on-surface-variant">
                   Try adjusting your filters or search criteria
                 </p>
               </Card.Body>
@@ -262,7 +262,7 @@ const JobBoard = () => {
           ) : (
             <>
               {jobs.map((job) => (
-                <Card key={job._id} className="mb-3 job-card">
+                <Card key={job._id} className="mb-3 job-card bg-surface-container-lowest rounded-2xl shadow-md border border-outline-variant/30">
                   <Card.Body>
                     {job.is_featured && (
                       <Badge bg="warning" text="dark" className="mb-2">
@@ -277,35 +277,35 @@ const JobBoard = () => {
                         {job.title}
                       </Link>
                     </Card.Title>
-                    <Card.Subtitle className="mb-2 text-muted">
+                    <Card.Subtitle className="mb-2 text-on-surface-variant">
                       {job.company}
                     </Card.Subtitle>
 
                     <div className="mb-3">
-                      <Badge bg="light" text="dark" className="me-2">
+                      <Badge bg="light" text="dark" className="me-2 bg-surface-container-lowest text-on-surface-variant border border-outline-variant/30">
                         {job.location.city}, {job.location.country}
                         {job.location.remote && " • Remote"}
                         {job.location.hybrid && " • Hybrid"}
                       </Badge>
-                      <Badge bg="light" text="dark" className="me-2">
+                      <Badge bg="light" text="dark" className="me-2 bg-surface-container-lowest text-on-surface-variant border border-outline-variant/30">
                         {job.employment_type}
                       </Badge>
-                      <Badge bg="light" text="dark" className="me-2">
+                      <Badge bg="light" text="dark" className="me-2 bg-surface-container-lowest text-on-surface-variant border border-outline-variant/30">
                         {job.experience_level}
                       </Badge>
                     </div>
 
-                    <Card.Text className="text-truncate-2">
+                    <Card.Text className="text-truncate-2 text-on-surface-variant">
                       {job.description.substring(0, 150)}...
                     </Card.Text>
 
                     <div className="d-flex justify-content-between align-items-center">
-                      <small className="text-muted">
+                      <small className="text-on-surface-variant">
                         Posted {new Date(job.created_at).toLocaleDateString()}
                       </small>
                       <Link
                         to={`/careers/jobs/${job._id}`}
-                        className="btn btn-primary btn-sm"
+                        className="btn btn-primary btn-sm rounded-full"
                       >
                         View Details
                       </Link>

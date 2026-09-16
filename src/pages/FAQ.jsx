@@ -6,8 +6,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Globe, ChevronDown, ChevronUp, Search } from 'lucide-react';
-import Header from '../components/Header';
-import Footer2 from '../components/Footer2';
+import PageLayout from '../components/PageLayout';
 
 function FAQ() {
   const [activeCategory, setActiveCategory] = useState('general');
@@ -231,86 +230,43 @@ function FAQ() {
     }));
   };
 
-  // Filter FAQs based on search query
+  const handleCategoryChange = (categoryId) => {
+    setActiveCategory(categoryId);
+    setSearchQuery('');
+  };
+
   const filteredFAQs = searchQuery
-    ? Object.values(faqData)
-        .flat()
+    ? Object.entries(faqData)
+        .flatMap(([category, faqs]) =>
+          faqs.map((faq, index) => ({
+            ...faq,
+            _category: category,
+            _index: index,
+          })),
+        )
         .filter(
           (faq) =>
             faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
             faq.answer.toLowerCase().includes(searchQuery.toLowerCase()),
         )
-    : faqData[activeCategory];
+    : faqData[activeCategory].map((faq, index) => ({
+        ...faq,
+        _category: activeCategory,
+        _index: index,
+      }));
 
   return (
-    <div className='min-h-screen bg-background'>
-      {/* Header */}
-      {/* <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-2">
-            <Globe className="h-8 w-8 text-primary" />
-            <span className="font-bold text-xl">AOCA Resources Limited</span>
-          </Link>
-
-          Desktop Navigation 
-          <nav className="hidden md:flex items-center gap-6">
-            <Link
-              to="/#pathways"
-              className="text-foreground/80 hover:text-primary transition-colors"
-            >
-              Pathways
-            </Link>
-            <Link
-              to="/#courses"
-              className="text-foreground/80 hover:text-primary transition-colors"
-            >
-              Courses
-            </Link>
-            <Link
-              to="/blog"
-              className="text-foreground/80 hover:text-primary transition-colors"
-            >
-              Blog
-            </Link>
-            <Link
-              to="/about"
-              className="text-foreground/80 hover:text-primary transition-colors"
-            >
-              About Us
-            </Link>
-            <Link
-              to="/contact"
-              className="text-foreground/80 hover:text-primary transition-colors"
-            >
-              Contact
-            </Link>
-            <Link
-              to="/login"
-              className="text-foreground/80 hover:text-primary transition-colors"
-            >
-              Login
-            </Link>
-            <Link
-              to="/register"
-              className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
-            >
-              Register
-            </Link>
-          </nav>
-        </div>
-      </header> */}
-
-      <Header />
+    <>
       {/* Page Content */}
-      <main className='pt-24 pb-16'>
+      <main className="pt-26 pb-16">
         {/* Hero Section */}
-        <section className='bg-primary/10 py-16'>
-          <div className='container mx-auto px-4'>
-            <div className='max-w-3xl mx-auto text-center'>
-              <h1 className='text-4xl md:text-5xl font-bold mb-6'>
+        <section className="bg-primary/10 py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-3xl mx-auto text-center">
+              <h1 className="font-headline-lg text-primary font-bold mb-6">
                 Frequently Asked Questions
               </h1>
-              <p className='text-xl text-gray-600'>
+              <p className="font-body-lg text-on-surface-variant">
                 Find answers to common questions about our services, German
                 immigration pathways, and more
               </p>
@@ -319,37 +275,39 @@ function FAQ() {
         </section>
 
         {/* FAQ Content */}
-        <section className='py-16'>
-          <div className='container mx-auto px-4'>
+        <section className="py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Search Bar */}
-            <div className='max-w-2xl mx-auto mb-12'>
-              <div className='relative'>
+            <div className="max-w-2xl mx-auto mb-12">
+              <div className="relative">
                 <input
-                  type='text'
-                  placeholder='Search for questions...'
-                  className='w-full px-4 py-3 pl-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
+                  type="text"
+                  placeholder="Search for questions..."
+                  className="w-full px-4 py-3 pl-12 border border-outline-variant/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <Search className='absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400' />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-on-surface-variant" />
               </div>
             </div>
 
-            <div className='flex flex-col lg:flex-row gap-8'>
+            <div className="flex flex-col lg:flex-row gap-8">
               {/* Categories */}
               {!searchQuery && (
-                <div className='lg:w-1/4'>
-                  <div className='bg-white rounded-lg shadow-md p-4'>
-                    <h3 className='text-lg font-bold mb-4'>Categories</h3>
-                    <ul className='space-y-2'>
+                <div className="lg:w-1/4">
+                  <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/30 p-4">
+                    <h3 className="font-headline-sm text-on-surface font-bold mb-4">
+                      Categories
+                    </h3>
+                    <ul className="space-y-2">
                       {categories.map((category) => (
                         <li key={category.id}>
                           <button
-                            onClick={() => setActiveCategory(category.id)}
-                            className={`w-full text-left px-3 py-2 rounded-md ${
+                            onClick={() => handleCategoryChange(category.id)}
+                            className={`w-full text-left px-3 py-2 rounded-xl font-label-caps text-sm font-bold transition-all ${
                               activeCategory === category.id
-                                ? 'bg-primary text-white'
-                                : 'hover:bg-gray-100'
+                                ? 'bg-primary text-on-primary'
+                                : 'text-on-surface-variant hover:bg-surface'
                             }`}
                           >
                             {category.name}
@@ -363,53 +321,61 @@ function FAQ() {
 
               {/* FAQ List */}
               <div className={searchQuery ? 'w-full' : 'lg:w-3/4'}>
-                <div className='bg-white rounded-lg shadow-md p-6'>
-                  <h2 className='text-2xl font-bold mb-6'>
+                <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/30 p-6">
+                  <h2 className="font-headline-md text-on-surface font-bold mb-6">
                     {searchQuery
                       ? 'Search Results'
                       : categories.find((c) => c.id === activeCategory)?.name}
                   </h2>
 
                   {filteredFAQs.length === 0 ? (
-                    <div className='text-center py-8'>
-                      <p className='text-gray-500 mb-2'>
+                    <div className="text-center py-8">
+                      <p className="text-on-surface-variant mb-2">
                         No questions found matching your search.
                       </p>
-                      <p className='text-gray-500'>
+                      <p className="text-on-surface-variant">
                         Try using different keywords or browse by category.
                       </p>
                     </div>
                   ) : (
-                    <div className='space-y-4'>
-                      {filteredFAQs.map((faq, index) => (
-                        <motion.div
-                          key={index}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.3, delay: index * 0.05 }}
-                          className='border rounded-lg overflow-hidden'
-                        >
-                          <button
-                            className='w-full flex justify-between items-center p-4 text-left font-medium hover:bg-gray-50'
-                            onClick={() =>
-                              toggleQuestion(`${activeCategory}-${index}`)
-                            }
+                    <div className="space-y-4">
+                      {filteredFAQs.map((faq) => {
+                        const faqId = `${faq._category}-${faq._index}`;
+                        return (
+                          <motion.div
+                            key={faqId}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{
+                              duration: 0.3,
+                              delay: faq._index * 0.05,
+                            }}
+                            className="border border-outline-variant/30 rounded-xl overflow-hidden"
                           >
-                            <span>{faq.question}</span>
-                            {openQuestions[`${activeCategory}-${index}`] ? (
-                              <ChevronUp className='h-5 w-5 text-primary flex-shrink-0' />
-                            ) : (
-                              <ChevronDown className='h-5 w-5 text-gray-400 flex-shrink-0' />
-                            )}
-                          </button>
+                            <button
+                              className="w-full flex justify-between items-center p-4 text-left font-medium hover:bg-surface transition-colors"
+                              onClick={() => toggleQuestion(faqId)}
+                            >
+                              <span className="text-on-surface">
+                                {faq.question}
+                              </span>
+                              {openQuestions[faqId] ? (
+                                <ChevronUp className="h-5 w-5 text-primary flex-shrink-0" />
+                              ) : (
+                                <ChevronDown className="h-5 w-5 text-on-surface-variant flex-shrink-0" />
+                              )}
+                            </button>
 
-                          {openQuestions[`${activeCategory}-${index}`] && (
-                            <div className='p-4 bg-gray-50 border-t'>
-                              <p className='text-gray-600'>{faq.answer}</p>
-                            </div>
-                          )}
-                        </motion.div>
-                      ))}
+                            {openQuestions[faqId] && (
+                              <div className="p-4 bg-surface border-t border-outline-variant/30">
+                                <p className="font-body-md text-on-surface-variant">
+                                  {faq.answer}
+                                </p>
+                              </div>
+                            )}
+                          </motion.div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -419,23 +385,25 @@ function FAQ() {
         </section>
 
         {/* CTA Section */}
-        <section className='bg-primary/10 py-12'>
-          <div className='container mx-auto px-4 text-center'>
-            <h2 className='text-2xl font-bold mb-4'>Still have questions?</h2>
-            <p className='text-gray-600 mb-6 max-w-2xl mx-auto'>
+        <section className="bg-primary/10 py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="font-headline-lg text-on-surface font-bold mb-4">
+              Still have questions?
+            </h2>
+            <p className="font-body-md text-on-surface-variant mb-6 max-w-2xl mx-auto">
               If you couldn't find the answer you were looking for, our team is
               here to help. Contact us for personalized assistance.
             </p>
-            <div className='flex flex-col sm:flex-row gap-4 justify-center'>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                to='/contact'
-                className='bg-primary text-white px-6 py-3 rounded-md hover:bg-primary/90 transition-colors'
+                to="/contact"
+                className="px-6 py-3 bg-primary text-on-primary rounded-full font-label-caps font-bold uppercase tracking-widest text-sm hover:bg-primary-container transition-all"
               >
                 Contact Us
               </Link>
               <a
-                href='tel:08038865466'
-                className='border border-primary text-primary px-6 py-3 rounded-md hover:bg-primary/10 transition-colors'
+                href="tel:08038865466"
+                className="px-6 py-3 border border-primary text-primary rounded-full font-label-caps font-bold uppercase tracking-widest text-sm hover:bg-primary/10 transition-all"
               >
                 Call Us
               </a>
@@ -443,10 +411,7 @@ function FAQ() {
           </div>
         </section>
       </main>
-
-      {/* Footer */}
-      <Footer2 />
-    </div>
+    </>
   );
 }
 

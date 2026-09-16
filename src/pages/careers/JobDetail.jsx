@@ -20,8 +20,9 @@ import {
 } from 'react-bootstrap';
 
 // Import navigation components
-import Navbar from '../../components/Navbar';
+import Header from '../../components/Header';
 import Footer from '../../components/Footer';
+import TopBar from '../../components/TopBar';
 
 const JobDetail = () => {
   const { jobId } = useParams();
@@ -183,8 +184,9 @@ const JobDetail = () => {
   if (loading) {
     return (
       <>
-        <Navbar />
-        <Container className='py-5 text-center' style={{ minHeight: '60vh' }}>
+        <TopBar />
+        <Header />
+        <Container className='py-12 sm:py-16 text-center' style={{ minHeight: '60vh' }}>
           <Spinner animation='border' role='status'>
             <span className='visually-hidden'>Loading...</span>
           </Spinner>
@@ -197,8 +199,9 @@ const JobDetail = () => {
   if (error || !job) {
     return (
       <>
-        <Navbar />
-        <Container className='py-5' style={{ minHeight: '60vh' }}>
+        <TopBar />
+        <Header />
+        <Container className='py-12 sm:py-16' style={{ minHeight: '60vh' }}>
           <Alert variant='danger'>{error || 'Job not found'}</Alert>
           <Link to='/careers/jobs' className='btn btn-link'>
             &larr; Back to Job Listings
@@ -214,15 +217,16 @@ const JobDetail = () => {
 
   return (
     <>
-      <Navbar />
-      <Container className='py-5'>
+      <TopBar />
+      <Header />
+      <Container className='py-12 sm:py-16'>
         <div className='mb-4'>
           <Link to='/careers/jobs' className='btn btn-link ps-0'>
             &larr; Back to Job Listings
           </Link>
         </div>
 
-        <Card className='mb-5'>
+        <Card className='mb-5 bg-surface-container-lowest rounded-2xl shadow-md border border-outline-variant/30'>
           <Card.Body>
             <Row className='mb-4'>
               <Col>
@@ -232,38 +236,38 @@ const JobDetail = () => {
                   </Badge>
                 )}
                 <h1>{job.title}</h1>
-                <h4 className='text-muted'>{job.company}</h4>
+                <h4 className='text-on-surface-variant'>{job.company}</h4>
               </Col>
 
               <Col xs='auto' className='text-end'>
-                <div className='text-muted mb-2'>
+                <div className='text-on-surface-variant mb-2'>
                   Posted {new Date(job.created_at).toLocaleDateString()}
                 </div>
-                <div className='text-muted'>
+                <div className='text-on-surface-variant'>
                   {job.views} views • {job.applications_count} applications
                 </div>
               </Col>
             </Row>
 
             <div className='mb-4'>
-              <Badge bg='light' text='dark' className='me-2 p-2'>
+              <Badge bg='light' text='dark' className='me-2 p-2 bg-surface-container-lowest text-on-surface-variant border border-outline-variant/30'>
                 {job.location.city}, {job.location.country}
                 {job.location.remote && ' • Remote'}
                 {job.location.hybrid && ' • Hybrid'}
               </Badge>
-              <Badge bg='light' text='dark' className='me-2 p-2'>
+              <Badge bg='light' text='dark' className='me-2 p-2 bg-surface-container-lowest text-on-surface-variant border border-outline-variant/30'>
                 {job.employment_type}
               </Badge>
-              <Badge bg='light' text='dark' className='me-2 p-2'>
+              <Badge bg='light' text='dark' className='me-2 p-2 bg-surface-container-lowest text-on-surface-variant border border-outline-variant/30'>
                 {job.experience_level}
               </Badge>
-              <Badge bg='light' text='dark' className='me-2 p-2'>
+              <Badge bg='light' text='dark' className='me-2 p-2 bg-surface-container-lowest text-on-surface-variant border border-outline-variant/30'>
                 {job.category}
               </Badge>
             </div>
 
             {(job.salary_min || job.salary_max) && (
-              <Card className='bg-light mb-4'>
+              <Card className='bg-surface-container-lowest mb-4 rounded-2xl shadow-md border border-outline-variant/30'>
                 <Card.Body>
                   <h5>Salary Range</h5>
                   <h4>
@@ -371,38 +375,40 @@ const JobDetail = () => {
                     <Alert variant='danger'>
                       The application deadline for this position has passed.
                     </Alert>
-                  ) : (
-                    <>
-                      {!showApplicationForm ? (
-                        <div className='d-flex gap-3'>
-                          <Button
-                            variant='primary'
-                            size='lg'
-                            onClick={() => {
-                              setShowApplicationForm(true);
-                              window.scrollTo({
-                                top: document.body.scrollHeight,
-                                behavior: 'smooth',
-                              });
-                            }}
-                          >
-                            Apply Now
-                          </Button>
-
-                          {job.application_url && (
-                            <Button
-                              variant='outline-primary'
-                              size='lg'
-                              href={job.application_url}
-                              target='_blank'
-                              rel='noopener noreferrer'
-                            >
-                              Apply on Company Website
-                            </Button>
-                          )}
-                        </div>
                       ) : (
-                        <Card>
+                        <>
+                          {!showApplicationForm ? (
+                            <div className='d-flex gap-3'>
+                              <Button
+                                variant='primary'
+                                size='lg'
+                                className='rounded-full'
+                                onClick={() => {
+                                  setShowApplicationForm(true);
+                                  window.scrollTo({
+                                    top: document.body.scrollHeight,
+                                    behavior: 'smooth',
+                                  });
+                                }}
+                              >
+                                Apply Now
+                              </Button>
+
+                              {job.application_url && (
+                                <Button
+                                  variant='outline-primary'
+                                  size='lg'
+                                  className='rounded-full'
+                                  href={job.application_url}
+                                  target='_blank'
+                                  rel='noopener noreferrer'
+                                >
+                                  Apply on Company Website
+                                </Button>
+                              )}
+                            </div>
+                          ) : (
+                            <Card className='bg-surface-container-lowest rounded-2xl shadow-md border border-outline-variant/30'>
                           <Card.Body>
                             <h3 className='mb-4'>Apply for this position</h3>
 
@@ -479,7 +485,7 @@ const JobDetail = () => {
                                   onChange={handleResumeChange}
                                   required
                                 />
-                                <Form.Text className='text-muted'>
+                                <Form.Text className='text-on-surface-variant'>
                                   Accepted formats: PDF, DOC, DOCX (Max 5MB)
                                 </Form.Text>
                               </Form.Group>
@@ -593,7 +599,7 @@ const JobDetail = () => {
             <Row>
               {job.similar_jobs.map((similarJob) => (
                 <Col md={4} key={similarJob._id} className='mb-4'>
-                  <Card className='h-100'>
+                  <Card className='h-100 bg-surface-container-lowest rounded-2xl shadow-md border border-outline-variant/30'>
                     <Card.Body>
                       <Card.Title>
                         <Link
@@ -603,17 +609,17 @@ const JobDetail = () => {
                           {similarJob.title}
                         </Link>
                       </Card.Title>
-                      <Card.Subtitle className='mb-2 text-muted'>
+                      <Card.Subtitle className='mb-2 text-on-surface-variant'>
                         {similarJob.company}
                       </Card.Subtitle>
                       <div className='mb-3'>
-                        <Badge bg='light' text='dark' className='me-2'>
-                          {similarJob.location.city},{' '}
-                          {similarJob.location.country}
-                        </Badge>
-                        <Badge bg='light' text='dark'>
-                          {similarJob.employment_type}
-                        </Badge>
+                      <Badge bg='light' text='dark' className='me-2 bg-surface-container-lowest text-on-surface-variant border border-outline-variant/30'>
+                            {similarJob.location.city},{' '}
+                            {similarJob.location.country}
+                          </Badge>
+                          <Badge bg='light' text='dark' className='bg-surface-container-lowest text-on-surface-variant border border-outline-variant/30'>
+                            {similarJob.employment_type}
+                          </Badge>
                       </div>
                       <Link
                         to={`/careers/jobs/${similarJob._id}`}

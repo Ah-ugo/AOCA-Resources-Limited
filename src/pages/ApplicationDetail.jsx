@@ -5,37 +5,38 @@ import {
   withdrawApplication,
 } from "../services/career-service";
 import {
-  FaBriefcase,
-  FaMapMarkerAlt,
-  FaCalendarAlt,
-  FaSpinner,
-  FaCheckCircle,
-  FaTimesCircle,
-  FaHourglassHalf,
-  FaFileAlt,
-  FaTrashAlt,
-  FaExclamationCircle,
-  FaArrowLeft,
-  FaBuilding,
-  FaEnvelope,
-  FaPhone,
-  FaLinkedin,
-  FaGlobe,
-  FaUser,
-  FaComments,
-} from "react-icons/fa";
+  Briefcase,
+  MapPin,
+  Calendar,
+  Loader2,
+  CheckCircle2,
+  XCircle,
+  Hourglass,
+  FileText,
+  Trash2,
+  AlertCircle,
+  ArrowLeft,
+  Building2,
+  Mail,
+  Phone,
+  Linkedin,
+  Globe,
+  User,
+  MessageSquare,
+} from "lucide-react";
+import PageLayout from "../components/PageLayout";
 
 const statusIcons = {
-  applied: <FaHourglassHalf className="text-yellow-500" />,
-  reviewing: <FaFileAlt className="text-blue-500" />,
-  interview: <FaCalendarAlt className="text-purple-500" />,
-  accepted: <FaCheckCircle className="text-green-500" />,
-  rejected: <FaTimesCircle className="text-red-500" />,
+  applied: <Hourglass className="text-yellow-600" />,
+  reviewing: <FileText className="text-primary" />,
+  interview: <Calendar className="text-purple-600" />,
+  accepted: <CheckCircle2 className="text-green-600" />,
+  rejected: <XCircle className="text-red-500" />,
 };
 
 const statusColors = {
   applied: "bg-yellow-100 text-yellow-800",
-  reviewing: "bg-blue-100 text-blue-800",
+  reviewing: "bg-primary/10 text-primary",
   interview: "bg-purple-100 text-purple-800",
   accepted: "bg-green-100 text-green-800",
   rejected: "bg-red-100 text-red-800",
@@ -90,73 +91,75 @@ const ApplicationDetail = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-5xl mx-auto">
+      <PageLayout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center py-12">
-            <FaSpinner className="animate-spin text-green-600 text-4xl" />
-            <span className="ml-2 text-xl font-medium text-gray-700">
+            <Loader2 className="animate-spin text-primary text-4xl" />
+            <span className="ml-2 font-body-lg text-on-surface">
               Loading application details...
             </span>
           </div>
         </div>
-      </div>
+      </PageLayout>
     );
   }
 
   if (error || !application) {
     return (
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-5xl mx-auto text-center">
-          <FaExclamationCircle className="text-red-500 text-5xl mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-4">Application Not Found</h2>
-          <p className="text-gray-600 mb-8">
-            {error || "The application you are looking for does not exist."}
-          </p>
-          <Link
-            to="/applications"
-            className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-md transition duration-300"
-          >
-            Back to Applications
-          </Link>
+      <PageLayout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-md mx-auto">
+            <AlertCircle className="text-red-500 text-5xl mx-auto mb-4" />
+            <h2 className="font-headline-lg text-on-surface font-bold mb-4">Application Not Found</h2>
+            <p className="font-body-md text-on-surface-variant mb-8">
+              {error || "The application you are looking for does not exist."}
+            </p>
+            <Link
+              to="/applications"
+              className="inline-flex items-center px-6 py-3 bg-primary text-on-primary rounded-full font-label-caps font-bold uppercase tracking-widest text-sm hover:bg-primary-container transition-all"
+            >
+              Back to Applications
+            </Link>
+          </div>
         </div>
-      </div>
+      </PageLayout>
     );
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-5xl mx-auto">
+    <PageLayout title="Application Details" subtitle="View and manage your job application">
+      <div className="bg-surface min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Back Button */}
           <Link
             to="/applications"
-            className="inline-flex items-center text-green-600 hover:text-green-800 mb-6"
+            className="inline-flex items-center text-primary hover:text-primary-container mb-6"
           >
-            <FaArrowLeft className="mr-2" />
+            <ArrowLeft className="mr-2" />
             Back to Applications
           </Link>
 
           {/* Application Header */}
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <div className="bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/30 p-6 mb-8">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
-                <h1 className="text-3xl font-bold mb-2 text-gray-900">
+                <h1 className="font-headline-lg text-on-surface font-bold mb-2">
                   {application.job?.title || "Job Application"}
                 </h1>
-                <p className="text-xl font-medium text-green-600">
+                <p className="font-headline-md text-primary">
                   {application.job?.company || "Company"}
                 </p>
               </div>
 
               <div className="flex flex-col items-end">
                 <span
-                  className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
+                  className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-label-caps font-medium ${
                     statusColors[application.status] ||
-                    "bg-gray-100 text-gray-800"
+                    "bg-surface text-on-surface"
                   }`}
                 >
                   {statusIcons[application.status] || (
-                    <FaHourglassHalf className="mr-2" />
+                    <Hourglass className="mr-2" />
                   )}
                   <span className="ml-1 capitalize">{application.status}</span>
                 </span>
@@ -168,9 +171,9 @@ const ApplicationDetail = () => {
                     className="mt-3 inline-flex items-center text-sm text-red-600 hover:text-red-800"
                   >
                     {isWithdrawing ? (
-                      <FaSpinner className="animate-spin mr-1" />
+                      <Loader2 className="animate-spin mr-1" />
                     ) : (
-                      <FaTrashAlt className="mr-1" />
+                      <Trash2 className="mr-1" />
                     )}
                     Withdraw Application
                   </button>
@@ -184,13 +187,13 @@ const ApplicationDetail = () => {
             {/* Main Content */}
             <div className="md:col-span-2 space-y-8">
               {/* Application Timeline */}
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-xl font-semibold mb-6 text-gray-800">
+              <div className="bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/30 p-6">
+                <h2 className="font-headline-md text-on-surface font-bold mb-6">
                   Application Timeline
                 </h2>
 
                 <div className="relative">
-                  <div className="absolute left-5 top-0 h-full w-0.5 bg-gray-200"></div>
+                  <div className="absolute left-5 top-0 h-full w-0.5 bg-outline-variant/30"></div>
 
                   <div className="relative z-10 mb-8">
                     <div className="flex items-center">
@@ -200,32 +203,32 @@ const ApplicationDetail = () => {
                           application.status === "reviewing" ||
                           application.status === "interview" ||
                           application.status === "accepted"
-                            ? "bg-green-100"
-                            : "bg-gray-100"
+                            ? "bg-primary/10"
+                            : "bg-surface"
                         }`}
                       >
-                        <FaFileAlt
+                        <FileText
                           className={
                             application.status === "applied" ||
                             application.status === "reviewing" ||
                             application.status === "interview" ||
                             application.status === "accepted"
-                              ? "text-green-600"
-                              : "text-gray-400"
+                              ? "text-primary"
+                              : "text-on-surface-variant"
                           }
                         />
                       </div>
                       <div className="ml-4">
-                        <h3 className="text-lg font-medium text-gray-900">
+                        <h3 className="font-headline-sm text-on-surface font-bold">
                           Application Submitted
                         </h3>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-on-surface-variant">
                           {formatDate(application.created_at)}
                         </p>
                       </div>
                     </div>
                     <div className="ml-10 mt-2">
-                      <p className="text-gray-600">
+                      <p className="font-body-md text-on-surface-variant">
                         Your application has been submitted successfully.
                       </p>
                     </div>
@@ -238,25 +241,25 @@ const ApplicationDetail = () => {
                           application.status === "reviewing" ||
                           application.status === "interview" ||
                           application.status === "accepted"
-                            ? "bg-blue-100"
-                            : "bg-gray-100"
+                            ? "bg-primary/10"
+                            : "bg-surface"
                         }`}
                       >
-                        <FaFileAlt
+                        <FileText
                           className={
                             application.status === "reviewing" ||
                             application.status === "interview" ||
                             application.status === "accepted"
-                              ? "text-blue-600"
-                              : "text-gray-400"
+                              ? "text-primary"
+                              : "text-on-surface-variant"
                           }
                         />
                       </div>
                       <div className="ml-4">
-                        <h3 className="text-lg font-medium text-gray-900">
+                        <h3 className="font-headline-sm text-on-surface font-bold">
                           Under Review
                         </h3>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-on-surface-variant">
                           {application.status === "reviewing" ||
                           application.status === "interview" ||
                           application.status === "accepted"
@@ -266,7 +269,7 @@ const ApplicationDetail = () => {
                       </div>
                     </div>
                     <div className="ml-10 mt-2">
-                      <p className="text-gray-600">
+                      <p className="font-body-md text-on-surface-variant">
                         {application.status === "reviewing" ||
                         application.status === "interview" ||
                         application.status === "accepted"
@@ -282,24 +285,24 @@ const ApplicationDetail = () => {
                         className={`flex items-center justify-center w-10 h-10 rounded-full ${
                           application.status === "interview" ||
                           application.status === "accepted"
-                            ? "bg-purple-100"
-                            : "bg-gray-100"
+                            ? "bg-primary/10"
+                            : "bg-surface"
                         }`}
                       >
-                        <FaCalendarAlt
+                        <Calendar
                           className={
                             application.status === "interview" ||
                             application.status === "accepted"
-                              ? "text-purple-600"
-                              : "text-gray-400"
+                              ? "text-primary"
+                              : "text-on-surface-variant"
                           }
                         />
                       </div>
                       <div className="ml-4">
-                        <h3 className="text-lg font-medium text-gray-900">
+                        <h3 className="font-headline-sm text-on-surface font-bold">
                           Interview
                         </h3>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-on-surface-variant">
                           {application.status === "interview" ||
                           application.status === "accepted"
                             ? formatDate(application.updated_at)
@@ -308,7 +311,7 @@ const ApplicationDetail = () => {
                       </div>
                     </div>
                     <div className="ml-10 mt-2">
-                      <p className="text-gray-600">
+                      <p className="font-body-md text-on-surface-variant">
                         {application.status === "interview"
                           ? "You have been selected for an interview. Check your email for details."
                           : application.status === "accepted"
@@ -326,22 +329,22 @@ const ApplicationDetail = () => {
                             ? "bg-green-100"
                             : application.status === "rejected"
                             ? "bg-red-100"
-                            : "bg-gray-100"
+                            : "bg-surface"
                         }`}
                       >
                         {application.status === "accepted" ? (
-                          <FaCheckCircle className="text-green-600" />
+                          <CheckCircle2 className="text-green-600" />
                         ) : application.status === "rejected" ? (
-                          <FaTimesCircle className="text-red-600" />
+                          <XCircle className="text-red-600" />
                         ) : (
-                          <FaCheckCircle className="text-gray-400" />
+                          <CheckCircle2 className="text-on-surface-variant" />
                         )}
                       </div>
                       <div className="ml-4">
-                        <h3 className="text-lg font-medium text-gray-900">
+                        <h3 className="font-headline-sm text-on-surface font-bold">
                           Decision
                         </h3>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-on-surface-variant">
                           {application.status === "accepted" ||
                           application.status === "rejected"
                             ? formatDate(application.updated_at)
@@ -350,7 +353,7 @@ const ApplicationDetail = () => {
                       </div>
                     </div>
                     <div className="ml-10 mt-2">
-                      <p className="text-gray-600">
+                      <p className="font-body-md text-on-surface-variant">
                         {application.status === "accepted"
                           ? "Congratulations! Your application has been accepted."
                           : application.status === "rejected"
@@ -363,26 +366,26 @@ const ApplicationDetail = () => {
               </div>
 
               {/* Application Details */}
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-xl font-semibold mb-6 text-gray-800">
+              <div className="bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/30 p-6">
+                <h2 className="font-headline-md text-on-surface font-bold mb-6">
                   Application Details
                 </h2>
 
                 <div className="space-y-6">
                   {application.cover_letter && (
                     <div>
-                      <h3 className="text-lg font-medium text-gray-800 mb-2">
+                      <h3 className="font-headline-sm text-on-surface font-bold mb-2">
                         Cover Letter
                       </h3>
-                      <div className="bg-gray-50 p-4 rounded-md text-gray-700">
-                        <p>{application.cover_letter}</p>
+                      <div className="bg-surface p-4 rounded-lg border border-outline-variant/30">
+                        <p className="font-body-md text-on-surface-variant">{application.cover_letter}</p>
                       </div>
                     </div>
                   )}
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <h3 className="text-lg font-medium text-gray-800 mb-2">
+                      <h3 className="font-headline-sm text-on-surface font-bold mb-2">
                         Resume
                       </h3>
                       {application.resume_url ? (
@@ -390,36 +393,36 @@ const ApplicationDetail = () => {
                           href={application.resume_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center bg-green-50 text-green-700 hover:bg-green-100 px-4 py-2 rounded-md transition duration-300"
+                          className="inline-flex items-center bg-primary/5 text-primary hover:bg-primary/10 px-4 py-2 rounded-lg transition duration-300"
                         >
-                          <FaFileAlt className="mr-2" />
+                          <FileText className="mr-2" />
                           View Resume
                         </a>
                       ) : (
-                        <p className="text-gray-500">No resume attached</p>
+                        <p className="text-on-surface-variant">No resume attached</p>
                       )}
                     </div>
 
                     <div>
-                      <h3 className="text-lg font-medium text-gray-800 mb-2">
+                      <h3 className="font-headline-sm text-on-surface font-bold mb-2">
                         Contact Information
                       </h3>
                       <div className="space-y-2">
-                        <div className="flex items-center">
-                          <FaPhone className="text-gray-500 mr-2" />
-                          <span className="text-gray-700">
+                        <div className="flex items-center gap-2">
+                          <Phone className="text-primary" />
+                          <span className="font-body-md text-on-surface-variant">
                             {application.phone || "Not provided"}
                           </span>
                         </div>
 
                         {application.linkedin_url && (
-                          <div className="flex items-center">
-                            <FaLinkedin className="text-gray-500 mr-2" />
+                          <div className="flex items-center gap-2">
+                            <Linkedin className="text-primary" />
                             <a
                               href={application.linkedin_url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-green-600 hover:text-green-800"
+                              className="text-primary hover:text-primary-container"
                             >
                               LinkedIn Profile
                             </a>
@@ -427,13 +430,13 @@ const ApplicationDetail = () => {
                         )}
 
                         {application.portfolio_url && (
-                          <div className="flex items-center">
-                            <FaGlobe className="text-gray-500 mr-2" />
+                          <div className="flex items-center gap-2">
+                            <Globe className="text-primary" />
                             <a
                               href={application.portfolio_url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-green-600 hover:text-green-800"
+                              className="text-primary hover:text-primary-container"
                             >
                               Portfolio Website
                             </a>
@@ -445,39 +448,39 @@ const ApplicationDetail = () => {
 
                   {application.additional_info && (
                     <div>
-                      <h3 className="text-lg font-medium text-gray-800 mb-2">
+                      <h3 className="font-headline-sm text-on-surface font-bold mb-2">
                         Additional Information
                       </h3>
-                      <div className="bg-gray-50 p-4 rounded-md text-gray-700">
-                        <p>{application.additional_info}</p>
+                      <div className="bg-surface p-4 rounded-lg border border-outline-variant/30">
+                        <p className="font-body-md text-on-surface-variant">{application.additional_info}</p>
                       </div>
                     </div>
                   )}
 
                   {application.referral && (
                     <div>
-                      <h3 className="text-lg font-medium text-gray-800 mb-2">
+                      <h3 className="font-headline-sm text-on-surface font-bold mb-2">
                         Referral
                       </h3>
-                      <p className="text-gray-700">{application.referral}</p>
+                      <p className="font-body-md text-on-surface-variant">{application.referral}</p>
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Feedback Section (if any) */}
+              {/* Feedback Section */}
               {application.feedback && (
-                <div className="bg-white rounded-lg shadow-md p-6">
-                  <h2 className="text-xl font-semibold mb-4 text-gray-800">
+                <div className="bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/30 p-6">
+                  <h2 className="font-headline-md text-on-surface font-bold mb-4">
                     Feedback
                   </h2>
-                  <div className="bg-gray-50 p-4 rounded-md">
-                    <div className="flex items-start">
-                      <FaComments className="text-green-600 mt-1 mr-3" />
+                  <div className="bg-surface p-4 rounded-lg border border-outline-variant/30">
+                    <div className="flex items-start gap-3">
+                      <MessageSquare className="text-primary mt-1" />
                       <div>
-                        <p className="text-gray-700">{application.feedback}</p>
+                        <p className="font-body-md text-on-surface-variant">{application.feedback}</p>
                         {application.feedback_date && (
-                          <p className="text-sm text-gray-500 mt-2">
+                          <p className="text-sm text-on-surface-variant mt-2">
                             Received on {formatDate(application.feedback_date)}
                           </p>
                         )}
@@ -491,32 +494,28 @@ const ApplicationDetail = () => {
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Job Details */}
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-semibold mb-4 text-gray-800">
+              <div className="bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/30 p-6">
+                <h3 className="font-headline-sm text-on-surface font-bold mb-4">
                   Job Details
                 </h3>
 
                 {application.job && (
                   <div className="space-y-4">
-                    <div className="flex items-start">
-                      <FaBriefcase className="text-green-500 mt-1 mr-3" />
+                    <div className="flex items-start gap-3">
+                      <Briefcase className="text-primary mt-1" />
                       <div>
-                        <p className="text-sm font-medium text-gray-700">
-                          Job Type
-                        </p>
-                        <p className="text-gray-600">
+                        <p className="text-sm text-on-surface-variant">Job Type</p>
+                        <p className="font-body-md text-on-surface">
                           {application.job.employment_type}
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-start">
-                      <FaMapMarkerAlt className="text-green-500 mt-1 mr-3" />
+                    <div className="flex items-start gap-3">
+                      <MapPin className="text-primary mt-1" />
                       <div>
-                        <p className="text-sm font-medium text-gray-700">
-                          Location
-                        </p>
-                        <p className="text-gray-600">
+                        <p className="text-sm text-on-surface-variant">Location</p>
+                        <p className="font-body-md text-on-surface">
                           {application.job.location.city},{" "}
                           {application.job.location.country}
                           {application.job.location.remote && " (Remote)"}
@@ -525,13 +524,11 @@ const ApplicationDetail = () => {
                     </div>
 
                     {application.job.experience_level && (
-                      <div className="flex items-start">
-                        <FaUser className="text-green-500 mt-1 mr-3" />
+                      <div className="flex items-start gap-3">
+                        <User className="text-primary mt-1" />
                         <div>
-                          <p className="text-sm font-medium text-gray-700">
-                            Experience Level
-                          </p>
-                          <p className="text-gray-600">
+                          <p className="text-sm text-on-surface-variant">Experience Level</p>
+                          <p className="font-body-md text-on-surface">
                             {application.job.experience_level}
                           </p>
                         </div>
@@ -540,7 +537,7 @@ const ApplicationDetail = () => {
 
                     <Link
                       to={`/careers/${application.job._id}`}
-                      className="block text-center bg-white border border-green-600 text-green-600 hover:bg-green-50 font-medium py-2 px-4 rounded-md transition duration-300 mt-4"
+                      className="block text-center bg-surface-container-lowest border border-primary text-primary hover:bg-primary/5 font-medium py-2 px-4 rounded-lg transition duration-300 mt-4"
                     >
                       View Job Posting
                     </Link>
@@ -550,11 +547,11 @@ const ApplicationDetail = () => {
 
               {/* Company Info */}
               {application.job && (
-                <div className="bg-white rounded-lg shadow-md p-6">
-                  <h3 className="text-lg font-semibold mb-4 text-gray-800">
+                <div className="bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/30 p-6">
+                  <h3 className="font-headline-sm text-on-surface font-bold mb-4">
                     About {application.job.company}
                   </h3>
-                  <p className="text-gray-600 mb-4">
+                  <p className="font-body-md text-on-surface-variant mb-4">
                     {application.job.company_description ||
                       `${application.job.company} is a leading organization in the ${application.job.category} industry.`}
                   </p>
@@ -563,7 +560,7 @@ const ApplicationDetail = () => {
                       href={application.job.company_website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block text-center bg-white border border-green-600 text-green-600 hover:bg-green-50 font-medium py-2 px-4 rounded-md transition duration-300"
+                      className="block text-center bg-surface-container-lowest border border-primary text-primary hover:bg-primary/5 font-medium py-2 px-4 rounded-lg transition duration-300"
                     >
                       Visit Company Website
                     </a>
@@ -572,19 +569,19 @@ const ApplicationDetail = () => {
               )}
 
               {/* Need Help? */}
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-semibold mb-4 text-gray-800">
+              <div className="bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/30 p-6">
+                <h3 className="font-headline-sm text-on-surface font-bold mb-4">
                   Need Help?
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="font-body-md text-on-surface-variant mb-4">
                   If you have any questions about your application or need to
                   update your information, please contact our recruitment team.
                 </p>
                 <a
                   href="mailto:careers@example.com"
-                  className="inline-flex items-center text-green-600 hover:text-green-800"
+                  className="inline-flex items-center text-primary hover:text-primary-container"
                 >
-                  <FaEnvelope className="mr-2" />
+                  <Mail className="mr-2" />
                   careers@example.com
                 </a>
               </div>
@@ -592,7 +589,7 @@ const ApplicationDetail = () => {
           </div>
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 

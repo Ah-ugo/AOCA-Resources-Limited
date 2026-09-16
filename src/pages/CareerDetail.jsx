@@ -11,40 +11,36 @@ import {
   uploadResume,
 } from '../services/career-service';
 import {
-  FaBriefcase,
-  FaMapMarkerAlt,
-  FaBuilding,
-  FaCalendarAlt,
-  FaGraduationCap,
-  FaDollarSign,
-  FaClock,
-  FaUser,
-  FaFileAlt,
-  FaUpload,
-  FaLinkedin,
-  FaGlobe,
-  FaArrowLeft,
-  FaShareAlt,
-  FaExclamationCircle,
-  FaCheckCircle,
-  FaEnvelope,
-  FaPhone,
-  FaSpinner,
-  FaTimes,
-  FaFacebookF,
-  FaTwitter,
-  FaInstagram,
-  FaWhatsapp,
-  FaTelegramPlane,
-  FaLink,
-  FaChevronDown,
-  FaPaperPlane,
-  FaRegClock,
-  FaRegBuilding,
-  FaRegUser,
-  FaHeart,
-  FaRegHeart,
-} from 'react-icons/fa';
+  Briefcase,
+  MapPin,
+  Building2,
+  Calendar,
+  GraduationCap,
+  DollarSign,
+  Clock,
+  User,
+  FileText,
+  Upload,
+  Linkedin,
+  Globe,
+  ArrowLeft,
+  Share2,
+  AlertCircle,
+  CheckCircle2,
+  Mail,
+  Phone,
+  Loader2,
+  X,
+  Facebook,
+  Twitter,
+  Instagram,
+  MessageCircle,
+  Send,
+  Link as LinkIcon,
+  ChevronDown,
+  Heart,
+  Trash2,
+} from 'lucide-react';
 
 const CareerDetail = () => {
   const { id } = useParams();
@@ -60,7 +56,6 @@ const CareerDetail = () => {
   const [isSaved, setIsSaved] = useState(false);
   const [activeTab, setActiveTab] = useState('description');
 
-  // Alert states
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState('error');
@@ -78,12 +73,10 @@ const CareerDetail = () => {
     additional_info: '',
   });
 
-  // Mock user state - replace with your actual auth state
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     fetchJobDetails();
-    // Check if user is logged in
     const loggedInUser = localStorage.getItem('user');
     if (loggedInUser) {
       const userData = JSON.parse(loggedInUser);
@@ -273,7 +266,6 @@ const CareerDetail = () => {
       .join(' ');
   };
 
-  // Social Media Share Functions
   const getShareText = () => {
     return encodeURIComponent(
       `Check out this ${job?.title} position at ${job?.company}!`,
@@ -330,44 +322,48 @@ const CareerDetail = () => {
 
   if (loading) {
     return (
-      <div className='min-h-screen bg-luxury-cream flex items-center justify-center'>
-        <div className='text-center'>
-          <FaSpinner className='animate-spin text-emerald-600 text-5xl mx-auto mb-4' />
-          <p className='text-gray-500 font-light text-lg'>
-            Loading opportunity...
-          </p>
+      <main className="w-full bg-surface overflow-x-hidden">
+        <div className="min-h-screen bg-surface flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="h-12 w-12 text-primary animate-spin mx-auto mb-4" />
+            <p className="text-on-surface-variant font-body-lg">
+              Loading opportunity...
+            </p>
+          </div>
         </div>
-      </div>
+      </main>
     );
   }
 
   if (error && !job) {
     return (
-      <div className='min-h-screen bg-luxury-cream flex items-center justify-center'>
-        <div className='text-center max-w-md px-6'>
-          <div className='w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6'>
-            <FaExclamationCircle className='text-red-500 text-4xl' />
+      <main className="w-full bg-surface overflow-x-hidden">
+        <div className="min-h-screen bg-surface flex items-center justify-center">
+          <div className="text-center max-w-md px-6">
+            <div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <AlertCircle className="text-red-500 h-12 w-12" />
+            </div>
+            <h2 className="font-headline-lg text-on-surface font-bold mb-4">
+              Opportunity Not Found
+            </h2>
+            <p className="font-body-md text-on-surface-variant mb-8">{error}</p>
+            <Link
+              to="/careers"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-on-primary rounded-full font-label-caps font-bold uppercase tracking-widest text-sm hover:bg-primary-container transition-all shadow-lg shadow-primary/20"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Browse All Jobs
+            </Link>
           </div>
-          <h2 className='text-3xl font-serif font-bold text-luxury-black mb-4'>
-            Opportunity Not Found
-          </h2>
-          <p className='text-gray-500 font-light mb-8'>{error}</p>
-          <Link
-            to='/careers'
-            className='inline-flex items-center gap-2 px-8 py-4 bg-emerald-600 text-white rounded-full font-bold uppercase tracking-widest text-sm hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-500/20'
-          >
-            <FaArrowLeft className='text-sm' />
-            Browse All Jobs
-          </Link>
         </div>
-      </div>
+      </main>
     );
   }
 
   if (!job) return null;
 
   return (
-    <div className='min-h-screen bg-luxury-cream'>
+    <main className="w-full bg-surface overflow-x-hidden">
       {/* Alert Modal */}
       <AnimatePresence>
         {showAlert && (
@@ -375,65 +371,61 @@ const CareerDetail = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className='fixed inset-0 flex items-center justify-center z-50 px-4'
+            className="fixed inset-0 flex items-center justify-center z-50 px-4"
           >
             <div
-              className='absolute inset-0 bg-black/50 backdrop-blur-sm'
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
               onClick={() => setShowAlert(false)}
             />
             <motion.div
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
-              className={`relative bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 ${
+              className={`relative bg-surface-container-lowest rounded-3xl shadow-2xl max-w-md w-full p-8 ${
                 alertType === 'error'
                   ? 'border-l-8 border-red-500'
-                  : 'border-l-8 border-emerald-500'
+                  : 'border-l-8 border-primary'
               }`}
             >
               <button
                 onClick={() => setShowAlert(false)}
-                className='absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors'
+                className="absolute top-6 right-6 text-on-surface-variant hover:text-on-surface transition-colors"
               >
-                <FaTimes />
+                <X />
               </button>
-              <div className='flex items-start gap-4'>
+              <div className="flex items-start gap-4">
                 <div
                   className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ${
-                    alertType === 'error' ? 'bg-red-100' : 'bg-emerald-100'
+                    alertType === 'error' ? 'bg-red-50' : 'bg-primary/5'
                   }`}
                 >
                   {alertType === 'error' ? (
-                    <FaExclamationCircle className='text-red-500 text-2xl' />
+                    <AlertCircle className="text-red-500 text-2xl" />
                   ) : (
-                    <FaCheckCircle className='text-emerald-500 text-2xl' />
+                    <CheckCircle2 className="text-primary text-2xl" />
                   )}
                 </div>
-                <div className='flex-1'>
+                <div className="flex-1">
                   <h3
-                    className={`text-xl font-serif font-bold mb-2 ${
-                      alertType === 'error'
-                        ? 'text-red-800'
-                        : 'text-emerald-800'
+                    className={`font-headline-md text-on-surface font-bold mb-2 ${
+                      alertType === 'error' ? 'text-red-800' : 'text-primary'
                     }`}
                   >
                     {alertType === 'error' ? 'Error' : 'Success'}
                   </h3>
                   <p
-                    className={`text-base mb-6 ${
-                      alertType === 'error'
-                        ? 'text-red-600'
-                        : 'text-emerald-600'
+                    className={`font-body-md mb-6 ${
+                      alertType === 'error' ? 'text-red-600' : 'text-primary'
                     }`}
                   >
                     {alertMessage}
                   </p>
                   <button
                     onClick={() => setShowAlert(false)}
-                    className={`w-full py-3 rounded-full font-bold uppercase tracking-widest text-sm text-white transition-all ${
+                    className={`w-full py-3 rounded-full font-label-caps font-bold uppercase tracking-widest text-sm text-on-primary transition-all ${
                       alertType === 'error'
                         ? 'bg-red-500 hover:bg-red-600'
-                        : 'bg-emerald-600 hover:bg-emerald-500'
+                        : 'bg-primary hover:bg-primary-container'
                     }`}
                   >
                     Dismiss
@@ -452,22 +444,22 @@ const CareerDetail = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className='fixed inset-0 flex items-center justify-center z-50 px-4'
+            className="fixed inset-0 flex items-center justify-center z-50 px-4"
           >
-            <div className='absolute inset-0 bg-black/50 backdrop-blur-sm' />
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
             <motion.div
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
-              className='relative bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 text-center'
+              className="relative bg-surface-container-lowest rounded-3xl shadow-2xl max-w-md w-full p-8 text-center"
             >
-              <div className='w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6'>
-                <FaCheckCircle className='text-emerald-600 text-4xl' />
+              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <CheckCircle2 className="text-primary text-4xl" />
               </div>
-              <h3 className='text-2xl font-serif font-bold text-luxury-black mb-3'>
+              <h3 className="font-headline-md text-on-surface font-bold mb-3">
                 Application Submitted!
               </h3>
-              <p className='text-gray-500 font-light mb-8'>
+              <p className="font-body-md text-on-surface-variant mb-8">
                 Your application has been successfully submitted. We'll review
                 it and get back to you soon.
               </p>
@@ -476,7 +468,7 @@ const CareerDetail = () => {
                   setApplicationSuccess(false);
                   navigate('/careers');
                 }}
-                className='w-full py-4 bg-emerald-600 text-white rounded-full font-bold uppercase tracking-widest text-sm hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-500/20'
+                className="w-full py-4 bg-primary text-on-primary rounded-full font-label-caps font-bold uppercase tracking-widest text-sm hover:bg-primary-container transition-all shadow-lg shadow-primary/20"
               >
                 Continue Browsing
               </button>
@@ -485,106 +477,106 @@ const CareerDetail = () => {
         )}
       </AnimatePresence>
 
-      {/* Navigation Bar */}
-      <nav className='bg-white/80 backdrop-blur-md sticky top-0 z-40 border-b border-gray-100'>
-        <div className='container mx-auto px-6 py-4'>
-          <div className='flex items-center justify-between'>
+      {/* Sub Navigation Bar */}
+      <nav className="bg-surface-container-lowest/80 backdrop-blur-md sticky top-[88px] z-30 border-b border-outline-variant/30">
+        <div className="max-w-7xl pt-15 mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
             <Link
-              to='/careers'
-              className='flex items-center gap-3 text-gray-600 hover:text-emerald-600 transition-colors group'
+              to="/careers"
+              className="flex items-center gap-3 text-on-surface-variant hover:text-primary transition-colors group"
             >
-              <div className='w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center group-hover:bg-emerald-100 transition-colors'>
-                <FaArrowLeft className='text-emerald-600 text-sm' />
+              <div className="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                <ArrowLeft className="h-4 w-4 text-primary" />
               </div>
-              <span className='font-medium'>Back to Opportunities</span>
+              <span className="font-medium">Back to Opportunities</span>
             </Link>
-            <div className='flex items-center gap-3'>
+            <div className="flex items-center gap-3">
               <button
                 onClick={() => setIsSaved(!isSaved)}
-                className='w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors'
+                className="w-10 h-10 rounded-full bg-surface flex items-center justify-center hover:bg-surface-container transition-colors"
               >
                 {isSaved ? (
-                  <FaHeart className='text-red-500' />
+                  <Heart className="text-red-500" fill="currentColor" />
                 ) : (
-                  <FaRegHeart className='text-gray-600' />
+                  <Heart className="text-on-surface-variant" />
                 )}
               </button>
-              <div className='relative'>
+              <div className="relative">
                 <button
                   onClick={() => setShowShareMenu(!showShareMenu)}
-                  className='w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors'
+                  className="w-10 h-10 rounded-full bg-surface flex items-center justify-center hover:bg-surface-container transition-colors"
                 >
-                  <FaShareAlt className='text-gray-600' />
+                  <Share2 className="text-on-surface-variant" />
                 </button>
                 <AnimatePresence>
                   {showShareMenu && (
                     <>
                       <div
-                        className='fixed inset-0 z-40'
+                        className="fixed inset-0 z-40"
                         onClick={() => setShowShareMenu(false)}
                       />
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
-                        className='absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-xl z-50 border border-gray-100 overflow-hidden'
+                        className="absolute right-0 mt-2 w-72 bg-surface-container-lowest rounded-2xl shadow-xl z-50 border border-outline-variant/30 overflow-hidden"
                       >
-                        <div className='p-4'>
-                          <p className='text-sm font-medium text-gray-500 mb-3'>
+                        <div className="p-4">
+                          <p className="text-sm font-medium text-on-surface-variant mb-3">
                             Share this opportunity
                           </p>
-                          <div className='grid grid-cols-4 gap-2'>
+                          <div className="grid grid-cols-4 gap-2">
                             <button
                               onClick={shareOnFacebook}
-                              className='flex flex-col items-center p-3 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors'
+                              className="flex flex-col items-center p-3 bg-surface rounded-xl hover:bg-surface-container transition-colors"
                             >
-                              <FaFacebookF className='text-blue-600 text-xl mb-1' />
-                              <span className='text-xs text-gray-600'>
+                              <Facebook className="text-primary text-xl mb-1" />
+                              <span className="text-xs text-on-surface-variant">
                                 Facebook
                               </span>
                             </button>
                             <button
                               onClick={shareOnTwitter}
-                              className='flex flex-col items-center p-3 bg-sky-50 rounded-xl hover:bg-sky-100 transition-colors'
+                              className="flex flex-col items-center p-3 bg-surface rounded-xl hover:bg-surface-container transition-colors"
                             >
-                              <FaTwitter className='text-sky-400 text-xl mb-1' />
-                              <span className='text-xs text-gray-600'>
+                              <Twitter className="text-primary text-xl mb-1" />
+                              <span className="text-xs text-on-surface-variant">
                                 Twitter
                               </span>
                             </button>
                             <button
                               onClick={shareOnLinkedIn}
-                              className='flex flex-col items-center p-3 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors'
+                              className="flex flex-col items-center p-3 bg-surface rounded-xl hover:bg-surface-container transition-colors"
                             >
-                              <FaLinkedin className='text-blue-700 text-xl mb-1' />
-                              <span className='text-xs text-gray-600'>
+                              <Linkedin className="text-primary text-xl mb-1" />
+                              <span className="text-xs text-on-surface-variant">
                                 LinkedIn
                               </span>
                             </button>
                             <button
                               onClick={shareOnWhatsApp}
-                              className='flex flex-col items-center p-3 bg-green-50 rounded-xl hover:bg-green-100 transition-colors'
+                              className="flex flex-col items-center p-3 bg-surface rounded-xl hover:bg-surface-container transition-colors"
                             >
-                              <FaWhatsapp className='text-green-500 text-xl mb-1' />
-                              <span className='text-xs text-gray-600'>
+                              <MessageCircle className="text-primary text-xl mb-1" />
+                              <span className="text-xs text-on-surface-variant">
                                 WhatsApp
                               </span>
                             </button>
                             <button
                               onClick={shareOnTelegram}
-                              className='flex flex-col items-center p-3 bg-sky-50 rounded-xl hover:bg-sky-100 transition-colors'
+                              className="flex flex-col items-center p-3 bg-surface rounded-xl hover:bg-surface-container transition-colors"
                             >
-                              <FaTelegramPlane className='text-sky-500 text-xl mb-1' />
-                              <span className='text-xs text-gray-600'>
+                              <Send className="text-primary text-xl mb-1" />
+                              <span className="text-xs text-on-surface-variant">
                                 Telegram
                               </span>
                             </button>
                             <button
                               onClick={copyToClipboard}
-                              className='col-span-3 flex items-center justify-center gap-2 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors'
+                              className="col-span-3 flex items-center justify-center gap-2 p-3 bg-surface rounded-xl hover:bg-surface-container transition-colors"
                             >
-                              <FaLink className='text-gray-600' />
-                              <span className='text-sm text-gray-600'>
+                              <LinkIcon className="text-on-surface-variant" />
+                              <span className="text-sm text-on-surface-variant">
                                 Copy Link
                               </span>
                             </button>
@@ -600,105 +592,125 @@ const CareerDetail = () => {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className='relative pt-20 pb-32 bg-luxury-black text-white overflow-hidden'>
-        <div className='absolute inset-0 z-0'>
+      {/* Full-Screen Hero */}
+      <section className="relative h-screen min-h-[640px] flex items-end overflow-hidden">
+        <div className="absolute inset-0 z-0">
           <img
-            src='https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&q=80&w=2000'
-            alt='Career Hero'
-            className='w-full h-full object-cover opacity-20'
+            src="/study-group.jpg"
+            alt="Career opportunity"
+            className="w-full h-full object-cover"
           />
-          <div className='absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-luxury-black' />
+          <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/70 to-primary/20" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-transparent" />
         </div>
 
-        <div className='container mx-auto px-6 relative z-10'>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full pb-24 sm:pb-28">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            className='max-w-4xl'
+            transition={{ duration: 0.7 }}
+            className="max-w-3xl"
           >
-            <div className='flex flex-wrap gap-3 mb-6'>
-              <span className='px-4 py-2 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-widest'>
+            <div className="flex flex-wrap gap-2 mb-6">
+              <span className="px-3.5 py-1.5 rounded-full bg-white/15 backdrop-blur-md text-white text-[11px] font-label-caps font-bold uppercase tracking-wider border border-white/20">
                 {job.category || 'General'}
               </span>
-              <span className='px-4 py-2 rounded-full bg-white/10 text-white/80 text-xs font-bold uppercase tracking-widest'>
+              <span className="px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-white/80 text-[11px] font-label-caps font-bold uppercase tracking-wider border border-white/20">
                 {formatEmploymentType(job.employment_type)}
               </span>
               {job.location?.remote && (
-                <span className='px-4 py-2 rounded-full bg-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest'>
+                <span className="px-3.5 py-1.5 rounded-full bg-secondary-fixed/90 text-on-secondary-fixed text-[11px] font-label-caps font-bold uppercase tracking-wider">
                   Remote Available
                 </span>
               )}
             </div>
-            <h1 className='text-5xl md:text-7xl font-serif font-bold mb-6'>
+            <h1 className="font-display-hero text-4xl sm:text-6xl lg:text-7xl text-white font-bold mb-6 leading-none">
               {job.title}
             </h1>
-            <div className='flex flex-wrap items-center gap-6 text-white/60'>
-              <div className='flex items-center gap-2'>
-                <FaBuilding className='text-emerald-500' />
+            <div className="flex flex-wrap items-center gap-6 text-white/80 text-sm">
+              <div className="flex items-center gap-2">
+                <Building2 className="h-4 w-4 text-secondary-fixed" />
                 <span>{job.company}</span>
               </div>
-              <div className='flex items-center gap-2'>
-                <FaMapMarkerAlt className='text-emerald-500' />
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-secondary-fixed" />
                 <span>
                   {job.location?.city || 'Various'},{' '}
                   {job.location?.country || 'Nigeria'}
                 </span>
               </div>
-              <div className='flex items-center gap-2'>
-                <FaCalendarAlt className='text-emerald-500' />
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-secondary-fixed" />
                 <span>Posted {formatDate(job.created_at)}</span>
               </div>
             </div>
           </motion.div>
         </div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1, duration: 0.6 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-white/70"
+        >
+          <span className="font-label-caps text-[10px] uppercase tracking-widest">
+            Scroll
+          </span>
+          <ChevronDown className="h-5 w-5 animate-bounce" />
+        </motion.div>
       </section>
 
       {/* Main Content */}
-      <section className='py-20'>
-        <div className='container mx-auto px-6'>
-          <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
+      <section className="py-12 sm:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left Column - Main Content */}
-            <div className='lg:col-span-2 space-y-8'>
+            <div className="lg:col-span-2 space-y-8">
               {/* Quick Stats */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className='grid grid-cols-2 md:grid-cols-4 gap-4'
+                className="grid grid-cols-2 md:grid-cols-4 gap-4"
               >
-                <div className='bg-white rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow'>
-                  <div className='w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3'>
-                    <FaBriefcase className='text-emerald-600 text-xl' />
+                <div className="bg-surface-container-lowest rounded-2xl p-6 text-center shadow-sm border border-outline-variant/30">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Briefcase className="h-5 w-5 text-primary" />
                   </div>
-                  <p className='text-sm text-gray-500 mb-1'>Job Type</p>
-                  <p className='font-serif font-bold text-luxury-black'>
+                  <p className="text-xs text-on-surface-variant mb-1">
+                    Job Type
+                  </p>
+                  <p className="font-headline-sm text-on-surface font-bold">
                     {formatEmploymentType(job.employment_type)}
                   </p>
                 </div>
-                <div className='bg-white rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow'>
-                  <div className='w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3'>
-                    <FaRegUser className='text-emerald-600 text-xl' />
+                <div className="bg-surface-container-lowest rounded-2xl p-6 text-center shadow-sm border border-outline-variant/30">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <User className="h-5 w-5 text-primary" />
                   </div>
-                  <p className='text-sm text-gray-500 mb-1'>Experience</p>
-                  <p className='font-serif font-bold text-luxury-black'>
+                  <p className="text-xs text-on-surface-variant mb-1">
+                    Experience
+                  </p>
+                  <p className="font-headline-sm text-on-surface font-bold">
                     {job.experience_level || 'Mid'}
                   </p>
                 </div>
-                <div className='bg-white rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow'>
-                  <div className='w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3'>
-                    <FaDollarSign className='text-emerald-600 text-xl' />
+                <div className="bg-surface-container-lowest rounded-2xl p-6 text-center shadow-sm border border-outline-variant/30">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <DollarSign className="h-5 w-5 text-primary" />
                   </div>
-                  <p className='text-sm text-gray-500 mb-1'>Salary</p>
-                  <p className='font-serif font-bold text-luxury-black'>
+                  <p className="text-xs text-on-surface-variant mb-1">Salary</p>
+                  <p className="font-headline-sm text-on-surface font-bold">
                     {formatSalary()}
                   </p>
                 </div>
-                <div className='bg-white rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow'>
-                  <div className='w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3'>
-                    <FaRegClock className='text-emerald-600 text-xl' />
+                <div className="bg-surface-container-lowest rounded-2xl p-6 text-center shadow-sm border border-outline-variant/30">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Clock className="h-5 w-5 text-primary" />
                   </div>
-                  <p className='text-sm text-gray-500 mb-1'>Deadline</p>
-                  <p className='font-serif font-bold text-luxury-black'>
+                  <p className="text-xs text-on-surface-variant mb-1">
+                    Deadline
+                  </p>
+                  <p className="font-headline-sm text-on-surface font-bold">
                     {job.application_deadline
                       ? formatDate(job.application_deadline)
                       : 'Rolling'}
@@ -711,72 +723,72 @@ const CareerDetail = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className='bg-white rounded-3xl shadow-sm overflow-hidden'
+                className="bg-surface-container-lowest rounded-3xl shadow-sm border border-outline-variant/30 overflow-hidden"
               >
-                <div className='border-b border-gray-100'>
-                  <div className='flex'>
+                <div className="border-b border-outline-variant/30">
+                  <div className="flex">
                     <button
                       onClick={() => setActiveTab('description')}
-                      className={`flex-1 py-5 px-6 text-sm font-bold uppercase tracking-widest transition-all relative ${
+                      className={`flex-1 py-5 px-6 text-sm font-label-caps font-bold uppercase tracking-widest transition-all relative ${
                         activeTab === 'description'
-                          ? 'text-emerald-600'
-                          : 'text-gray-400 hover:text-luxury-black'
+                          ? 'text-primary'
+                          : 'text-on-surface-variant hover:text-on-surface'
                       }`}
                     >
                       Description
                       {activeTab === 'description' && (
                         <motion.div
-                          layoutId='activeTab'
-                          className='absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600'
+                          layoutId="activeTab"
+                          className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
                         />
                       )}
                     </button>
                     <button
                       onClick={() => setActiveTab('requirements')}
-                      className={`flex-1 py-5 px-6 text-sm font-bold uppercase tracking-widest transition-all relative ${
+                      className={`flex-1 py-5 px-6 text-sm font-label-caps font-bold uppercase tracking-widest transition-all relative ${
                         activeTab === 'requirements'
-                          ? 'text-emerald-600'
-                          : 'text-gray-400 hover:text-luxury-black'
+                          ? 'text-primary'
+                          : 'text-on-surface-variant hover:text-on-surface'
                       }`}
                     >
                       Requirements
                       {activeTab === 'requirements' && (
                         <motion.div
-                          layoutId='activeTab'
-                          className='absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600'
+                          layoutId="activeTab"
+                          className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
                         />
                       )}
                     </button>
                     <button
                       onClick={() => setActiveTab('responsibilities')}
-                      className={`flex-1 py-5 px-6 text-sm font-bold uppercase tracking-widest transition-all relative ${
+                      className={`flex-1 py-5 px-6 text-sm font-label-caps font-bold uppercase tracking-widest transition-all relative ${
                         activeTab === 'responsibilities'
-                          ? 'text-emerald-600'
-                          : 'text-gray-400 hover:text-luxury-black'
+                          ? 'text-primary'
+                          : 'text-on-surface-variant hover:text-on-surface'
                       }`}
                     >
                       Responsibilities
                       {activeTab === 'responsibilities' && (
                         <motion.div
-                          layoutId='activeTab'
-                          className='absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600'
+                          layoutId="activeTab"
+                          className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
                         />
                       )}
                     </button>
                   </div>
                 </div>
 
-                <div className='p-8'>
-                  <AnimatePresence mode='wait'>
+                <div className="p-8">
+                  <AnimatePresence mode="wait">
                     {activeTab === 'description' && (
                       <motion.div
-                        key='description'
+                        key="description"
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className='prose prose-lg max-w-none'
+                        className="prose prose-lg max-w-none"
                       >
-                        <p className='text-gray-600 leading-relaxed text-lg'>
+                        <p className="font-body-lg text-on-surface-variant leading-relaxed">
                           {job.description}
                         </p>
                       </motion.div>
@@ -784,24 +796,26 @@ const CareerDetail = () => {
 
                     {activeTab === 'requirements' && (
                       <motion.div
-                        key='requirements'
+                        key="requirements"
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                       >
-                        <ul className='space-y-4'>
+                        <ul className="space-y-4">
                           {job.requirements.map((item, index) => (
                             <motion.li
                               key={index}
                               initial={{ opacity: 0, x: -20 }}
                               animate={{ opacity: 1, x: 0 }}
                               transition={{ delay: index * 0.1 }}
-                              className='flex items-start gap-4'
+                              className="flex items-start gap-4"
                             >
-                              <div className='w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-1'>
-                                <div className='w-2 h-2 rounded-full bg-emerald-600' />
+                              <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
+                                <div className="w-2 h-2 rounded-full bg-primary" />
                               </div>
-                              <span className='text-gray-600'>{item}</span>
+                              <span className="font-body-md text-on-surface-variant">
+                                {item}
+                              </span>
                             </motion.li>
                           ))}
                         </ul>
@@ -810,24 +824,26 @@ const CareerDetail = () => {
 
                     {activeTab === 'responsibilities' && (
                       <motion.div
-                        key='responsibilities'
+                        key="responsibilities"
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                       >
-                        <ul className='space-y-4'>
+                        <ul className="space-y-4">
                           {job.responsibilities.map((item, index) => (
                             <motion.li
                               key={index}
                               initial={{ opacity: 0, x: -20 }}
                               animate={{ opacity: 1, x: 0 }}
                               transition={{ delay: index * 0.1 }}
-                              className='flex items-start gap-4'
+                              className="flex items-start gap-4"
                             >
-                              <div className='w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-1'>
-                                <div className='w-2 h-2 rounded-full bg-emerald-600' />
+                              <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
+                                <div className="w-2 h-2 rounded-full bg-primary" />
                               </div>
-                              <span className='text-gray-600'>{item}</span>
+                              <span className="font-body-md text-on-surface-variant">
+                                {item}
+                              </span>
                             </motion.li>
                           ))}
                         </ul>
@@ -843,19 +859,19 @@ const CareerDetail = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
-                  className='bg-white rounded-3xl p-8 shadow-sm'
+                  className="bg-surface-container-lowest rounded-3xl p-8 shadow-sm border border-outline-variant/30"
                 >
-                  <h3 className='text-2xl font-serif font-bold text-luxury-black mb-6'>
+                  <h3 className="font-headline-md text-on-surface font-bold mb-6">
                     Required Skills
                   </h3>
-                  <div className='flex flex-wrap gap-3'>
+                  <div className="flex flex-wrap gap-3">
                     {job.skills.map((skill, index) => (
                       <motion.span
                         key={index}
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: index * 0.05 }}
-                        className='px-5 py-2.5 bg-emerald-50 text-emerald-700 rounded-full text-sm font-medium hover:bg-emerald-100 transition-colors'
+                        className="px-5 py-2.5 bg-primary/5 text-primary rounded-full text-sm font-medium hover:bg-primary/10 transition-colors"
                       >
                         {skill}
                       </motion.span>
@@ -870,24 +886,26 @@ const CareerDetail = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  className='bg-white rounded-3xl p-8 shadow-sm'
+                  className="bg-surface-container-lowest rounded-3xl p-8 shadow-sm border border-outline-variant/30"
                 >
-                  <h3 className='text-2xl font-serif font-bold text-luxury-black mb-6'>
+                  <h3 className="font-headline-md text-on-surface font-bold mb-6">
                     Benefits
                   </h3>
-                  <ul className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {job.benefits.map((benefit, index) => (
                       <motion.li
                         key={index}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className='flex items-center gap-3'
+                        className="flex items-center gap-3"
                       >
-                        <div className='w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0'>
-                          <FaCheckCircle className='text-emerald-600 text-sm' />
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <CheckCircle2 className="h-4 w-4 text-primary" />
                         </div>
-                        <span className='text-gray-600'>{benefit}</span>
+                        <span className="font-body-md text-on-surface-variant">
+                          {benefit}
+                        </span>
                       </motion.li>
                     ))}
                   </ul>
@@ -896,16 +914,16 @@ const CareerDetail = () => {
 
               {/* Application Form */}
               <motion.div
-                id='apply-section'
+                id="apply-section"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className='bg-white rounded-3xl p-8 shadow-sm scroll-mt-24'
+                className="bg-surface-container-lowest rounded-3xl p-8 shadow-sm border border-outline-variant/30 scroll-mt-24"
               >
-                <h3 className='text-2xl font-serif font-bold text-luxury-black mb-2'>
+                <h3 className="font-headline-md text-on-surface font-bold mb-2">
                   Apply for this position
                 </h3>
-                <p className='text-gray-500 font-light mb-8'>
+                <p className="font-body-md text-on-surface-variant mb-8">
                   Take the next step in your career journey with AOCA Resources
                 </p>
 
@@ -913,46 +931,46 @@ const CareerDetail = () => {
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className='text-center py-12 bg-gradient-to-br from-emerald-50 to-luxury-cream rounded-2xl'
+                    className="text-center py-12 bg-gradient-to-br from-primary/5 to-surface rounded-2xl"
                   >
-                    <div className='w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6'>
-                      <FaUser className='text-emerald-600 text-3xl' />
+                    <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <User className="text-primary text-3xl" />
                     </div>
-                    <h4 className='text-xl font-serif font-bold text-luxury-black mb-3'>
+                    <h4 className="font-headline-md text-on-surface font-bold mb-3">
                       Login Required
                     </h4>
-                    <p className='text-gray-500 font-light mb-8 max-w-sm mx-auto'>
+                    <p className="font-body-md text-on-surface-variant mb-8 max-w-sm mx-auto">
                       Please login or create an account to apply for this
                       position
                     </p>
-                    <div className='flex flex-col sm:flex-row gap-4 justify-center'>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
                       <Link
-                        to='/login'
-                        className='px-8 py-4 bg-emerald-600 text-white rounded-full font-bold uppercase tracking-widest text-sm hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-500/20'
+                        to="/login"
+                        className="px-8 py-4 bg-primary text-on-primary rounded-full font-label-caps font-bold uppercase tracking-widest text-sm hover:bg-primary-container transition-all shadow-lg shadow-primary/20"
                       >
                         Login
                       </Link>
                       <Link
-                        to='/register'
-                        className='px-8 py-4 bg-white border-2 border-emerald-600 text-emerald-600 rounded-full font-bold uppercase tracking-widest text-sm hover:bg-emerald-50 transition-all'
+                        to="/register"
+                        className="px-8 py-4 bg-surface border-2 border-primary text-primary rounded-full font-label-caps font-bold uppercase tracking-widest text-sm hover:bg-primary/5 transition-all"
                       >
                         Create Account
                       </Link>
                     </div>
                   </motion.div>
                 ) : (
-                  <form onSubmit={handleSubmit} className='space-y-6'>
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* First Name */}
                       <div>
-                        <label className='block text-sm font-medium text-gray-700 mb-2'>
-                          First Name <span className='text-emerald-600'>*</span>
+                        <label className="block text-xs font-label-caps text-on-surface-variant mb-2">
+                          First Name <span className="text-primary">*</span>
                         </label>
                         <input
-                          type='text'
-                          name='first_name'
-                          className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all'
-                          placeholder='John'
+                          type="text"
+                          name="first_name"
+                          className="w-full px-4 py-3 border border-outline-variant/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                          placeholder="John"
                           value={applicationData.first_name}
                           onChange={handleInputChange}
                           required
@@ -961,14 +979,14 @@ const CareerDetail = () => {
 
                       {/* Last Name */}
                       <div>
-                        <label className='block text-sm font-medium text-gray-700 mb-2'>
-                          Last Name <span className='text-emerald-600'>*</span>
+                        <label className="block text-xs font-label-caps text-on-surface-variant mb-2">
+                          Last Name <span className="text-primary">*</span>
                         </label>
                         <input
-                          type='text'
-                          name='last_name'
-                          className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all'
-                          placeholder='Doe'
+                          type="text"
+                          name="last_name"
+                          className="w-full px-4 py-3 border border-outline-variant/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                          placeholder="Doe"
                           value={applicationData.last_name}
                           onChange={handleInputChange}
                           required
@@ -977,19 +995,18 @@ const CareerDetail = () => {
 
                       {/* Email */}
                       <div>
-                        <label className='block text-sm font-medium text-gray-700 mb-2'>
-                          Email Address{' '}
-                          <span className='text-emerald-600'>*</span>
+                        <label className="block text-xs font-label-caps text-on-surface-variant mb-2">
+                          Email Address <span className="text-primary">*</span>
                         </label>
-                        <div className='relative'>
-                          <div className='absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none'>
-                            <FaEnvelope className='text-gray-400' />
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <Mail className="text-on-surface-variant" />
                           </div>
                           <input
-                            type='email'
-                            name='email'
-                            className='w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all'
-                            placeholder='johndoe@example.com'
+                            type="email"
+                            name="email"
+                            className="w-full pl-11 pr-4 py-3 border border-outline-variant/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                            placeholder="johndoe@example.com"
                             value={applicationData.email}
                             onChange={handleInputChange}
                             required
@@ -999,19 +1016,18 @@ const CareerDetail = () => {
 
                       {/* Phone */}
                       <div>
-                        <label className='block text-sm font-medium text-gray-700 mb-2'>
-                          Phone Number{' '}
-                          <span className='text-emerald-600'>*</span>
+                        <label className="block text-xs font-label-caps text-on-surface-variant mb-2">
+                          Phone Number <span className="text-primary">*</span>
                         </label>
-                        <div className='relative'>
-                          <div className='absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none'>
-                            <FaPhone className='text-gray-400' />
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <Phone className="text-on-surface-variant" />
                           </div>
                           <input
-                            type='tel'
-                            name='phone'
-                            className='w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all'
-                            placeholder='+234 123 456 7890'
+                            type="tel"
+                            name="phone"
+                            className="w-full pl-11 pr-4 py-3 border border-outline-variant/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                            placeholder="+234 123 456 7890"
                             value={applicationData.phone}
                             onChange={handleInputChange}
                             required
@@ -1020,40 +1036,40 @@ const CareerDetail = () => {
                       </div>
 
                       {/* Resume Upload */}
-                      <div className='md:col-span-2'>
-                        <label className='block text-sm font-medium text-gray-700 mb-2'>
-                          Resume/CV <span className='text-emerald-600'>*</span>
+                      <div className="md:col-span-2">
+                        <label className="block text-xs font-label-caps text-on-surface-variant mb-2">
+                          Resume/CV <span className="text-primary">*</span>
                         </label>
-                        <label className='flex flex-col items-center justify-center w-full h-48 px-4 transition bg-white border-2 border-gray-200 border-dashed rounded-2xl cursor-pointer hover:border-emerald-500 hover:bg-emerald-50/50 group'>
-                          <div className='flex flex-col items-center space-y-3 text-center'>
+                        <label className="flex flex-col items-center justify-center w-full h-48 px-4 transition bg-surface border-2 border-outline-variant/30 border-dashed rounded-2xl cursor-pointer hover:border-primary hover:bg-primary/5 group">
+                          <div className="flex flex-col items-center space-y-3 text-center">
                             {resumeFile ? (
                               <>
-                                <div className='w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center group-hover:bg-emerald-200 transition-colors'>
-                                  <FaFileAlt className='text-emerald-600 text-2xl' />
+                                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                                  <FileText className="text-primary text-2xl" />
                                 </div>
                                 <div>
-                                  <p className='font-medium text-luxury-black'>
+                                  <p className="font-medium text-on-surface">
                                     {resumeFile.name}
                                   </p>
-                                  <p className='text-sm text-gray-500'>
+                                  <p className="text-sm text-on-surface-variant">
                                     {(resumeFile.size / 1024 / 1024).toFixed(2)}{' '}
                                     MB
                                   </p>
                                 </div>
-                                <p className='text-xs text-emerald-600'>
+                                <p className="text-xs text-primary">
                                   Click to change file
                                 </p>
                               </>
                             ) : (
                               <>
-                                <div className='w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center group-hover:bg-emerald-100 transition-colors'>
-                                  <FaUpload className='text-gray-400 group-hover:text-emerald-600 text-2xl transition-colors' />
+                                <div className="w-16 h-16 bg-surface-container flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                                  <Upload className="text-on-surface-variant group-hover:text-primary text-2xl transition-colors" />
                                 </div>
                                 <div>
-                                  <p className='font-medium text-luxury-black'>
+                                  <p className="font-medium text-on-surface">
                                     Drop your resume here or click to browse
                                   </p>
-                                  <p className='text-sm text-gray-500'>
+                                  <p className="text-sm text-on-surface-variant">
                                     PDF, DOC, DOCX (Max 5MB)
                                   </p>
                                 </div>
@@ -1061,10 +1077,10 @@ const CareerDetail = () => {
                             )}
                           </div>
                           <input
-                            type='file'
-                            name='resume'
-                            className='hidden'
-                            accept='.pdf,.doc,.docx'
+                            type="file"
+                            name="resume"
+                            className="hidden"
+                            accept=".pdf,.doc,.docx"
                             onChange={handleResumeChange}
                             required={!applicationData.resume_url}
                           />
@@ -1072,14 +1088,14 @@ const CareerDetail = () => {
                       </div>
 
                       {/* Cover Letter */}
-                      <div className='md:col-span-2'>
-                        <label className='block text-sm font-medium text-gray-700 mb-2'>
+                      <div className="md:col-span-2">
+                        <label className="block text-xs font-label-caps text-on-surface-variant mb-2">
                           Cover Letter
                         </label>
                         <textarea
-                          name='cover_letter'
-                          rows='5'
-                          className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all resize-none'
+                          name="cover_letter"
+                          rows="5"
+                          className="w-full px-4 py-3 border border-outline-variant/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
                           placeholder="Tell us why you're the perfect fit for this role..."
                           value={applicationData.cover_letter}
                           onChange={handleInputChange}
@@ -1088,18 +1104,18 @@ const CareerDetail = () => {
 
                       {/* LinkedIn */}
                       <div>
-                        <label className='block text-sm font-medium text-gray-700 mb-2'>
+                        <label className="block text-xs font-label-caps text-on-surface-variant mb-2">
                           LinkedIn Profile
                         </label>
-                        <div className='relative'>
-                          <div className='absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none'>
-                            <FaLinkedin className='text-gray-400' />
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <Linkedin className="text-on-surface-variant" />
                           </div>
                           <input
-                            type='url'
-                            name='linkedin_url'
-                            className='w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all'
-                            placeholder='https://linkedin.com/in/yourprofile'
+                            type="url"
+                            name="linkedin_url"
+                            className="w-full pl-11 pr-4 py-3 border border-outline-variant/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                            placeholder="https://linkedin.com/in/yourprofile"
                             value={applicationData.linkedin_url}
                             onChange={handleInputChange}
                           />
@@ -1108,18 +1124,18 @@ const CareerDetail = () => {
 
                       {/* Portfolio */}
                       <div>
-                        <label className='block text-sm font-medium text-gray-700 mb-2'>
+                        <label className="block text-xs font-label-caps text-on-surface-variant mb-2">
                           Portfolio/Website
                         </label>
-                        <div className='relative'>
-                          <div className='absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none'>
-                            <FaGlobe className='text-gray-400' />
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <Globe className="text-on-surface-variant" />
                           </div>
                           <input
-                            type='url'
-                            name='portfolio_url'
-                            className='w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all'
-                            placeholder='https://yourportfolio.com'
+                            type="url"
+                            name="portfolio_url"
+                            className="w-full pl-11 pr-4 py-3 border border-outline-variant/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                            placeholder="https://yourportfolio.com"
                             value={applicationData.portfolio_url}
                             onChange={handleInputChange}
                           />
@@ -1128,28 +1144,28 @@ const CareerDetail = () => {
 
                       {/* Referral */}
                       <div>
-                        <label className='block text-sm font-medium text-gray-700 mb-2'>
+                        <label className="block text-xs font-label-caps text-on-surface-variant mb-2">
                           How did you hear about us?
                         </label>
                         <input
-                          type='text'
-                          name='referral'
-                          className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all'
-                          placeholder='LinkedIn, Friend, Website, etc.'
+                          type="text"
+                          name="referral"
+                          className="w-full px-4 py-3 border border-outline-variant/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                          placeholder="LinkedIn, Friend, Website, etc."
                           value={applicationData.referral}
                           onChange={handleInputChange}
                         />
                       </div>
 
                       {/* Additional Info */}
-                      <div className='md:col-span-2'>
-                        <label className='block text-sm font-medium text-gray-700 mb-2'>
+                      <div className="md:col-span-2">
+                        <label className="block text-xs font-label-caps text-on-surface-variant mb-2">
                           Additional Information
                         </label>
                         <textarea
-                          name='additional_info'
-                          rows='3'
-                          className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all resize-none'
+                          name="additional_info"
+                          rows="3"
+                          className="w-full px-4 py-3 border border-outline-variant/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
                           placeholder="Anything else you'd like us to know..."
                           value={applicationData.additional_info}
                           onChange={handleInputChange}
@@ -1158,26 +1174,26 @@ const CareerDetail = () => {
                     </div>
 
                     {/* Terms Checkbox */}
-                    <div className='border-t border-gray-100 pt-6'>
-                      <div className='flex items-start'>
-                        <div className='flex items-center h-5'>
+                    <div className="border-t border-outline-variant/30 pt-6">
+                      <div className="flex items-start">
+                        <div className="flex items-center h-5">
                           <input
-                            id='terms'
-                            name='terms'
-                            type='checkbox'
-                            className='w-5 h-5 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500'
+                            id="terms"
+                            name="terms"
+                            type="checkbox"
+                            className="w-5 h-5 text-primary border-outline-variant/30 rounded focus:ring-primary"
                             required
                           />
                         </div>
-                        <div className='ml-3'>
+                        <div className="ml-3">
                           <label
-                            htmlFor='terms'
-                            className='text-sm text-gray-600'
+                            htmlFor="terms"
+                            className="text-sm text-on-surface-variant"
                           >
                             I agree to the{' '}
                             <a
-                              href='/privacy-policy'
-                              className='text-emerald-600 hover:text-emerald-700 font-medium underline'
+                              href="/privacy-policy"
+                              className="text-primary hover:text-primary-container font-medium underline"
                             >
                               Privacy Policy
                             </a>{' '}
@@ -1189,18 +1205,18 @@ const CareerDetail = () => {
 
                     {/* Submit Button */}
                     <button
-                      type='submit'
+                      type="submit"
                       disabled={isSubmitting}
-                      className='w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-3 text-sm uppercase tracking-widest shadow-lg shadow-emerald-500/20 hover:shadow-xl hover:shadow-emerald-500/30'
+                      className="w-full bg-primary hover:bg-primary-container text-on-primary font-bold py-4 px-6 rounded-xl transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-3 text-sm font-label-caps uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30"
                     >
                       {isSubmitting ? (
                         <>
-                          <FaSpinner className='animate-spin' />
+                          <Loader2 className="animate-spin" />
                           Submitting Application...
                         </>
                       ) : (
                         <>
-                          <FaPaperPlane />
+                          <Send />
                           Submit Application
                         </>
                       )}
@@ -1211,34 +1227,36 @@ const CareerDetail = () => {
             </div>
 
             {/* Right Column - Sidebar */}
-            <div className='space-y-6'>
+            <div className="space-y-6">
               {/* Company Info */}
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className='bg-white rounded-3xl p-8 shadow-sm'
+                className="bg-surface-container-lowest rounded-3xl p-8 shadow-sm border border-outline-variant/30"
               >
-                <div className='flex items-center gap-4 mb-6'>
-                  <div className='w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold'>
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary-container rounded-2xl flex items-center justify-center text-on-primary text-2xl font-bold">
                     {job.company?.charAt(0)}
                   </div>
                   <div>
-                    <h4 className='text-xl font-serif font-bold text-luxury-black'>
+                    <h4 className="font-headline-md text-on-surface font-bold">
                       {job.company}
                     </h4>
-                    <p className='text-sm text-gray-500'>Industry Leader</p>
+                    <p className="text-sm text-on-surface-variant">
+                      Industry Leader
+                    </p>
                   </div>
                 </div>
-                <p className='text-gray-600 font-light mb-6'>
+                <p className="font-body-md text-on-surface-variant mb-6">
                   {job.company_description ||
                     `${job.company} is a leading organization in the ${job.category} industry, dedicated to excellence and innovation.`}
                 </p>
                 {job.company_website && (
                   <a
                     href={job.company_website}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    className='block text-center py-3 border-2 border-emerald-600 text-emerald-600 rounded-xl font-bold uppercase tracking-widest text-sm hover:bg-emerald-50 transition-all'
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block text-center py-3 border-2 border-primary text-primary rounded-xl font-label-caps font-bold uppercase tracking-widest text-sm hover:bg-primary/5 transition-all"
                   >
                     Visit Website
                   </a>
@@ -1250,30 +1268,30 @@ const CareerDetail = () => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.1 }}
-                className='bg-white rounded-3xl p-8 shadow-sm'
+                className="bg-surface-container-lowest rounded-3xl p-8 shadow-sm border border-outline-variant/30"
               >
-                <h4 className='text-lg font-serif font-bold text-luxury-black mb-4'>
+                <h4 className="font-headline-sm text-on-surface font-bold mb-4">
                   Quick Actions
                 </h4>
-                <div className='space-y-3'>
+                <div className="space-y-3">
                   <a
-                    href='#apply-section'
-                    className='flex items-center justify-between w-full p-4 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-xl hover:from-emerald-500 hover:to-emerald-400 transition-all group'
+                    href="#apply-section"
+                    className="flex items-center justify-between w-full p-4 bg-gradient-to-r from-primary to-primary-container text-on-primary rounded-xl hover:from-primary-container hover:to-primary transition-all group"
                   >
-                    <span className='font-medium'>Apply Now</span>
-                    <FaChevronDown className='transform -rotate-90 group-hover:translate-x-1 transition-transform' />
+                    <span className="font-medium">Apply Now</span>
+                    <ChevronDown className="transform -rotate-90 group-hover:translate-x-1 transition-transform" />
                   </a>
                   <button
                     onClick={() => setIsSaved(!isSaved)}
-                    className='flex items-center justify-between w-full p-4 border-2 border-gray-200 text-gray-700 rounded-xl hover:border-emerald-600 hover:bg-emerald-50/50 transition-all group'
+                    className="flex items-center justify-between w-full p-4 border-2 border-outline-variant/30 text-on-surface rounded-xl hover:border-primary hover:bg-primary/5 transition-all group"
                   >
-                    <span className='font-medium'>
+                    <span className="font-medium">
                       {isSaved ? 'Saved' : 'Save for Later'}
                     </span>
                     {isSaved ? (
-                      <FaHeart className='text-red-500' />
+                      <Heart className="text-red-500" fill="currentColor" />
                     ) : (
-                      <FaRegHeart className='group-hover:text-emerald-600' />
+                      <Heart className="group-hover:text-primary" />
                     )}
                   </button>
                 </div>
@@ -1284,72 +1302,80 @@ const CareerDetail = () => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 }}
-                className='bg-white rounded-3xl p-8 shadow-sm'
+                className="bg-surface-container-lowest rounded-3xl p-8 shadow-sm border border-outline-variant/30"
               >
-                <h4 className='text-lg font-serif font-bold text-luxury-black mb-4'>
+                <h4 className="font-headline-sm text-on-surface font-bold mb-4">
                   Job Overview
                 </h4>
-                <div className='space-y-4'>
-                  <div className='flex items-start gap-3'>
-                    <div className='w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0'>
-                      <FaBriefcase className='text-emerald-600' />
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Briefcase className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <p className='text-sm text-gray-500'>Job Type</p>
-                      <p className='font-medium text-luxury-black'>
+                      <p className="text-xs text-on-surface-variant">
+                        Job Type
+                      </p>
+                      <p className="font-medium text-on-surface">
                         {formatEmploymentType(job.employment_type)}
                       </p>
                     </div>
                   </div>
 
-                  <div className='flex items-start gap-3'>
-                    <div className='w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0'>
-                      <FaRegUser className='text-emerald-600' />
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <User className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <p className='text-sm text-gray-500'>Experience Level</p>
-                      <p className='font-medium text-luxury-black'>
+                      <p className="text-xs text-on-surface-variant">
+                        Experience Level
+                      </p>
+                      <p className="font-medium text-on-surface">
                         {job.experience_level || 'Mid Level'}
                       </p>
                     </div>
                   </div>
 
                   {job.education && (
-                    <div className='flex items-start gap-3'>
-                      <div className='w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0'>
-                        <FaGraduationCap className='text-emerald-600' />
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <GraduationCap className="h-5 w-5 text-primary" />
                       </div>
                       <div>
-                        <p className='text-sm text-gray-500'>Education</p>
-                        <p className='font-medium text-luxury-black'>
+                        <p className="text-xs text-on-surface-variant">
+                          Education
+                        </p>
+                        <p className="font-medium text-on-surface">
                           {job.education}
                         </p>
                       </div>
                     </div>
                   )}
 
-                  <div className='flex items-start gap-3'>
-                    <div className='w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0'>
-                      <FaDollarSign className='text-emerald-600' />
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <DollarSign className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <p className='text-sm text-gray-500'>Salary Range</p>
-                      <p className='font-medium text-luxury-black'>
+                      <p className="text-xs text-on-surface-variant">
+                        Salary Range
+                      </p>
+                      <p className="font-medium text-on-surface">
                         {formatSalary()}
                       </p>
                     </div>
                   </div>
 
                   {job.application_deadline && (
-                    <div className='flex items-start gap-3'>
-                      <div className='w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0'>
-                        <FaRegClock className='text-emerald-600' />
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <Clock className="h-5 w-5 text-primary" />
                       </div>
                       <div>
-                        <p className='text-sm text-gray-500'>
+                        <p className="text-xs text-on-surface-variant">
                           Application Deadline
                         </p>
-                        <p className='font-medium text-luxury-black'>
+                        <p className="font-medium text-on-surface">
                           {formatDate(job.application_deadline)}
                         </p>
                       </div>
@@ -1363,28 +1389,28 @@ const CareerDetail = () => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 }}
-                className='bg-white rounded-3xl p-8 shadow-sm'
+                className="bg-surface-container-lowest rounded-3xl p-8 shadow-sm border border-outline-variant/30"
               >
-                <h4 className='text-lg font-serif font-bold text-luxury-black mb-4'>
+                <h4 className="font-headline-sm text-on-surface font-bold mb-4">
                   Location
                 </h4>
-                <div className='space-y-3'>
-                  <div className='flex items-center gap-3 text-gray-600'>
-                    <FaMapMarkerAlt className='text-emerald-600' />
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 text-on-surface-variant">
+                    <MapPin className="h-5 w-5 text-primary" />
                     <span>
                       {job.location?.city || 'Various'},{' '}
                       {job.location?.country || 'Nigeria'}
                     </span>
                   </div>
                   {job.location?.remote && (
-                    <div className='flex items-center gap-3 text-emerald-600'>
-                      <FaCheckCircle className='text-emerald-600' />
+                    <div className="flex items-center gap-3 text-primary">
+                      <CheckCircle2 className="h-5 w-5 text-primary" />
                       <span>Remote work available</span>
                     </div>
                   )}
                   {job.location?.hybrid && (
-                    <div className='flex items-center gap-3 text-emerald-600'>
-                      <FaCheckCircle className='text-emerald-600' />
+                    <div className="flex items-center gap-3 text-primary">
+                      <CheckCircle2 className="h-5 w-5 text-primary" />
                       <span>Hybrid work model</span>
                     </div>
                   )}
@@ -1394,7 +1420,7 @@ const CareerDetail = () => {
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 };
 
