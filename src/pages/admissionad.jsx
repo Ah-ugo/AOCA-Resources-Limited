@@ -1419,13 +1419,13 @@ const AdmissionLandingPage = () => {
             >
               {/* Classroom image placeholder */}
               <div className="relative rounded-3xl overflow-hidden bg-surface-container-lowest shadow-lg border border-outline-variant/30 mb-6">
-                <div className="aspect-[4/3] bg-gradient-to-br from-surface-container-low to-surface-container flex items-center justify-center">
-                  <div className="text-center">
-                    <GraduationCap className="h-16 w-16 text-primary/30 mx-auto mb-3" />
-                    <p className="text-on-surface-variant text-sm">
-                      Modern classrooms, expert instructors
-                    </p>
-                  </div>
+                <div className="aspect-[4/3] relative">
+                  <img
+                    src="/image10.png"
+                    alt="Modern classrooms and expert instructors"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 </div>
                 {/* Floating credibility stamp */}
                 <div className="absolute top-4 right-4 bg-surface/90 backdrop-blur-sm rounded-2xl px-4 py-3 shadow-md border border-outline-variant/30">
@@ -1884,14 +1884,21 @@ const AdmissionLandingPage = () => {
               </div>
 
               {/* Study Abroad Banner */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="relative rounded-3xl overflow-hidden bg-primary p-8 md:p-10 text-on-primary shadow-lg"
-              >
-                <div className="absolute inset-0 noise opacity-30" />
-                <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                 <motion.div
+                   initial={{ opacity: 0, y: 20 }}
+                   whileInView={{ opacity: 1, y: 0 }}
+                   viewport={{ once: true }}
+                   className="relative rounded-3xl overflow-hidden bg-primary p-8 md:p-10 text-on-primary shadow-lg"
+                 >
+                   <div className="absolute inset-0 noise opacity-30" />
+                   <div className="absolute top-0 right-0 w-64 h-64 opacity-20">
+                     <img
+                       src="/image3.png"
+                       alt="Study abroad"
+                       className="w-full h-full object-cover"
+                     />
+                   </div>
+                   <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                   <div>
                     <div className="flex items-center gap-2 mb-3">
                       <GraduationCap className="h-5 w-5 text-on-primary-container" />
@@ -2012,9 +2019,15 @@ const AdmissionLandingPage = () => {
                       &ldquo;{t.text}&rdquo;
                     </p>
                     <div className="flex items-center gap-3 pt-4 border-t border-outline-variant/30">
-                      <div className="w-10 h-10 bg-primary-container/15 rounded-full flex items-center justify-center font-bold text-primary text-sm">
-                        {t.name.charAt(0)}
-                      </div>
+                      <img
+                        src={[
+                          '/ukaegbu.jpeg',
+                          '/study-group.jpg',
+                          '/image2.png',
+                        ][i]}
+                        alt={t.name}
+                        className="w-10 h-10 rounded-full object-cover border border-outline-variant/30"
+                      />
                       <div>
                         <p className="font-bold text-on-surface text-sm">
                           {t.name}
@@ -2338,21 +2351,21 @@ const AdmissionLandingPage = () => {
               {/* Candidate Dossier Sidebar */}
               <div className="lg:col-span-5">
                 <div className="bg-surface-container-lowest rounded-3xl p-8 shadow-xl border border-outline-variant/30 sticky top-40">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-14 h-14 bg-primary-container/15 rounded-full flex items-center justify-center">
-                      <span className="font-display-hero text-xl text-primary">
-                        {candidateDossier.name.charAt(0)}
-                      </span>
-                    </div>
-                    <div>
-                      <h3 className="font-headline-sm text-headline-sm text-on-surface">
-                        {candidateDossier.name}
-                      </h3>
-                      <p className="text-on-surface-variant text-sm">
-                        {candidateDossier.intake}
-                      </p>
-                    </div>
-                  </div>
+                   <div className="flex items-center gap-4 mb-6">
+                     <img
+                       src="/ukaegbu.jpeg"
+                       alt={candidateDossier.name}
+                       className="w-14 h-14 rounded-full object-cover border-2 border-outline-variant/30"
+                     />
+                     <div>
+                       <h3 className="font-headline-sm text-headline-sm text-on-surface">
+                         {candidateDossier.name}
+                       </h3>
+                       <p className="text-on-surface-variant text-sm">
+                         {candidateDossier.intake}
+                       </p>
+                     </div>
+                   </div>
 
                   <div className="space-y-4 mb-6">
                     <div className="flex justify-between items-center p-4 rounded-xl bg-surface-container border border-outline-variant/30">
@@ -2486,15 +2499,23 @@ const AdmissionLandingPage = () => {
           </div>
           <div className="lg:col-span-7">
             <div className="rounded-3xl overflow-hidden bg-surface-container shadow-lg border border-outline-variant/30">
-              <div className="aspect-video bg-gradient-to-br from-surface-container-low to-surface-container flex items-center justify-center">
-                <div className="text-center">
-                  <Navigation className="h-16 w-16 text-primary/30 mx-auto mb-3" />
-                  <p className="text-on-surface-variant text-sm">
-                    Lagos &amp; Port Harcourt locations
-                  </p>
-                  <p className="text-on-surface-variant text-xs mt-1">
-                    Find us on Google Maps
-                  </p>
+              <div className="aspect-video relative">
+                <img
+                  src="/image8.png"
+                  alt="AOCA campus locations"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
+                  <div>
+                    <Navigation className="h-8 w-8 text-white mb-2" />
+                    <p className="text-white text-sm font-semibold">
+                      Lagos &amp; Port Harcourt locations
+                    </p>
+                    <p className="text-white/80 text-xs">
+                      Find us on Google Maps
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
