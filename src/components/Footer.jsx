@@ -1,14 +1,11 @@
 /** @format */
 
 import { Link } from 'react-router-dom';
-import { MapPin, Phone, Mail } from 'lucide-react';
+import { MapPin, Phone, Mail, Sparkles } from 'lucide-react';
 
 function Footer() {
   return (
     <footer className="w-full bg-primary-container text-on-primary-container pt-12 pb-8 border-t border-outline-variant/20">
-      {/* <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
-        <div className="bg-surface-container-lowest/5 backdrop-blur-md rounded-2xl p-4 sm:p-6 border border-outline-variant/20 flex flex-wrap items-center justify-between gap-4"></div>
-      </div> */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 pb-12 border-b border-outline-variant/10">
         <div>
           <div className="flex items-center gap-2 mb-4">
@@ -42,6 +39,14 @@ function Footer() {
                 call
               </span>
               <span>+234 816 191 0975, +234 803 886 5466</span>
+            </p>
+            <p className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[18px] text-secondary-fixed shrink-0">
+                mail
+              </span>
+              <a href="mailto:aocaresourcesltd@gmail.com" className="hover:text-secondary-fixed transition-colors font-semibold text-secondary-fixed underline underline-offset-2">
+                aocaresourcesltd@gmail.com
+              </a>
             </p>
             <p className="flex items-center gap-2">
               <span className="material-symbols-outlined text-[18px] text-secondary-fixed shrink-0">

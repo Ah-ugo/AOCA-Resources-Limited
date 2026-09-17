@@ -403,19 +403,27 @@ export default function Contact() {
                     </div>
                   </div>
                   <div className="flex items-start gap-space-sm text-on-surface">
-                    <Mail className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                    <div>
-                      <span className="font-label-md text-label-md font-semibold text-on-surface block">
-                        Diplomatic Inquiries
-                      </span>
-                      <a
-                        href="mailto:germany@aocaresourcesltd.com"
-                        className="font-body-sm text-body-sm text-primary hover:underline"
-                      >
-                        germany@aocaresourcesltd.com
-                      </a>
-                    </div>
-                  </div>
+                     <Mail className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                     <div>
+                       <span className="font-label-md text-label-md font-semibold text-on-surface block">
+                         Gmail Address
+                       </span>
+                       <a href="mailto:aocaresourcesltd@gmail.com" className="font-body-sm text-body-sm text-secondary hover:underline font-semibold">
+                         aocaresourcesltd@gmail.com
+                       </a>
+                     </div>
+                   </div>
+                   <div className="flex items-start gap-space-sm text-on-surface">
+                     <Mail className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                     <div>
+                       <span className="font-label-md text-label-md font-semibold text-on-surface block">
+                         Official Email
+                       </span>
+                       <span className="font-body-sm text-body-sm text-on-surface-variant">
+                         info@aocaresourcesltd.com
+                       </span>
+                     </div>
+                   </div>
                   <div className="p-space-sm bg-surface-container-low rounded-lg text-body-sm text-on-surface-variant">
                     <strong className="text-primary font-semibold block mb-1">
                       German Labor Compliance:

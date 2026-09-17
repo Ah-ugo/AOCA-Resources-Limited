@@ -21,6 +21,11 @@ import {
   Shield,
   Verified,
   Handshake,
+  BookOpen,
+  Briefcase,
+  BarChart,
+  Laptop,
+  ShieldCheck,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
@@ -37,30 +42,125 @@ function AboutUs() {
 
   const services = [
     {
-      title: 'Language Training',
-      icon: Languages,
-      desc: 'Intensive German language courses from A1 to B2 level, taught by certified instructors.',
+      title: 'German Visa Travel Consultancy',
+      icon: Globe,
+      desc: 'Expert guidance through the German visa application process — document verification, embassy coaching, and application tracking for all visa categories.',
       features: [
-        'Native-level fluency',
+        'Document verification',
+        'Embassy interview coaching',
+        'Application tracking & updates',
+      ],
+      highlight: false,
+    },
+    {
+      title: 'German Language & Exam Prep (A1–B2)',
+      icon: BookOpen,
+      desc: 'Intensive German language courses from A1 to B2 level, taught by certified instructors with Goethe exam preparation for adults and kids.',
+      features: [
+        'Goethe-Institut aligned',
         'Exam preparation',
         'Cultural integration',
       ],
+      highlight: false,
     },
     {
-      title: 'Visa Consultancy',
-      icon: Globe,
-      desc: 'Expert guidance through the complex German visa application process for various pathways.',
+      title: 'French Language & Exam Prep (A1–C1) ★ Special Emphasis',
+      icon: Languages,
+      desc: 'Expert French language instruction from A1 to C1 for adults and kids. DELF/DALF preparatory classes with certified instructors — fully immersive and exam-focused.',
       features: [
-        'Document verification',
-        'Interview coaching',
-        'Application tracking',
+        'DELF/DALF exam prep',
+        'Native-fluency instructors',
+        'Adults & children classes',
       ],
+      highlight: true,
     },
     {
-      title: 'Recruitment Services',
-      icon: GraduationCap,
-      desc: 'Connecting talented professionals with top employers and institutions in Germany.',
-      features: ['Job placement', 'Contract negotiation', 'Relocation support'],
+      title: 'IELTS Exam Preparatory Classes ★ Special Emphasis',
+      icon: Award,
+      desc: 'Comprehensive IELTS exam preparation covering all four modules: Listening, Reading, Writing, and Speaking. Expert instructors, mock tests, and band-score strategies.',
+      features: [
+        'Listening & Speaking drills',
+        'Academic & General Training',
+        'Mock test sessions',
+      ],
+      highlight: true,
+    },
+    {
+      title: 'Corporate Bodies / Staff Training',
+      icon: Briefcase,
+      desc: 'Professional development programs for corporate bodies and staff teams across Data Analysis, Project Management, ICT, and HSE.',
+      features: [
+        'Custom in-house programs',
+        'Nationwide delivery',
+        'Certified completion',
+      ],
+      highlight: false,
+    },
+    {
+      title: 'Data Analysis Training ★ Special Emphasis',
+      icon: BarChart,
+      desc: 'Master Excel for Data Analysis, SQL Databases, Power BI, Tableau, and foundational Python analytics. Available for individuals and corporate staff teams.',
+      features: [
+        'Excel & Power BI',
+        'SQL & Python analytics',
+        'Business Intelligence',
+      ],
+      highlight: true,
+    },
+    {
+      title: 'Project Management Training ★ Special Emphasis',
+      icon: Briefcase,
+      desc: 'Industry-aligned Project Management Professional methodologies, Agile frameworks, Scrum sprint cycles, and PMP certification preparation for corporate staff.',
+      features: [
+        'PMP certification prep',
+        'Agile & Scrum',
+        'Resource tracking',
+      ],
+      highlight: true,
+    },
+    {
+      title: 'ICT Training (Basic & Advanced) ★ Special Emphasis',
+      icon: Laptop,
+      desc: 'Professional ICT certification programs from basic computer literacy to advanced tracks including Python programming, Web Development, Software Engineering, and Computer Programming.',
+      features: [
+        'Basic to Advanced',
+        'Certificate on completion',
+        'Hands-on lab sessions',
+      ],
+      highlight: true,
+    },
+    {
+      title: 'Cyber Security Training ★ Special Emphasis',
+      icon: Shield,
+      desc: 'Network security fundamentals, ethical hacking essentials, cyber defense tactics, risk mitigation, and security architecture training with hands-on lab drills.',
+      features: [
+        'Ethical hacking',
+        'Network defense',
+        'Risk mitigation',
+      ],
+      highlight: true,
+    },
+    {
+      title: 'HSE Level 1–3 Training ★ Special Emphasis',
+      icon: ShieldCheck,
+      desc: 'General and Advanced Health, Safety & Environment (HSE) Level 1, 2 & 3 Certification. Essential for oil & gas, maritime, construction, and global corporate safety roles.',
+      features: [
+        'HSE Level 1, 2 & 3',
+        'Internationally recognised',
+        'Corporate & individual',
+      ],
+      highlight: true,
+    },
+    {
+      title: 'Kids & Children Tech Programs',
+      icon: Users,
+      desc: 'Tech programs for kids and children above — Scratch coding, Python robotics, elementary German language modules, and STEM bootcamps for ages 6–16.',
+      features: [
+        'Ages 6–16',
+        'Scratch & Python robotics',
+        'After-school & holiday bootcamps',
+      ],
+      highlight: false,
     },
   ];
 
@@ -262,115 +362,46 @@ function AboutUs() {
               and rigorous preparation.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Mission */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="bg-surface-container-lowest p-8 rounded-2xl shadow-sm flex flex-col justify-between"
-            >
-              <div>
-                <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-6">
-                  <Rocket className="h-6 w-6" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {services.map((service, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05 }}
+                className={`p-6 rounded-2xl shadow-sm flex flex-col justify-between ${service.highlight ? 'bg-secondary/5 border-2 border-secondary shadow-md' : 'bg-surface-container-lowest border border-outline-variant/30'}`}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${service.highlight ? 'bg-secondary text-secondary-fixed' : 'bg-primary/10 text-primary'}`}>
+                      <service.icon className="h-6 w-6" />
+                    </div>
+                    {service.highlight && (
+                      <span className="font-label-caps text-[9px] bg-secondary text-secondary-fixed px-2 py-0.5 rounded font-bold uppercase tracking-wider">Special Emphasis</span>
+                    )}
+                  </div>
+                  <h3 className="font-headline-sm text-headline-sm text-on-surface font-semibold mb-2">
+                    {service.title}
+                  </h3>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed mb-4">
+                    {service.desc}
+                  </p>
+                  <ul className="space-y-2 font-body-sm text-body-sm text-on-surface-variant">
+                    {service.features.map((feature, j) => (
+                      <li key={j} className="flex items-start gap-2.5">
+                        <CheckCircle className="h-4 w-4 text-secondary shrink-0 mt-0.5" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <span className="font-label-caps text-label-caps uppercase tracking-wider text-secondary font-bold">
-                  Our Prime Mission
-                </span>
-                <h3 className="font-headline-sm text-headline-sm text-on-surface mt-2 mb-4 font-semibold">
-                  Systematized Emigration
-                </h3>
-                <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-                  To systematically upskill, certify, and relocate West African
-                  healthcare and technical talents to Germany under accredited
-                  legal frameworks, ensuring ethical brain circulation and
-                  generational prosperity.
-                </p>
-              </div>
-              <div className="pt-6 mt-6 border-t border-surface-variant/60 flex items-center text-primary font-label-md text-label-md font-semibold">
-                <span>Direct Consular Accord</span>
-                <CheckCircle className="h-4 w-4 ml-1" />
-              </div>
-            </motion.div>
-
-            {/* Vision */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="bg-primary-container p-8 rounded-2xl shadow-md text-on-primary flex flex-col justify-between"
-            >
-              <div>
-                <div className="w-12 h-12 rounded-xl bg-secondary-fixed/20 text-secondary-fixed flex items-center justify-center mb-6">
-                  <Eye className="h-6 w-6" />
+                <div className="pt-5 mt-5 border-t border-outline-variant/20 flex items-center text-primary font-label-md text-label-md font-semibold">
+                  <span>Learn More</span>
+                  <ArrowRight className="h-4 w-4 ml-1" />
                 </div>
-                <span className="font-label-caps text-label-caps uppercase tracking-wider text-secondary-fixed font-bold">
-                  Our Global Vision
-                </span>
-                <h3 className="font-headline-sm text-headline-sm text-on-primary mt-2 mb-4 font-semibold">
-                  The Premier Corridor
-                </h3>
-                <p className="font-body-md text-body-md text-on-primary-container leading-relaxed">
-                  To establish Nigeria's most respected transatlantic human
-                  capital bridge, recognized by German federal chambers (IHK,
-                  ZAV) and university senates as the gold standard of African
-                  excellence.
-                </p>
-              </div>
-              <div className="pt-6 mt-6 border-t border-on-primary-container/20 flex items-center text-secondary-fixed font-label-md text-label-md font-semibold">
-                <span>AufenthG Section 16 & 18 Benchmarks</span>
-                <ArrowRight className="h-4 w-4 ml-1" />
-              </div>
-            </motion.div>
-
-            {/* Core Values */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="bg-surface-container-lowest p-8 rounded-2xl shadow-sm flex flex-col justify-between"
-            >
-              <div>
-                <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-6">
-                  <Shield className="h-6 w-6" />
-                </div>
-                <span className="font-label-caps text-label-caps uppercase tracking-wider text-secondary font-bold">
-                  Guiding Tenets
-                </span>
-                <h3 className="font-headline-sm text-headline-sm text-on-surface mt-2 mb-4 font-semibold">
-                  Pedigree & Precision
-                </h3>
-                <ul className="space-y-3 font-body-sm text-body-sm text-on-surface-variant">
-                  <li className="flex items-start gap-2.5">
-                    <CheckCircle className="h-4 w-4 text-secondary shrink-0 mt-0.5" />
-                    <span>
-                      <strong>Truth in Advisory:</strong> Zero false promises,
-                      only verified legal quotas and statutory steps.
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2.5">
-                    <CheckCircle className="h-4 w-4 text-secondary shrink-0 mt-0.5" />
-                    <span>
-                      <strong>Pedagogical Rigor:</strong> Native-aligned German
-                      phonetic drills and hospital terminology.
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2.5">
-                    <CheckCircle className="h-4 w-4 text-secondary shrink-0 mt-0.5" />
-                    <span>
-                      <strong>Lifelong Integration:</strong> Ongoing support
-                      upon landing across Berlin, Munich, or Frankfurt.
-                    </span>
-                  </li>
-                </ul>
-              </div>
-              <div className="pt-6 mt-6 border-t border-surface-variant/60 flex items-center text-primary font-label-md text-label-md font-semibold">
-                <span>Audited Institutional Quality</span>
-                <Verified className="h-4 w-4 ml-1" />
-              </div>
-            </motion.div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>

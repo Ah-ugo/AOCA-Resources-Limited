@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, CheckCircle2, Award, Home } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Award, Home, AlertCircle } from 'lucide-react';
 
 const serviceData = {
   'german-visa': {
@@ -252,10 +252,37 @@ export default function ServiceDetail() {
 
   const [form, setForm] = useState({ name: '', email: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = useState('idle');
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    setStatus('loading');
+    setErrorMessage('');
+
+    try {
+      const response = await fetch(
+        'https://aoca-resources-backend.onrender.com/contact',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...form, service: location.pathname }),
+        },
+      );
+
+      if (response.ok) {
+        setStatus('success');
+        setSubmitted(true);
+      } else {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.message || 'Failed to send message. Please try again.');
+      }
+    } catch (error) {
+      setStatus('error');
+      setErrorMessage(
+        error.message || 'Something went wrong. Please try again later.',
+      );
+    }
   };
 
   return (
@@ -377,38 +404,45 @@ export default function ServiceDetail() {
                 Join our next cohort and take the first step towards your
                 international career.
               </p>
-              <form className="space-y-4" onSubmit={handleSubmit}>
-                <input
-                  type="text"
-                  placeholder="Full Name"
-                  required
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full px-6 py-4 rounded-xl bg-surface-container-low border border-outline-variant/30 focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
-                />
-                <input
-                  type="email"
-                  placeholder="Email Address"
-                  required
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full px-6 py-4 rounded-xl bg-surface-container-low border border-outline-variant/30 focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
-                />
-                <button
-                  type="submit"
-                  className="w-full py-5 bg-primary text-on-primary rounded-full font-label-caps font-bold uppercase tracking-widest text-sm hover:bg-primary-container transition-all"
-                >
-                  Enquire Now
-                </button>
-              </form>
-              {submitted && (
-                <div className="mt-4 p-4 bg-emerald-50 text-emerald-900 border border-emerald-200 rounded-xl text-sm flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-emerald-700 shrink-0" />
-                  <span>
-                    Thanks! Our admissions team will reach out to you shortly.
-                  </span>
-                </div>
-              )}
+               <form className="space-y-4" onSubmit={handleSubmit}>
+                 <input
+                   type="text"
+                   placeholder="Full Name"
+                   required
+                   value={form.name}
+                   onChange={(e) => setForm({ ...form, name: e.target.value })}
+                   className="w-full px-6 py-4 rounded-xl bg-surface-container-low border border-outline-variant/30 focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
+                 />
+                 <input
+                   type="email"
+                   placeholder="Email Address"
+                   required
+                   value={form.email}
+                   onChange={(e) => setForm({ ...form, email: e.target.value })}
+                   className="w-full px-6 py-4 rounded-xl bg-surface-container-low border border-outline-variant/30 focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
+                 />
+                 <button
+                   type="submit"
+                   disabled={status === 'loading'}
+                   className="w-full py-5 bg-primary text-on-primary rounded-full font-label-caps font-bold uppercase tracking-widest text-sm hover:bg-primary-container transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                 >
+                   {status === 'loading' ? 'Sending...' : 'Enquire Now'}
+                 </button>
+               </form>
+               {status === 'error' && (
+                 <div className="mt-4 p-4 bg-red-50 text-red-700 border border-red-200 rounded-xl text-sm flex items-center gap-2">
+                   <AlertCircle className="h-5 w-5 shrink-0" />
+                   {errorMessage}
+                 </div>
+               )}
+               {submitted && status === 'success' && (
+                 <div className="mt-4 p-4 bg-emerald-50 text-emerald-900 border border-emerald-200 rounded-xl text-sm flex items-center gap-2">
+                   <CheckCircle2 className="h-5 w-5 text-emerald-700 shrink-0" />
+                   <span>
+                     Thanks! Our admissions team will reach out to you shortly.
+                   </span>
+                 </div>
+               )}
             </div>
           </div>
         </div>

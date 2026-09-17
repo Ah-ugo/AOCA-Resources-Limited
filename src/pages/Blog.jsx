@@ -19,6 +19,7 @@ import {
   Mail,
   Send,
   ArrowUpRight,
+  AlertCircle,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -116,12 +117,41 @@ export default function Blog() {
   const [featuredPost, ...remainingPosts] = filteredPosts;
   const topicChips = categories.filter((c) => c !== 'All').slice(0, 5);
 
-  const handleNewsletterSubmit = (e) => {
+  const handleNewsletterSubmit = async (e) => {
     e.preventDefault();
     if (!newsletterEmail) return;
-    setSubscribed(true);
-    setNewsletterEmail('');
-    setTimeout(() => setSubscribed(false), 4500);
+
+    setNewsletterStatus('loading');
+    setNewsletterError('');
+
+    try {
+      const response = await fetch(
+        'https://aoca-resources-backend.onrender.com/newsletter/subscribe',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: newsletterEmail }),
+        },
+      );
+
+      if (response.ok) {
+        setNewsletterStatus('success');
+        setSubscribed(true);
+        setNewsletterEmail('');
+        setTimeout(() => {
+          setSubscribed(false);
+          setNewsletterStatus('idle');
+        }, 4500);
+      } else {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.message || 'Subscription failed. Please try again.');
+      }
+    } catch (error) {
+      setNewsletterStatus('error');
+      setNewsletterError(
+        error.message || 'Something went wrong. Please try again later.',
+      );
+    }
   };
 
   return (
@@ -465,15 +495,28 @@ export default function Blog() {
               />
               <button
                 type="submit"
-                className="px-6 py-3.5 bg-primary hover:bg-primary-container text-on-primary font-label-md text-sm font-semibold rounded-lg transition-all shadow-sm flex items-center justify-center gap-2 shrink-0"
+                disabled={newsletterStatus === 'loading'}
+                className="px-6 py-3.5 bg-primary hover:bg-primary-container text-on-primary font-label-md text-sm font-semibold rounded-lg transition-all shadow-sm flex items-center justify-center gap-2 shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span>Subscribe Now</span>
+                <span>
+                  {newsletterStatus === 'loading' ? 'Subscribing...' : 'Subscribe Now'}
+                </span>
                 <Send className="h-4 w-4" />
               </button>
             </form>
+            {newsletterStatus === 'error' && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-4 p-3 rounded-lg bg-red-50 text-red-700 border border-red-200 font-body-sm text-sm flex items-center gap-2 max-w-xl"
+              >
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                {newsletterError}
+              </motion.div>
+            )}
           </motion.div>
           <AnimatePresence>
-            {subscribed && (
+            {subscribed && newsletterStatus === 'success' && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}

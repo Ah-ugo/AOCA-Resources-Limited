@@ -151,6 +151,7 @@ function NavDropdown({ item, onClose }) {
 function Header({ onNavigate }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [openMobileDropdown, setOpenMobileDropdown] = useState(null);
   const location = useLocation();
 
   useEffect(() => {
@@ -161,7 +162,12 @@ function Header({ onNavigate }) {
 
   useEffect(() => {
     setIsMenuOpen(false);
+    setOpenMobileDropdown(null);
   }, [location.pathname]);
+
+  const toggleMobileDropdown = (id) => {
+    setOpenMobileDropdown(openMobileDropdown === id ? null : id);
+  };
 
   const isActive = (path) => {
     if (path === '/') return location.pathname === '/';
@@ -304,16 +310,60 @@ function Header({ onNavigate }) {
                   </button>
                 </div>
                 <nav className="flex flex-col gap-1 flex-1">
-                  {navItems.map((item) => (
-                    <Link
-                      key={item.name}
-                      to={item.path}
-                      className="block px-3 py-3 text-base font-headline-sm font-bold text-primary hover:text-secondary rounded-xl hover:bg-surface-container-low transition-colors"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
+                  {navItems.map((item) =>
+                    item.type === 'dropdown' ? (
+                      <div key={item.name} className="flex flex-col">
+                        <button
+                          type="button"
+                          onClick={() => toggleMobileDropdown(item.id)}
+                          className="flex items-center justify-between px-3 py-3 text-base font-headline-sm font-bold text-primary hover:text-secondary rounded-xl hover:bg-surface-container-low transition-colors"
+                        >
+                          <span>{item.name}</span>
+                          <ChevronDown
+                            className={`h-4 w-4 transition-transform duration-200 ${openMobileDropdown === item.id ? 'rotate-180' : ''}`}
+                          />
+                        </button>
+                        <AnimatePresence>
+                          {openMobileDropdown === item.id && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.2 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="flex flex-col gap-0.5 pl-4 pr-1 pb-2">
+                                {dropdownItems[item.id].map((subItem) => (
+                                  <Link
+                                    key={subItem.name}
+                                    to={subItem.path}
+                                    className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-surface-container-low text-on-surface hover:text-primary font-semibold transition-all"
+                                    onClick={() => setIsMenuOpen(false)}
+                                  >
+                                    <div className="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center shrink-0 shadow-sm">
+                                      <subItem.icon className="h-3.5 w-3.5 text-primary" />
+                                    </div>
+                                    <span className="text-sm font-medium text-on-surface-variant group-hover:text-primary leading-tight">
+                                      {subItem.name}
+                                    </span>
+                                  </Link>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    ) : (
+                      <Link
+                        key={item.name}
+                        to={item.path}
+                        className="block px-3 py-3 text-base font-headline-sm font-bold text-primary hover:text-secondary rounded-xl hover:bg-surface-container-low transition-colors"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        {item.name}
+                      </Link>
+                    )
+                  )}
                 </nav>
                 <div className="pt-8 flex flex-col gap-3">
                   <Link

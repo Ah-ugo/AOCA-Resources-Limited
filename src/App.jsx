@@ -38,6 +38,7 @@ import {
   Images,
   Volume2,
   VolumeX,
+  AlertCircle,
 } from 'lucide-react';
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
 
@@ -136,9 +137,7 @@ function WelcomeModal({ onClose }) {
         </div>
         <div className="p-6 flex flex-col gap-4">
           <p className="text-sm text-on-surface-variant leading-relaxed">
-            Discover our certified German & French language programs, ICT
-            training, and direct relocation pathways to Germany. Join 500+
-            professionals already placed in German hospitals and tech firms.
+            Discover our comprehensive programs: <strong className="text-secondary font-semibold">French Language Classes A1–C1</strong> (Adults & Kids with exam prep), <strong className="text-secondary font-semibold">IELTS Exam Preparatory Classes</strong>, <strong className="text-secondary font-semibold">Data Analysis Training</strong> for individuals and corporate staff, <strong className="text-secondary font-semibold">Project Management Training</strong>, <strong className="text-secondary font-semibold">Professional ICT Training</strong> (Basic & Advanced), <strong className="text-secondary font-semibold">Cyber Security Training</strong>, <strong className="text-secondary font-semibold">HSE Level 1–3 Courses</strong>, German Language A1–B2, German Visa Consultancy, Computer Programming, and Kids Tech Programs. Join 500+ professionals already placed in Germany.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
@@ -335,7 +334,7 @@ function HeroSection() {
 const videoData = [
   {
     title:
-      'Live German B1 Grammar Seminar & ICT Coding Session at Rumudumaya Campus',
+      'German B1 Grammar Seminar & ICT Coding Session at Rumudumaya Campus',
     desc: "Instructor explaining reflexive pronouns ('sich vorstellen', 'sich waschen') and syntax drills for Goethe exam readiness.",
     poster: '/image1.png',
     src: 'https://res.cloudinary.com/dejeplzpv/video/upload/v1789516639/WhatsApp_Video_2026-09-13_at_16.13.36_n1kn5n.mp4',
@@ -376,11 +375,13 @@ function VideoShowcaseSection() {
   const [active, setActive] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [progress, setProgress] = useState(0);
   const videoRef = useRef(null);
 
   const switchVideo = (index) => {
     setActive(index);
     setIsPlaying(true);
+    setProgress(0);
   };
 
   useEffect(() => {
@@ -399,6 +400,20 @@ function VideoShowcaseSection() {
     }
   }, [isMuted]);
 
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleTimeUpdate = () => {
+      if (video.duration) {
+        setProgress((video.currentTime / video.duration) * 100);
+      }
+    };
+
+    video.addEventListener('timeupdate', handleTimeUpdate);
+    return () => video.removeEventListener('timeupdate', handleTimeUpdate);
+  }, [active]);
+
   const toggleVideoPlayback = () => {
     setIsPlaying(!isPlaying);
   };
@@ -410,7 +425,11 @@ function VideoShowcaseSection() {
   const scrubVideo = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const pos = (e.clientX - rect.left) / rect.width;
-    document.getElementById('videoProgress').style.width = pos * 100 + '%';
+    const newProgress = Math.max(0, Math.min(1, pos));
+    setProgress(newProgress * 100);
+    if (videoRef.current && videoRef.current.duration) {
+      videoRef.current.currentTime = newProgress * videoRef.current.duration;
+    }
   };
 
   const expandVideo = () => {
@@ -440,7 +459,7 @@ function VideoShowcaseSection() {
           <div className="flex flex-col gap-2 max-w-2xl">
             <div className="inline-flex items-center gap-2 text-secondary-fixed text-xs font-bold uppercase tracking-widest">
               <Video className="h-4 w-4" />
-              <span>VIDEO DOCUMENTARY & LIVE LECTURE FOOTAGE</span>
+              <span>VIDEO DOCUMENTARY & CLASSROOM FOOTAGE</span>
             </div>
             <h2 className="font-headline-lg text-2xl sm:text-4xl font-bold text-white">
               Inside AOCA: Real Video Tours & Classroom Sessions
@@ -494,9 +513,9 @@ function VideoShowcaseSection() {
                 />
               </button>
               <div className="absolute top-4 left-4 flex items-center gap-2">
-                <span className="bg-rose-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1 shadow">
-                  <span className="w-1.5 h-1.5 rounded-full bg-surface-container-lowest animate-pulse"></span>
-                  HD STREAM
+                <span className="bg-white/10 backdrop-blur-md text-white text-[11px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1 shadow border border-white/10">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/70"></span>
+                  Recorded Class
                 </span>
                 <span
                   className="bg-black/70 backdrop-blur-md text-white/90 text-xs px-2.5 py-1 rounded-md border border-white/10 font-mono"
@@ -513,7 +532,7 @@ function VideoShowcaseSection() {
                   <div
                     className="bg-secondary-fixed h-full transition-all duration-300"
                     id="videoProgress"
-                    style={{ width: videoData[active].progress }}
+                    style={{ width: `${progress}%` }}
                   ></div>
                 </div>
                 <div className="flex items-center justify-between text-xs text-white/90 pt-1">
@@ -652,7 +671,7 @@ const voices = [
     role: 'Charité Hospital, Berlin',
     quote:
       '"I started German A1 at Rumudumaya without a single word of Deutsch. Passing B2 Pflege under AOCA\'s faculty got me directly sponsored into Charité Berlin with relocation accommodation."',
-    image: '/ukaegbu.jpeg',
+     image: 'https://placehold.co/600x400/1a73e8/ffffff?text=Chioma+Ezeh',
     location: 'BERLIN, GERMANY',
     salary: 'Salary: €3,400/month',
     status: 'Hospital Anerkennung Completed',
@@ -662,8 +681,8 @@ const voices = [
     role: 'IT Systems Specialist, Munich',
     quote:
       '"Combining Python programming at the AOCA computer laboratory with intensive B1 German qualified me for a dual Ausbildung contract in Bavaria without needing a blocked account."',
-    image: '/image3.png',
-    location: 'MUNICH, GERMANY',
+      image: 'https://placehold.co/600x400/34a853/ffffff?text=Emmanuel+Briggs',
+      location: 'MUNICH, GERMANY',
     salary: 'Stipend: €1,250/month',
     status: 'Dual IT Vocational Contract',
   },
@@ -672,8 +691,8 @@ const voices = [
     role: 'Goethe University Frankfurt',
     quote:
       '"Our entire study group got our German visas approved on the first attempt after completing APS documentation and embassy mock interviews with AOCA counselors."',
-    image: '/study-group.jpg',
-    location: 'FRANKFURT, GERMANY',
+      image: 'https://placehold.co/600x400/ea4335/ffffff?text=Blessing+and+Group',
+      location: 'FRANKFURT, GERMANY',
     salary: 'Tuition: €0.00 / Free Public Uni',
     status: 'German National Visa Stamped',
   },
@@ -682,8 +701,8 @@ const voices = [
     role: 'Port Logistics Safety Officer',
     quote:
       '"The HSE certification paired with Data Analysis courses gave my CV the precise European standard needed for fast-track Chancenkarte points assessment."',
-    image: '/image4.png',
-    location: 'HAMBURG, GERMANY',
+      image: 'https://placehold.co/600x400/fbbc04/ffffff?text=Tari+Tari-Cole',
+      location: 'HAMBURG, GERMANY',
     salary: 'Role: Industrial Safety Lead',
     status: 'HSE 1-3 & Chancenkarte',
   },
@@ -828,7 +847,7 @@ const galleryItems = [
     tag: 'EXAM PREP',
     title: 'Adults & Nurses Language Lecture',
     desc: 'Nurses and candidates working through German phonetic materials.',
-    image: '/study-group.jpg',
+    image: 'https://placehold.co/600x400/7b1fa2/ffffff?text=Nurses+Language+Lecture',
     category: 'language',
   },
   {
@@ -1017,9 +1036,9 @@ const paths = [
   {
     title: 'German & French Language Training',
     items: [
-      'A1 through C2, Goethe & DELF/DALF aligned',
+      'German A1 – B2 Goethe exam prep for adults & kids',
+      'French A1 – C1 DELF/DALF exam prep for adults & kids',
       'Standard or intensive fast-track pace',
-      'Kids, teens & adult classes',
     ],
   },
   {
@@ -1041,8 +1060,11 @@ const paths = [
   {
     title: 'Professional ICT & Tech Skills Training',
     items: [
-      'Data analysis, web dev, cyber security',
-      'Beginner through advanced tracks',
+      'Data analysis — Excel, SQL, Power BI, Tableau, Python',
+      'Cyber Security — ethical hacking, network defense, risk mitigation',
+      'Project Management — Agile, Scrum, PMP methodologies',
+      'Basic & Advanced ICT certification tracks',
+      'Computer Programming — Python, Web Development, Software Engineering',
       'Certificate on completion',
     ],
   },
@@ -1057,9 +1079,34 @@ const paths = [
   {
     title: 'Health, Safety & Environment (HSE)',
     items: [
-      'HSE Levels 1 through 3',
+      'HSE Levels 1, 2 & 3 — General & Advanced',
       'Corporate & individual enrollment',
       'Internationally recognised curriculum',
+    ],
+  },
+  {
+    title: 'IELTS & Exam Preparatory Classes',
+    items: [
+      'Intensive IELTS exam preparation for all bands',
+      'Listening, Reading, Writing & Speaking drills',
+      'Expert instructors & mock test sessions',
+    ],
+  },
+  {
+    title: 'Kids & Children Tech Programs',
+    items: [
+      'Scratch coding, Python robotics, elementary tech modules',
+      'Bilingual STEM exposure',
+      'Ages 6–16, after-school & holiday bootcamps',
+    ],
+  },
+  {
+    title: 'Corporate Bodies / Staff Training',
+    items: [
+      'Data Analysis for teams',
+      'Project Management Professional (PMP)',
+      'ICT & Cyber Security upskilling',
+      'HSE Level 1–3 for workforce safety compliance',
     ],
   },
 ];
@@ -1123,12 +1170,15 @@ function PathToExcellenceSection() {
                 <span className="font-label-caps text-[10px] bg-secondary-container text-on-secondary-container px-2.5 py-1 rounded font-bold uppercase">
                   {
                     [
-                      'A1 - C2 CERTIFIED',
-                      'EARN €3,200+ / MO',
+                      'A1–C2 CERTIFIED',
+                      'EARN €3,200+/MO',
                       'CHANCENKARTE',
                       'HANDS-ON LABS',
                       'EARN & LEARN',
-                      'HSE LEVEL 1 - 3',
+                      'HSE LEVEL 1–3',
+                      'IELTS & EXAM PREP',
+                      'KIDS TECH AGES 6–16',
+                      'CORPORATE TRAINING',
                     ][i]
                   }
                 </span>
@@ -1139,12 +1189,15 @@ function PathToExcellenceSection() {
               <p className="text-sm text-on-surface-variant">
                 {
                   [
-                    '"Join Our Certified German & French courses designed to help you speak with Confidence." Classes from A1 to C2 for adults and kids with Goethe-Institut and DELF/DALF preparatory exams.',
+                    '"Join Our Certified German & French courses designed to help you speak with Confidence." German A1–B2 Goethe exam prep and French A1–C1 DELF/DALF exam prep classes for adults and kids with certified instructors.',
                     'Direct German hospital placements for Nigerian registered nurses (RN, RM, BNSC). Comprehensive Anerkennung licensing, hospital employer sponsorship, and Defizitbescheid processing.',
                     'Admission into 100% tuition-free public universities across Germany for Bachelors and Masters. Opportunity Card (Chancenkarte) advisory and ZAB degree evaluation.',
-                    'Basic and Advanced ICT certifications in Port Harcourt: Data Analysis Courses, Project Management, Cyber Security, Python Programming, and Software Development.',
+                    'Professional ICT certifications in Port Harcourt: Data Analysis (Excel, SQL, Power BI, Tableau, Python), Cyber Security, Project Management (Agile/Scrum/PMP), Computer Programming, and Web Development. Basic to Advanced tracks.',
                     'Earn while you learn in Germany. Guaranteed monthly stipends (€1,000 – €1,400/mo) in IT, Mechatronics, Logistics, Care, Hospitality, and Business. No blocked account required.',
                     'General and Advanced Health, Safety & Environment (HSE) Level 1, 2 & 3 Certification. Essential for oil, gas, maritime, engineering, construction, and global corporate safety roles.',
+                    'Intensive IELTS exam preparatory classes covering Listening, Reading, Writing, and Speaking. Expert instructors, mock test sessions, and band-score strategies for UK, Canada, Australia, and NZ.',
+                    'Kids & Children Tech Programs: Scratch coding, Python robotics, and elementary technology modules for ages 6–16. After-school and holiday bootcamps preparing the next generation of Nigerian tech innovators.',
+                    'Corporate Bodies / Staff Professional Training: Customized in-house and off-site programs on Data Analysis, Project Management, ICT, Cyber Security, and HSE Level 1–3. Available for teams and entire organisations.',
                   ][i]
                 }
               </p>
@@ -1158,21 +1211,24 @@ function PathToExcellenceSection() {
               </ul>
             </div>
             <div className="pt-5 mt-4">
-              <a
-                href="#language-academy"
-                className="w-full block py-2.5 bg-primary text-on-primary text-center rounded-full text-sm font-semibold hover:bg-primary-container transition-colors"
-              >
-                {
-                  [
-                    'Explore Language Classes →',
-                    'Nurse Eligibility Audit →',
-                    'Apply for Admission →',
-                    'View ICT Syllabus →',
-                    'Ausbildung Registration →',
-                    'Enroll in HSE Today →',
-                  ][i]
-                }
-              </a>
+               <a
+                 href="#language-academy"
+                 className="w-full block py-2.5 bg-primary text-on-primary text-center rounded-full text-sm font-semibold hover:bg-primary-container transition-colors"
+               >
+                 {
+                   [
+                     'Explore Language Classes →',
+                     'Nurse Eligibility Audit →',
+                     'Apply for Admission →',
+                     'View ICT & Tech Syllabus →',
+                     'Ausbildung Registration →',
+                     'Enroll in HSE Today →',
+                     'IELTS Prep Inquiry →',
+                     'Kids Tech Enrollment →',
+                     'Corporate Training Inquiry →',
+                   ][i]
+                 }
+               </a>
             </div>
           </motion.div>
         ))}
@@ -1223,26 +1279,26 @@ function IctsHseSection() {
             {
               icon: BarChart,
               title: 'Data Analysis Courses',
-              desc: 'Master Excel for Data Analysis, SQL Databases, Power BI, Tableau, and foundational Python analytics for reporting and business intelligence.',
-              tag: 'PHYSICAL & VIRTUAL',
+              desc: 'Master Excel for Data Analysis, SQL Databases, Power BI, Tableau, and foundational Python analytics for reporting and business intelligence. Available for individuals and corporate staff.',
+              tag: 'INDIVIDUALS & CORPORATE • PHYSICAL & VIRTUAL',
             },
             {
               icon: Briefcase,
               title: 'Project Management Courses',
-              desc: 'Industry-aligned Project Management Professional methodologies, Agile frameworks, Scrum sprint cycles, and resource tracking software.',
-              tag: 'EXECUTIVE SESSIONS',
+              desc: 'Industry-aligned Project Management Professional methodologies, Agile frameworks, Scrum sprint cycles, and resource tracking software. Tailored for corporate bodies and staff professional development.',
+              tag: 'CORPORATE BODIES • EXECUTIVE SESSIONS',
             },
             {
               icon: Shield,
               title: 'Cyber Security Courses',
-              desc: 'Network security fundamentals, ethical hacking essentials, cyber defense tactics, risk mitigation, and security architecture training.',
+              desc: 'Network security fundamentals, ethical hacking essentials, cyber defense tactics, risk mitigation, and security architecture training. Hands-on lab drills at our Port Harcourt center.',
               tag: 'HANDS-ON LAB DRILLS',
             },
             {
               icon: ShieldCheck,
               title: 'HSE Level 1 - 3 Certification',
-              desc: 'General & Advanced Health, Safety & Environment training with authentic certification for Oil, Gas, Construction, and Maritime industries.',
-              tag: 'INDUSTRY CERTIFIED',
+              desc: 'General and Advanced Health, Safety & Environment training with authentic certification. Level 1, 2 & 3 for Oil & Gas, Maritime, Construction, and global corporate safety roles.',
+              tag: 'INDUSTRY CERTIFIED • LEVEL 1–3',
             },
           ].map((track, i) => (
             <motion.div
@@ -1357,6 +1413,7 @@ function LanguageAcademySection() {
           </div>
           <h2 className="font-headline-lg text-2xl md:text-3xl text-primary font-bold">
             German & French Language Academy (CEFR A1 – C2).
+            <span className="block text-secondary text-xl md:text-2xl mt-1">French Classes A1–C1 for Adults & Kids — Special Emphasis!</span>
           </h2>
           <p className="font-body-md text-on-surface-variant">
             Whether your dream is studying tuition-free at a German university,
@@ -1427,24 +1484,135 @@ function LanguageAcademySection() {
           </motion.div>
         ))}
       </div>
+
+      {/* French Language Special Emphasis */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="mt-10 p-6 rounded-2xl bg-secondary/10 border-2 border-secondary shadow-lg"
+      >
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className="w-14 h-14 rounded-xl bg-secondary text-secondary-fixed flex items-center justify-center shrink-0">
+              <Languages className="h-7 w-7" />
+            </div>
+            <div>
+              <span className="font-label-caps text-[10px] bg-secondary text-secondary-fixed px-2.5 py-1 rounded font-bold uppercase tracking-wider">Special Emphasis</span>
+              <h3 className="font-headline-sm text-xl text-primary font-bold mt-1.5">French Language Classes A1 – C1 — Adults & Kids</h3>
+              <p className="text-sm text-on-surface-variant mt-1 leading-relaxed">
+                Expert DELF/DALF-aligned French instruction for all ages. From complete beginners (A1) to advanced proficiency (C1), our certified French instructors deliver immersive, exam-focused classes for adults and children. Prepare for French diplomatic, academic, and career excellence.
+              </p>
+            </div>
+          </div>
+          <a
+            href="#eligibility-calculator"
+            className="px-6 py-3 bg-secondary text-secondary-fixed rounded-full font-semibold text-sm hover:bg-secondary-container hover:text-on-secondary-fixed transition-colors shrink-0"
+          >
+            Enroll in French Course →
+          </a>
+        </div>
+      </motion.div>
+
+      {/* IELTS Exam Prep Special Emphasis */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="mt-6 p-6 rounded-2xl bg-primary/5 border-2 border-primary shadow-md"
+      >
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className="w-14 h-14 rounded-xl bg-primary text-on-primary flex items-center justify-center shrink-0">
+              <Award className="h-7 w-7" />
+            </div>
+            <div>
+              <span className="font-label-caps text-[10px] bg-primary text-on-primary px-2.5 py-1 rounded font-bold uppercase tracking-wider">Special Emphasis</span>
+              <h3 className="font-headline-sm text-xl text-primary font-bold mt-1.5">IELTS Exam Preparatory Classes</h3>
+              <p className="text-sm text-on-surface-variant mt-1 leading-relaxed">
+                Comprehensive IELTS preparation covering Listening, Reading, Writing, and Speaking. Expert-led sessions with mock tests, band-score strategies, and personalised feedback. Ideal for UK, Canada, Australia, and New Zealand visa applicants.
+              </p>
+            </div>
+          </div>
+          <a
+            href="#eligibility-calculator"
+            className="px-6 py-3 bg-primary text-on-primary rounded-full font-semibold text-sm hover:bg-primary-container transition-colors shrink-0"
+          >
+            IELTS Prep Inquiry →
+          </a>
+        </div>
+      </motion.div>
     </section>
   );
 }
 
 function EnrollFormSection() {
   const [form, setForm] = useState({
-    name: '',
+    first_name: '',
+    last_name: '',
     phone: '',
     email: '',
     program: 'german',
-    mode: 'physical',
+    location: 'port-harcourt',
+    message: '',
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = useState('idle');
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    setStatus('loading');
+    setErrorMessage('');
+
+    const payload = {
+      first_name: form.first_name.trim(),
+      last_name: form.last_name.trim(),
+      phone: form.phone.trim(),
+      email: form.email.trim(),
+      program: form.program,
+      location: form.location,
+      message: form.message.trim(),
+    };
+
+    try {
+      const response = await fetch(
+        'https://aoca-resources-backend.onrender.com/admission-inquiry',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        },
+      );
+
+      if (response.ok) {
+        setStatus('success');
+        setSubmitted(true);
+        setForm({
+          first_name: '',
+          last_name: '',
+          phone: '',
+          email: '',
+          program: 'german',
+          location: 'port-harcourt',
+          message: '',
+        });
+      } else {
+        const data = await response.json().catch(() => ({}));
+        const backendMsg = data.detail
+          ? Array.isArray(data.detail)
+            ? data.detail.map((err) => `${err.loc[err.loc.length - 1]}: ${err.msg}`).join(', ')
+            : data.detail
+           : data.message || 'Failed to submit. Please try again.';
+        throw new Error(backendMsg);
+      }
+    } catch (error) {
+      setStatus('error');
+      setErrorMessage(
+        error.message || 'Something went wrong. Please try again later.',
+      );
+    }
   };
 
   return (
@@ -1479,26 +1647,26 @@ function EnrollFormSection() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-bold text-primary uppercase">
-                  Full Legal Name
+                  First Name
                 </label>
                 <input
                   className="w-full bg-surface-container-low px-4 py-3 rounded-xl text-sm text-on-surface border border-outline-variant/40 focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
-                  placeholder="e.g. Samuel Okafor"
+                  placeholder="e.g. Samuel"
                   required
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  value={form.first_name}
+                  onChange={(e) => setForm({ ...form, first_name: e.target.value })}
                 />
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-bold text-primary uppercase">
-                  Active WhatsApp Phone Number
+                  Last Name
                 </label>
                 <input
                   className="w-full bg-surface-container-low px-4 py-3 rounded-xl text-sm text-on-surface border border-outline-variant/40 focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
-                  placeholder="+234 816 191 0975"
+                  placeholder="e.g. Okafor"
                   required
-                  value={form.phone}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  value={form.last_name}
+                  onChange={(e) => setForm({ ...form, last_name: e.target.value })}
                 />
               </div>
             </div>
@@ -1530,7 +1698,10 @@ function EnrollFormSection() {
                     German Language Training (A1 - C2)
                   </option>
                   <option value="french">
-                    French Language Training (A1 - C1)
+                    French Language Training (A1 - C1) — Adults & Kids
+                  </option>
+                  <option value="ielts">
+                    IELTS Exam Preparatory Classes
                   </option>
                   <option value="nursing">
                     Healthcare & Nursing Relocation to Germany
@@ -1544,6 +1715,12 @@ function EnrollFormSection() {
                   <option value="ict">
                     Professional ICT & Data Analysis Courses
                   </option>
+                  <option value="cybersecurity">
+                    Cyber Security Training
+                  </option>
+                  <option value="project-management">
+                    Project Management Professional Training
+                  </option>
                   <option value="programming">
                     Python Programming & Web Development
                   </option>
@@ -1553,62 +1730,82 @@ function EnrollFormSection() {
                   <option value="kids-tech">
                     Kids & Teens Certified Tech Course
                   </option>
+                  <option value="corporate">
+                    Corporate Bodies / Staff Professional Training
+                  </option>
                 </select>
               </div>
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-bold text-primary uppercase">
-                Preferred Learning Mode
+                Location / Learning Mode
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {['physical', 'online', 'weekend'].map((mode) => (
+                {[
+                  { value: 'port-harcourt', label: 'Physical in Port Harcourt' },
+                  { value: 'online', label: 'Live Online Zoom Cohort' },
+                  { value: 'weekend', label: 'Weekend Executive Class' },
+                ].map((opt) => (
                   <label
-                    key={mode}
+                    key={opt.value}
                     className="flex items-center gap-2 p-3 bg-surface-container-low rounded-xl border border-outline-variant/30 cursor-pointer text-xs font-medium"
                   >
                     <input
                       type="radio"
-                      name="learning-mode"
-                      value={mode}
-                      checked={form.mode === mode}
+                      name="location"
+                      value={opt.value}
+                      checked={form.location === opt.value}
                       onChange={(e) =>
-                        setForm({ ...form, mode: e.target.value })
+                        setForm({ ...form, location: e.target.value })
                       }
                     />
-                    <span>
-                      {mode === 'physical'
-                        ? 'Physical in Port Harcourt'
-                        : mode === 'online'
-                          ? 'Live Online Zoom Cohort'
-                          : 'Weekend Executive Class'}
-                    </span>
+                    <span>{opt.label}</span>
                   </label>
                 ))}
               </div>
             </div>
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-xs text-on-surface-variant flex items-center gap-1.5">
-                <CheckCircle2 className="h-4 w-4 text-secondary" />
-                <span>
-                  Head Office: 70 Eligbolo Rd, Rumudumaya, Port Harcourt.
-                </span>
-              </div>
-              <button
-                type="submit"
-                className="w-full sm:w-auto px-8 py-3.5 bg-primary text-on-primary rounded-full font-semibold text-sm hover:bg-primary-container shadow transition-all"
-              >
-                Submit Application Now
-              </button>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold text-primary uppercase">
+                Additional Message (Optional)
+              </label>
+              <textarea
+                className="w-full bg-surface-container-low px-4 py-3 rounded-xl text-sm text-on-surface border border-outline-variant/40 focus:outline-none focus:ring-2 focus:ring-primary transition-colors resize-none"
+                placeholder="Tell us about your goals or any questions..."
+                rows="3"
+                value={form.message}
+                onChange={(e) => setForm({ ...form, message: e.target.value })}
+              />
             </div>
-            {submitted && (
-              <div className="p-4 bg-emerald-50 text-emerald-900 border border-emerald-200 rounded-xl text-sm flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-emerald-700" />
-                <span>
-                  Your request has been received! Our admissions team will
-                  call/WhatsApp you at +234 816 191 0975 shortly.
-                </span>
+              <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-xs text-on-surface-variant flex items-center gap-1.5">
+                  <CheckCircle2 className="h-4 w-4 text-secondary" />
+                  <span>
+                    Head Office: 70 Eligbolo Rd, Rumudumaya, Port Harcourt.
+                  </span>
+                </div>
+                <button
+                  type="submit"
+                  disabled={status === 'loading'}
+                  className="w-full sm:w-auto px-8 py-3.5 bg-primary text-on-primary rounded-full font-semibold text-sm hover:bg-primary-container shadow transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {status === 'loading' ? 'Submitting...' : 'Submit Application Now'}
+                </button>
               </div>
-            )}
+              {status === 'error' && (
+                <div className="p-4 bg-red-50 text-red-700 border border-red-200 rounded-xl text-sm flex items-center gap-2">
+                  <AlertCircle className="h-5 w-5 shrink-0" />
+                  {errorMessage}
+                </div>
+              )}
+              {submitted && status === 'success' && (
+                <div className="p-4 bg-emerald-50 text-emerald-900 border border-emerald-200 rounded-xl text-sm flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-emerald-700" />
+                  <span>
+                    Your request has been received! Our admissions team will
+                    call/WhatsApp you at +234 816 191 0975 shortly.
+                  </span>
+                </div>
+              )}
           </form>
         </div>
       </div>
