@@ -137,7 +137,37 @@ function WelcomeModal({ onClose }) {
         </div>
         <div className="p-6 flex flex-col gap-4">
           <p className="text-sm text-on-surface-variant leading-relaxed">
-            Discover our comprehensive programs: <strong className="text-secondary font-semibold">French Language Classes A1–C1</strong> (Adults & Kids with exam prep), <strong className="text-secondary font-semibold">IELTS Exam Preparatory Classes</strong>, <strong className="text-secondary font-semibold">Data Analysis Training</strong> for individuals and corporate staff, <strong className="text-secondary font-semibold">Project Management Training</strong>, <strong className="text-secondary font-semibold">Professional ICT Training</strong> (Basic & Advanced), <strong className="text-secondary font-semibold">Cyber Security Training</strong>, <strong className="text-secondary font-semibold">HSE Level 1–3 Courses</strong>, German Language A1–B2, German Visa Consultancy, Computer Programming, and Kids Tech Programs. Join 500+ professionals already placed in Germany.
+            Discover our comprehensive programs:{' '}
+            <strong className="text-secondary font-semibold">
+              French Language Classes A1–C1
+            </strong>{' '}
+            (Adults & Kids with exam prep),{' '}
+            <strong className="text-secondary font-semibold">
+              IELTS Exam Preparatory Classes
+            </strong>
+            ,{' '}
+            <strong className="text-secondary font-semibold">
+              Data Analysis Training
+            </strong>{' '}
+            for individuals and corporate staff,{' '}
+            <strong className="text-secondary font-semibold">
+              Project Management Training
+            </strong>
+            ,{' '}
+            <strong className="text-secondary font-semibold">
+              Professional ICT Training
+            </strong>{' '}
+            (Basic & Advanced),{' '}
+            <strong className="text-secondary font-semibold">
+              Cyber Security Training
+            </strong>
+            ,{' '}
+            <strong className="text-secondary font-semibold">
+              HSE Level 1–3 Courses
+            </strong>
+            , German Language A1–B2, German Visa Consultancy, Computer
+            Programming, and Kids Tech Programs. Join 500+ professionals already
+            placed in Germany.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
@@ -340,7 +370,7 @@ const videoData = [
     src: 'https://res.cloudinary.com/dejeplzpv/video/upload/v1789516639/WhatsApp_Video_2026-09-13_at_16.13.36_n1kn5n.mp4',
     duration: '04:28',
     time: '01:52 / 04:28',
-    progress: '42%',
+    category: 'language',
   },
   {
     title: 'Inside Our Port Harcourt Computer & ICT Training Lab',
@@ -349,7 +379,7 @@ const videoData = [
     src: 'https://res.cloudinary.com/dejeplzpv/video/upload/v1789517795/WhatsApp_Video_2026-09-13_at_16.13.39_rf6d4u.mp4',
     duration: '06:15',
     time: '02:40 / 06:15',
-    progress: '44%',
+    category: 'tech',
   },
   {
     title: 'Anerkennung Nursing Roadmap & Hospital Placement Interview',
@@ -358,7 +388,7 @@ const videoData = [
     src: 'https://res.cloudinary.com/dejeplzpv/video/upload/v1789517795/WhatsApp_Video_2026-09-13_at_16.13.44_tvqsdu.mp4',
     duration: '05:40',
     time: '01:10 / 05:40',
-    progress: '20%',
+    category: 'healthcare',
   },
   {
     title: 'Kids & Teens Summer Coding Camp Demonstration',
@@ -367,16 +397,24 @@ const videoData = [
     src: 'https://res.cloudinary.com/dejeplzpv/video/upload/v1789517793/WhatsApp_Video_2026-09-13_at_16.13.43_qyedgt.mp4',
     duration: '03:55',
     time: '00:45 / 03:55',
-    progress: '18%',
+    category: 'youth',
   },
 ];
 
 function VideoShowcaseSection() {
+  const [activeCategory, setActiveCategory] = useState('all');
   const [active, setActive] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
   const videoRef = useRef(null);
+
+  const filteredVideos =
+    activeCategory === 'all'
+      ? videoData
+      : videoData.filter((v) => v.category === activeCategory);
+
+  const currentVideo = filteredVideos[active] || videoData[0];
 
   const switchVideo = (index) => {
     setActive(index);
@@ -405,14 +443,14 @@ function VideoShowcaseSection() {
     if (!video) return;
 
     const handleTimeUpdate = () => {
-      if (video.duration) {
+      if (video.duration && isFinite(video.duration)) {
         setProgress((video.currentTime / video.duration) * 100);
       }
     };
 
     video.addEventListener('timeupdate', handleTimeUpdate);
     return () => video.removeEventListener('timeupdate', handleTimeUpdate);
-  }, [active]);
+  }, [active, isPlaying]);
 
   const toggleVideoPlayback = () => {
     setIsPlaying(!isPlaying);
@@ -423,13 +461,14 @@ function VideoShowcaseSection() {
   };
 
   const scrubVideo = (e) => {
+    const video = videoRef.current;
+    if (!video || !isFinite(video.duration)) return;
+
     const rect = e.currentTarget.getBoundingClientRect();
-    const pos = (e.clientX - rect.left) / rect.width;
-    const newProgress = Math.max(0, Math.min(1, pos));
-    setProgress(newProgress * 100);
-    if (videoRef.current && videoRef.current.duration) {
-      videoRef.current.currentTime = newProgress * videoRef.current.duration;
-    }
+    const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const newTime = pos * video.duration;
+    video.currentTime = newTime;
+    setProgress(pos * 100);
   };
 
   const expandVideo = () => {
@@ -441,6 +480,12 @@ function VideoShowcaseSection() {
     } else {
       document.exitFullscreen();
     }
+  };
+
+  const handleCategoryChange = (cat) => {
+    setActiveCategory(cat);
+    setActive(0);
+    setProgress(0);
   };
 
   return (
@@ -459,24 +504,40 @@ function VideoShowcaseSection() {
           <div className="flex flex-col gap-2 max-w-2xl">
             <div className="inline-flex items-center gap-2 text-secondary-fixed text-xs font-bold uppercase tracking-widest">
               <Video className="h-4 w-4" />
-              <span>VIDEO DOCUMENTARY & CLASSROOM FOOTAGE</span>
+              <span>VIDEO GALLERY</span>
             </div>
             <h2 className="font-headline-lg text-2xl sm:text-4xl font-bold text-white">
-              Inside AOCA: Real Video Tours & Classroom Sessions
+              Real Tours & Classroom Sessions
             </h2>
             <p className="text-white/80 text-sm sm:text-base leading-relaxed">
-              Experience unscripted classroom dynamics, Goethe exam simulation
-              drills, computer lab workstations, and nursing relocation
-              interviews recorded directly at our campuses.
+              Unscripted classroom dynamics, Goethe exam simulation drills,
+              computer lab workstations, and nursing relocation interviews
+              recorded directly at our campuses.
             </p>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-xs bg-white/10 px-3 py-1.5 rounded-lg text-white/80 border border-white/15 flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
-              4 HD Classroom Reels
+              {videoData.length} Sessions Available
             </span>
           </div>
         </motion.div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {['all', 'language', 'tech', 'healthcare', 'youth'].map((cat) => (
+            <button
+              key={cat}
+              onClick={() => handleCategoryChange(cat)}
+              className={`px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all ${
+                activeCategory === cat
+                  ? 'bg-secondary text-secondary-fixed'
+                  : 'bg-white/10 text-white/80 hover:bg-white/20'
+              }`}
+            >
+              {cat === 'all' ? 'All Sessions' : cat}
+            </button>
+          ))}
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <motion.div
@@ -493,12 +554,12 @@ function VideoShowcaseSection() {
               <video
                 key={active}
                 ref={videoRef}
-                poster={videoData[active].poster}
+                poster={currentVideo.poster}
                 className="w-full h-full object-cover"
                 playsInline
                 preload="metadata"
               >
-                <source src={videoData[active].src} type="video/mp4" />
+                <source src={currentVideo.src} type="video/mp4" />
               </video>
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent"></div>
               <button
@@ -517,12 +578,12 @@ function VideoShowcaseSection() {
                   <span className="w-1.5 h-1.5 rounded-full bg-white/70"></span>
                   Recorded Class
                 </span>
-                <span
-                  className="bg-black/70 backdrop-blur-md text-white/90 text-xs px-2.5 py-1 rounded-md border border-white/10 font-mono"
-                  id="videoDurationBadge"
-                >
-                  {videoData[active].duration}
-                </span>
+                 <span
+                   className="bg-black/70 backdrop-blur-md text-white/90 text-xs px-2.5 py-1 rounded-md border border-white/10 font-mono"
+                   id="videoDurationBadge"
+                 >
+                   {currentVideo.duration}
+                 </span>
               </div>
               <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/95 to-transparent flex flex-col gap-2">
                 <div
@@ -557,12 +618,12 @@ function VideoShowcaseSection() {
                         <Volume2 className="h-5 w-5" />
                       )}
                     </button>
-                    <span
-                      className="font-mono text-[11px] text-white/75"
-                      id="videoTimeCounter"
-                    >
-                      {videoData[active].time}
-                    </span>
+                     <span
+                       className="font-mono text-[11px] text-white/75"
+                       id="videoTimeCounter"
+                     >
+                       {currentVideo.time}
+                     </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-[11px] text-secondary-fixed font-semibold uppercase hidden sm:inline">
@@ -581,17 +642,17 @@ function VideoShowcaseSection() {
             <div className="p-6 bg-primary-container/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex flex-col gap-1">
                 <span className="text-[11px] font-bold text-secondary-fixed uppercase tracking-wider">
-                  NOW PLAYING • CHAPTER 1
+                  NOW PLAYING
                 </span>
                 <h3
                   className="font-title-md text-lg font-bold text-white"
                   id="currentVideoTitle"
                 >
-                  {videoData[active].title}
-                </h3>
-                <p className="text-xs text-white/70" id="currentVideoDesc">
-                  {videoData[active].desc}
-                </p>
+                   {currentVideo.title}
+                 </h3>
+                 <p className="text-xs text-white/70" id="currentVideoDesc">
+                   {currentVideo.desc}
+                 </p>
               </div>
               <a
                 href="tel:+2348161910975"
@@ -611,53 +672,48 @@ function VideoShowcaseSection() {
           >
             <div className="flex items-center justify-between pb-1 border-b border-white/10">
               <span className="text-xs font-bold text-secondary-fixed uppercase tracking-wider">
-                SELECT VIDEO CHAPTER
+                SELECT SESSION
               </span>
               <span className="text-[11px] text-white/60">
-                4 Sessions Available
+                {filteredVideos.length} Session{filteredVideos.length !== 1 ? 's' : ''} Available
               </span>
             </div>
-            {videoData.map((video, i) => (
-              <motion.div
-                key={i}
-                whileHover={{ scale: 1.02 }}
-                className={`cursor-pointer p-3 rounded-xl transition-all flex gap-3 group ${active === i ? 'bg-primary-container border-2 border-secondary' : 'bg-primary-container/40 border border-white/10 hover:border-secondary-fixed hover:bg-primary-container'}`}
-                onClick={() => switchVideo(i)}
-              >
-                <div className="relative w-28 h-20 rounded-xl overflow-hidden shrink-0 bg-black">
-                  <img
-                    alt={video.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                    src={videoData[i].poster}
-                  />
-                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                    <Play className="h-6 w-6 text-white group-hover:text-secondary-fixed" />
+            {filteredVideos.map((video, i) => {
+              const originalIndex = videoData.indexOf(video);
+              return (
+                <motion.div
+                  key={originalIndex}
+                  whileHover={{ scale: 1.02 }}
+                  className={`cursor-pointer p-3 rounded-xl transition-all flex gap-3 group ${active === i ? 'bg-primary-container border-2 border-secondary' : 'bg-primary-container/40 border border-white/10 hover:border-secondary-fixed hover:bg-primary-container'}`}
+                  onClick={() => switchVideo(i)}
+                >
+                  <div className="relative w-28 h-20 rounded-xl overflow-hidden shrink-0 bg-black">
+                    <img
+                      alt={video.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                      src={video.poster}
+                    />
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                      <Play className="h-6 w-6 text-white group-hover:text-secondary-fixed" />
+                    </div>
+                    <span className="absolute bottom-1 right-1 bg-black/80 text-[10px] text-white px-1 rounded font-mono">
+                      {video.duration}
+                    </span>
                   </div>
-                  <span className="absolute bottom-1 right-1 bg-black/80 text-[10px] text-white px-1 rounded font-mono">
-                    {video.duration}
-                  </span>
-                </div>
-                <div className="flex flex-col justify-center">
-                  <span className="text-[10px] font-bold text-secondary-fixed uppercase">
-                    {
-                      [
-                        'Language Studio',
-                        'Tech Hub',
-                        'Healthcare',
-                        'Youth Tech',
-                      ][i]
-                    }
-                  </span>
-                  <h4 className="text-xs font-bold text-white line-clamp-2">
-                    {video.title}
-                  </h4>
-                  <span className="text-[11px] text-white/60 mt-1 flex items-center gap-1">
-                    <Eye className="h-3 w-3" /> {[2840, 3410, 4920, 1730][i]}{' '}
-                    views
-                  </span>
-                </div>
-              </motion.div>
-            ))}
+                  <div className="flex flex-col justify-center">
+                    <span className="text-[10px] font-bold text-secondary-fixed uppercase">
+                      {video.category}
+                    </span>
+                    <h4 className="text-xs font-bold text-white line-clamp-2">
+                      {video.title}
+                    </h4>
+                    <span className="text-[11px] text-white/60 mt-1 flex items-center gap-1">
+                      <Eye className="h-3 w-3" />{[2840, 3410, 4920, 1730][originalIndex]} views
+                    </span>
+                  </div>
+                </motion.div>
+              );
+            })}
           </motion.div>
         </div>
       </div>
@@ -671,7 +727,7 @@ const voices = [
     role: 'Charité Hospital, Berlin',
     quote:
       '"I started German A1 at Rumudumaya without a single word of Deutsch. Passing B2 Pflege under AOCA\'s faculty got me directly sponsored into Charité Berlin with relocation accommodation."',
-     image: 'https://placehold.co/600x400/1a73e8/ffffff?text=Chioma+Ezeh',
+    image: 'https://placehold.co/600x400/1a73e8/ffffff?text=Chioma+Ezeh',
     location: 'BERLIN, GERMANY',
     salary: 'Salary: €3,400/month',
     status: 'Hospital Anerkennung Completed',
@@ -681,8 +737,8 @@ const voices = [
     role: 'IT Systems Specialist, Munich',
     quote:
       '"Combining Python programming at the AOCA computer laboratory with intensive B1 German qualified me for a dual Ausbildung contract in Bavaria without needing a blocked account."',
-      image: 'https://placehold.co/600x400/34a853/ffffff?text=Emmanuel+Briggs',
-      location: 'MUNICH, GERMANY',
+    image: 'https://placehold.co/600x400/34a853/ffffff?text=Emmanuel+Briggs',
+    location: 'MUNICH, GERMANY',
     salary: 'Stipend: €1,250/month',
     status: 'Dual IT Vocational Contract',
   },
@@ -691,8 +747,8 @@ const voices = [
     role: 'Goethe University Frankfurt',
     quote:
       '"Our entire study group got our German visas approved on the first attempt after completing APS documentation and embassy mock interviews with AOCA counselors."',
-      image: 'https://placehold.co/600x400/ea4335/ffffff?text=Blessing+and+Group',
-      location: 'FRANKFURT, GERMANY',
+    image: 'https://placehold.co/600x400/ea4335/ffffff?text=Blessing+and+Group',
+    location: 'FRANKFURT, GERMANY',
     salary: 'Tuition: €0.00 / Free Public Uni',
     status: 'German National Visa Stamped',
   },
@@ -701,8 +757,8 @@ const voices = [
     role: 'Port Logistics Safety Officer',
     quote:
       '"The HSE certification paired with Data Analysis courses gave my CV the precise European standard needed for fast-track Chancenkarte points assessment."',
-      image: 'https://placehold.co/600x400/fbbc04/ffffff?text=Tari+Tari-Cole',
-      location: 'HAMBURG, GERMANY',
+    image: 'https://placehold.co/600x400/fbbc04/ffffff?text=Tari+Tari-Cole',
+    location: 'HAMBURG, GERMANY',
     salary: 'Role: Industrial Safety Lead',
     status: 'HSE 1-3 & Chancenkarte',
   },
@@ -847,7 +903,8 @@ const galleryItems = [
     tag: 'EXAM PREP',
     title: 'Adults & Nurses Language Lecture',
     desc: 'Nurses and candidates working through German phonetic materials.',
-    image: 'https://placehold.co/600x400/7b1fa2/ffffff?text=Nurses+Language+Lecture',
+    image:
+      'https://placehold.co/600x400/7b1fa2/ffffff?text=Nurses+Language+Lecture',
     category: 'language',
   },
   {
@@ -1009,24 +1066,6 @@ function GallerySection() {
             <ChevronRight className="h-5 w-5" />
           </button>
         </div>
-
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-xl bg-surface-container border border-outline-variant/30 text-xs">
-          <div className="flex items-center gap-2 text-on-surface-variant font-medium">
-            <Shield className="h-4 w-4 text-secondary" />
-            <span>
-              All media photographed at 70 Eligbolo Rd, Rumudumaya or accredited
-              consular venues.
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <a
-              href="tel:+2348161910975"
-              className="text-primary font-bold hover:text-secondary"
-            >
-              Admissions Hotline: +234 816 191 0975
-            </a>
-          </div>
-        </div>
       </div>
     </section>
   );
@@ -1143,7 +1182,19 @@ function PathToExcellenceSection() {
             DIRECT STUDENT DESK
           </span>
           <span className="font-headline-sm text-lg font-bold text-primary">
-            +234 816 191 0975 / +234 803 886 5466
+            <a
+              href="tel:+2348161910975"
+              className="hover:text-secondary transition-colors"
+            >
+              +234 816 191 0975
+            </a>
+            <span className="text-on-surface-variant/50 mx-1">/</span>
+            <a
+              href="tel:+2348038865466"
+              className="hover:text-secondary transition-colors"
+            >
+              +234 803 886 5466
+            </a>
           </span>
         </div>
       </motion.div>
@@ -1211,24 +1262,24 @@ function PathToExcellenceSection() {
               </ul>
             </div>
             <div className="pt-5 mt-4">
-               <a
-                 href="#language-academy"
-                 className="w-full block py-2.5 bg-primary text-on-primary text-center rounded-full text-sm font-semibold hover:bg-primary-container transition-colors"
-               >
-                 {
-                   [
-                     'Explore Language Classes →',
-                     'Nurse Eligibility Audit →',
-                     'Apply for Admission →',
-                     'View ICT & Tech Syllabus →',
-                     'Ausbildung Registration →',
-                     'Enroll in HSE Today →',
-                     'IELTS Prep Inquiry →',
-                     'Kids Tech Enrollment →',
-                     'Corporate Training Inquiry →',
-                   ][i]
-                 }
-               </a>
+              <a
+                href="#language-academy"
+                className="w-full block py-2.5 bg-primary text-on-primary text-center rounded-full text-sm font-semibold hover:bg-primary-container transition-colors"
+              >
+                {
+                  [
+                    'Explore Language Classes →',
+                    'Nurse Eligibility Audit →',
+                    'Apply for Admission →',
+                    'View ICT & Tech Syllabus →',
+                    'Ausbildung Registration →',
+                    'Enroll in HSE Today →',
+                    'IELTS Prep Inquiry →',
+                    'Kids Tech Enrollment →',
+                    'Corporate Training Inquiry →',
+                  ][i]
+                }
+              </a>
             </div>
           </motion.div>
         ))}
@@ -1413,7 +1464,9 @@ function LanguageAcademySection() {
           </div>
           <h2 className="font-headline-lg text-2xl md:text-3xl text-primary font-bold">
             German & French Language Academy (CEFR A1 – C2).
-            <span className="block text-secondary text-xl md:text-2xl mt-1">French Classes A1–C1 for Adults & Kids — Special Emphasis!</span>
+            <span className="block text-secondary text-xl md:text-2xl mt-1">
+              French Classes A1–C1 for Adults & Kids — Special Emphasis!
+            </span>
           </h2>
           <p className="font-body-md text-on-surface-variant">
             Whether your dream is studying tuition-free at a German university,
@@ -1498,10 +1551,18 @@ function LanguageAcademySection() {
               <Languages className="h-7 w-7" />
             </div>
             <div>
-              <span className="font-label-caps text-[10px] bg-secondary text-secondary-fixed px-2.5 py-1 rounded font-bold uppercase tracking-wider">Special Emphasis</span>
-              <h3 className="font-headline-sm text-xl text-primary font-bold mt-1.5">French Language Classes A1 – C1 — Adults & Kids</h3>
+              <span className="font-label-caps text-[10px] bg-secondary text-secondary-fixed px-2.5 py-1 rounded font-bold uppercase tracking-wider">
+                Special Emphasis
+              </span>
+              <h3 className="font-headline-sm text-xl text-primary font-bold mt-1.5">
+                French Language Classes A1 – C1 — Adults & Kids
+              </h3>
               <p className="text-sm text-on-surface-variant mt-1 leading-relaxed">
-                Expert DELF/DALF-aligned French instruction for all ages. From complete beginners (A1) to advanced proficiency (C1), our certified French instructors deliver immersive, exam-focused classes for adults and children. Prepare for French diplomatic, academic, and career excellence.
+                Expert DELF/DALF-aligned French instruction for all ages. From
+                complete beginners (A1) to advanced proficiency (C1), our
+                certified French instructors deliver immersive, exam-focused
+                classes for adults and children. Prepare for French diplomatic,
+                academic, and career excellence.
               </p>
             </div>
           </div>
@@ -1527,10 +1588,17 @@ function LanguageAcademySection() {
               <Award className="h-7 w-7" />
             </div>
             <div>
-              <span className="font-label-caps text-[10px] bg-primary text-on-primary px-2.5 py-1 rounded font-bold uppercase tracking-wider">Special Emphasis</span>
-              <h3 className="font-headline-sm text-xl text-primary font-bold mt-1.5">IELTS Exam Preparatory Classes</h3>
+              <span className="font-label-caps text-[10px] bg-primary text-on-primary px-2.5 py-1 rounded font-bold uppercase tracking-wider">
+                Special Emphasis
+              </span>
+              <h3 className="font-headline-sm text-xl text-primary font-bold mt-1.5">
+                IELTS Exam Preparatory Classes
+              </h3>
               <p className="text-sm text-on-surface-variant mt-1 leading-relaxed">
-                Comprehensive IELTS preparation covering Listening, Reading, Writing, and Speaking. Expert-led sessions with mock tests, band-score strategies, and personalised feedback. Ideal for UK, Canada, Australia, and New Zealand visa applicants.
+                Comprehensive IELTS preparation covering Listening, Reading,
+                Writing, and Speaking. Expert-led sessions with mock tests,
+                band-score strategies, and personalised feedback. Ideal for UK,
+                Canada, Australia, and New Zealand visa applicants.
               </p>
             </div>
           </div>
@@ -1602,9 +1670,11 @@ function EnrollFormSection() {
         const data = await response.json().catch(() => ({}));
         const backendMsg = data.detail
           ? Array.isArray(data.detail)
-            ? data.detail.map((err) => `${err.loc[err.loc.length - 1]}: ${err.msg}`).join(', ')
+            ? data.detail
+                .map((err) => `${err.loc[err.loc.length - 1]}: ${err.msg}`)
+                .join(', ')
             : data.detail
-           : data.message || 'Failed to submit. Please try again.';
+          : data.message || 'Failed to submit. Please try again.';
         throw new Error(backendMsg);
       }
     } catch (error) {
@@ -1654,7 +1724,9 @@ function EnrollFormSection() {
                   placeholder="e.g. Samuel"
                   required
                   value={form.first_name}
-                  onChange={(e) => setForm({ ...form, first_name: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, first_name: e.target.value })
+                  }
                 />
               </div>
               <div className="flex flex-col gap-1.5">
@@ -1666,7 +1738,9 @@ function EnrollFormSection() {
                   placeholder="e.g. Okafor"
                   required
                   value={form.last_name}
-                  onChange={(e) => setForm({ ...form, last_name: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, last_name: e.target.value })
+                  }
                 />
               </div>
             </div>
@@ -1700,9 +1774,7 @@ function EnrollFormSection() {
                   <option value="french">
                     French Language Training (A1 - C1) — Adults & Kids
                   </option>
-                  <option value="ielts">
-                    IELTS Exam Preparatory Classes
-                  </option>
+                  <option value="ielts">IELTS Exam Preparatory Classes</option>
                   <option value="nursing">
                     Healthcare & Nursing Relocation to Germany
                   </option>
@@ -1715,9 +1787,7 @@ function EnrollFormSection() {
                   <option value="ict">
                     Professional ICT & Data Analysis Courses
                   </option>
-                  <option value="cybersecurity">
-                    Cyber Security Training
-                  </option>
+                  <option value="cybersecurity">Cyber Security Training</option>
                   <option value="project-management">
                     Project Management Professional Training
                   </option>
@@ -1742,7 +1812,10 @@ function EnrollFormSection() {
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {[
-                  { value: 'port-harcourt', label: 'Physical in Port Harcourt' },
+                  {
+                    value: 'port-harcourt',
+                    label: 'Physical in Port Harcourt',
+                  },
                   { value: 'online', label: 'Live Online Zoom Cohort' },
                   { value: 'weekend', label: 'Weekend Executive Class' },
                 ].map((opt) => (
@@ -1776,36 +1849,38 @@ function EnrollFormSection() {
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
               />
             </div>
-              <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="text-xs text-on-surface-variant flex items-center gap-1.5">
-                  <CheckCircle2 className="h-4 w-4 text-secondary" />
-                  <span>
-                    Head Office: 70 Eligbolo Rd, Rumudumaya, Port Harcourt.
-                  </span>
-                </div>
-                <button
-                  type="submit"
-                  disabled={status === 'loading'}
-                  className="w-full sm:w-auto px-8 py-3.5 bg-primary text-on-primary rounded-full font-semibold text-sm hover:bg-primary-container shadow transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {status === 'loading' ? 'Submitting...' : 'Submit Application Now'}
-                </button>
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="text-xs text-on-surface-variant flex items-center gap-1.5">
+                <CheckCircle2 className="h-4 w-4 text-secondary" />
+                <span>
+                  Head Office: 70 Eligbolo Rd, Rumudumaya, Port Harcourt.
+                </span>
               </div>
-              {status === 'error' && (
-                <div className="p-4 bg-red-50 text-red-700 border border-red-200 rounded-xl text-sm flex items-center gap-2">
-                  <AlertCircle className="h-5 w-5 shrink-0" />
-                  {errorMessage}
-                </div>
-              )}
-              {submitted && status === 'success' && (
-                <div className="p-4 bg-emerald-50 text-emerald-900 border border-emerald-200 rounded-xl text-sm flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-emerald-700" />
-                  <span>
-                    Your request has been received! Our admissions team will
-                    call/WhatsApp you at +234 816 191 0975 shortly.
-                  </span>
-                </div>
-              )}
+              <button
+                type="submit"
+                disabled={status === 'loading'}
+                className="w-full sm:w-auto px-8 py-3.5 bg-primary text-on-primary rounded-full font-semibold text-sm hover:bg-primary-container shadow transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {status === 'loading'
+                  ? 'Submitting...'
+                  : 'Submit Application Now'}
+              </button>
+            </div>
+            {status === 'error' && (
+              <div className="p-4 bg-red-50 text-red-700 border border-red-200 rounded-xl text-sm flex items-center gap-2">
+                <AlertCircle className="h-5 w-5 shrink-0" />
+                {errorMessage}
+              </div>
+            )}
+            {submitted && status === 'success' && (
+              <div className="p-4 bg-emerald-50 text-emerald-900 border border-emerald-200 rounded-xl text-sm flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-emerald-700" />
+                <span>
+                  Your request has been received! Our admissions team will
+                  call/WhatsApp you at +234 816 191 0975 shortly.
+                </span>
+              </div>
+            )}
           </form>
         </div>
       </div>
@@ -1949,12 +2024,12 @@ function App() {
             path="/dashboard/*"
             element={
               <PrivateRoute>
-                <Layout hideHeaderFooter={true}>
-                  <Routes>
-                    <Route path="/" element={<StudentDashboard />} />
-                    <Route path="course/:courseId" element={<CoursePlayer />} />
-                  </Routes>
-                </Layout>
+                {/* <Layout hideHeaderFooter={true}> */}
+                <Routes>
+                  <Route path="/" element={<StudentDashboard />} />
+                  <Route path="course/:courseId" element={<CoursePlayer />} />
+                </Routes>
+                {/* </Layout> */}
               </PrivateRoute>
             }
           />
@@ -1976,80 +2051,74 @@ function App() {
             path="/admin/*"
             element={
               <AdminRoute>
-                <Layout hideHeaderFooter={true}>
-                  <AdminLayout>
-                    <Routes>
-                      <Route path="dashboard" element={<AdminDashboard />} />
-                      <Route path="users" element={<UsersList />} />
-                      <Route path="users/new" element={<UserForm />} />
-                      <Route path="users/:id" element={<UserDetail />} />
-                      <Route path="users/:id/edit" element={<UserForm />} />
-                      <Route path="careers/jobs" element={<JobsList />} />
-                      <Route path="careers/jobs/new" element={<JobForm />} />
-                      <Route
-                        path="careers/jobs/:id/edit"
-                        element={<JobForm />}
-                      />
-                      <Route
-                        path="careers/applications"
-                        element={<ApplicationsList />}
-                      />
-                      <Route
-                        path="careers/applications/:id"
-                        element={<ApplicationDetails />}
-                      />
-                      <Route
-                        path="careers/categories"
-                        element={<JobCategoriesList />}
-                      />
-                      <Route path="blogs" element={<BlogsList />} />
-                      <Route path="blogs/new" element={<BlogForm />} />
-                      <Route path="blogs/:id/edit" element={<BlogForm />} />
-                      <Route
-                        path="blogs/categories"
-                        element={<CategoriesList />}
-                      />
-                      <Route path="courses" element={<CoursesList />} />
-                      <Route path="courses/new" element={<CourseForm />} />
-                      <Route path="courses/:id" element={<CourseDetail />} />
-                      <Route path="courses/:id/edit" element={<CourseForm />} />
-                      <Route path="classes" element={<ClassesList />} />
-                      <Route path="lessons" element={<ClassesList />} />
-                      <Route path="classes/new" element={<ClassCreate />} />
-                      <Route path="classes/:id" element={<ClassPreview />} />
-                      <Route path="classes/:id/edit" element={<ClassEdit />} />
-                      <Route
-                        path="courses/:courseId/lessons"
-                        element={<LessonsList />}
-                      />
-                      <Route
-                        path="courses/:courseId/lessons/new"
-                        element={<LessonForm />}
-                      />
-                      <Route
-                        path="courses/:courseId/lessons/:lessonId"
-                        element={<LessonDetail />}
-                      />
-                      <Route
-                        path="courses/:courseId/lessons/:lessonId/edit"
-                        element={<LessonForm />}
-                      />
-                      <Route
-                        path="messages"
-                        element={<AdminContactSubmissions />}
-                      />
-                      <Route
-                        path="enrollments"
-                        element={<EnrollmentManagement />}
-                      />
-                      <Route
-                        path="admissions"
-                        element={<AdmissionInquiries />}
-                      />
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                  </AdminLayout>
-                </Layout>
+                {/* <Layout hideHeaderFooter={true}> */}
+                <AdminLayout>
+                  <Routes>
+                    <Route path="dashboard" element={<AdminDashboard />} />
+                    <Route path="users" element={<UsersList />} />
+                    <Route path="users/new" element={<UserForm />} />
+                    <Route path="users/:id" element={<UserDetail />} />
+                    <Route path="users/:id/edit" element={<UserForm />} />
+                    <Route path="careers/jobs" element={<JobsList />} />
+                    <Route path="careers/jobs/new" element={<JobForm />} />
+                    <Route path="careers/jobs/:id/edit" element={<JobForm />} />
+                    <Route
+                      path="careers/applications"
+                      element={<ApplicationsList />}
+                    />
+                    <Route
+                      path="careers/applications/:id"
+                      element={<ApplicationDetails />}
+                    />
+                    <Route
+                      path="careers/categories"
+                      element={<JobCategoriesList />}
+                    />
+                    <Route path="blogs" element={<BlogsList />} />
+                    <Route path="blogs/new" element={<BlogForm />} />
+                    <Route path="blogs/:id/edit" element={<BlogForm />} />
+                    <Route
+                      path="blogs/categories"
+                      element={<CategoriesList />}
+                    />
+                    <Route path="courses" element={<CoursesList />} />
+                    <Route path="courses/new" element={<CourseForm />} />
+                    <Route path="courses/:id" element={<CourseDetail />} />
+                    <Route path="courses/:id/edit" element={<CourseForm />} />
+                    <Route path="classes" element={<ClassesList />} />
+                    <Route path="lessons" element={<ClassesList />} />
+                    <Route path="classes/new" element={<ClassCreate />} />
+                    <Route path="classes/:id" element={<ClassPreview />} />
+                    <Route path="classes/:id/edit" element={<ClassEdit />} />
+                    <Route
+                      path="courses/:courseId/lessons"
+                      element={<LessonsList />}
+                    />
+                    <Route
+                      path="courses/:courseId/lessons/new"
+                      element={<LessonForm />}
+                    />
+                    <Route
+                      path="courses/:courseId/lessons/:lessonId"
+                      element={<LessonDetail />}
+                    />
+                    <Route
+                      path="courses/:courseId/lessons/:lessonId/edit"
+                      element={<LessonForm />}
+                    />
+                    <Route
+                      path="messages"
+                      element={<AdminContactSubmissions />}
+                    />
+                    <Route
+                      path="enrollments"
+                      element={<EnrollmentManagement />}
+                    />
+                    <Route path="admissions" element={<AdmissionInquiries />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </AdminLayout>
+                {/* </Layout> */}
               </AdminRoute>
             }
           />
@@ -2057,22 +2126,19 @@ function App() {
             path="/instructor/*"
             element={
               <InstructorRoute>
-                <Layout hideHeaderFooter={true}>
-                  {/* You can create a specific InstructorLayout later */}
-                  <div className="min-h-screen bg-gray-50">
-                    <Routes>
-                      <Route
-                        path="dashboard"
-                        element={<InstructorDashboard />}
-                      />
-                      <Route
-                        path="courses/create"
-                        element={<InstructorCourseCreate />}
-                      />
-                      <Route path="messages" element={<Messages />} />
-                    </Routes>
-                  </div>
-                </Layout>
+                {/* <Layout hideHeaderFooter={true}> */}
+                {/* You can create a specific InstructorLayout later */}
+                <div className="min-h-screen bg-gray-50">
+                  <Routes>
+                    <Route path="dashboard" element={<InstructorDashboard />} />
+                    <Route
+                      path="courses/create"
+                      element={<InstructorCourseCreate />}
+                    />
+                    <Route path="messages" element={<Messages />} />
+                  </Routes>
+                </div>
+                {/* </Layout> */}
               </InstructorRoute>
             }
           />

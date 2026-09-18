@@ -157,7 +157,7 @@ function Profile() {
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return 'March 2025';
+    if (!dateString) return 'March 2026';
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'long',
       year: 'numeric',

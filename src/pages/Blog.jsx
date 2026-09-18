@@ -70,6 +70,8 @@ export default function Blog() {
   const [error, setError] = useState(null);
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [newsletterStatus, setNewsletterStatus] = useState('idle');
+  const [newsletterError, setNewsletterError] = useState('');
 
   useEffect(() => {
     const fetchPosts = async () => {

@@ -479,7 +479,7 @@ export default function PathwayDetail() {
             <div className="inline-flex items-center gap-2 self-start md:self-auto bg-surface-container-high text-on-surface-variant px-3 py-1 rounded-full shadow-sm">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
               <span className="font-label-caps text-[11px] uppercase tracking-wider text-primary font-bold">
-                2024/2025 Consular Intake Active
+                2025/2026 Consular Intake Active
               </span>
             </div>
           </div>
@@ -874,7 +874,7 @@ export default function PathwayDetail() {
                       Placement Dossier
                     </span>
                     <span className="font-body-sm text-body-sm text-on-surface-variant text-[12px]">
-                      Official 2024–2025 PDF Edition
+                       Official 2025–2026 PDF Edition
                     </span>
                   </div>
                 </div>

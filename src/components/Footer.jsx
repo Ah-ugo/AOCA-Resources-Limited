@@ -38,7 +38,13 @@ function Footer() {
               <span className="material-symbols-outlined text-[18px] text-secondary-fixed shrink-0">
                 call
               </span>
-              <span>+234 816 191 0975, +234 803 886 5466</span>
+              <a href="tel:+2348161910975" className="hover:text-secondary-fixed transition-colors font-semibold">
+                +234 816 191 0975
+              </a>
+              <span className="text-on-primary-container/50">,</span>
+              <a href="tel:+2348038865466" className="hover:text-secondary-fixed transition-colors font-semibold">
+                +234 803 886 5466
+              </a>
             </p>
             <p className="flex items-center gap-2">
               <span className="material-symbols-outlined text-[18px] text-secondary-fixed shrink-0">
@@ -202,9 +208,8 @@ function Footer() {
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-on-primary-container/70">
         <p>
-          © 2025 AOCA Resources Limited. All rights reserved. Registered Federal
-          Republic of Nigeria RC-7049182.
-        </p>
+           © 2026 AOCA Resources Limited. All rights reserved.
+         </p>
         <div className="flex items-center gap-6">
           <Link
             to="/privacy-policy"

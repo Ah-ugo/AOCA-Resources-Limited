@@ -14,7 +14,7 @@ function FloatingWhatsApp() {
           <span className="font-label-caps text-[9px] uppercase tracking-wider text-secondary-fixed">
             CHAT DIRECT DESK
           </span>
-          <span className="font-bold text-xs">+234 816 191 0975</span>
+          <a href="tel:+2348161910975" className="font-bold text-xs hover:text-secondary-fixed transition-colors">+234 816 191 0975</a>
         </div>
       </a>
     </aside>

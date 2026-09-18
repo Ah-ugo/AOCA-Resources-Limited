@@ -51,7 +51,7 @@
 //             <h1 className="text-3xl md:text-4xl font-bold mb-6">Privacy Policy</h1>
 //             <div className="bg-white rounded-lg shadow-md p-6 md:p-8">
 //               <div className="prose max-w-none">
-//                 <p className="text-gray-500 mb-6">Last updated: March 15, 2025</p>
+//                 <p className="text-gray-500 mb-6">Last updated: March 15, 2026</p>
 
 //                 <h2>1. Introduction</h2>
 //                 <p>

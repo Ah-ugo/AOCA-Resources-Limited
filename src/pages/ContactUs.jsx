@@ -142,7 +142,7 @@ export default function Contact() {
               </div>
               <div className="flex items-center gap-space-xs text-secondary-fixed bg-surface-container-lowest/10 px-space-md py-space-xs rounded-lg backdrop-blur-sm">
                 <BadgeCheck className="h-4 w-4" />
-                <span>RC-7049182 Verified</span>
+                <span>Verified Institution</span>
               </div>
             </div>
           </div>
@@ -855,7 +855,8 @@ export default function Contact() {
               className="inline-flex items-center gap-space-xs px-space-lg py-space-sm rounded-lg bg-secondary text-on-secondary font-label-md text-label-md font-semibold hover:bg-secondary-container hover:text-on-secondary-container transition-all shadow-md"
             >
               <MessageCircle className="h-5 w-5" />
-              <span>WhatsApp Admissions Director: +234 816 191 0975</span>
+              <span>WhatsApp Admissions Director: </span>
+              <a href="tel:+2348161910975" className="font-semibold underline hover:text-secondary-fixed transition-colors">+234 816 191 0975</a>
             </a>
           </div>
         </div>

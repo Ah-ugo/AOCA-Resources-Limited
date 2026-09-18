@@ -179,7 +179,7 @@ export default function Register() {
             </div>
 
             <div className="text-white/30 text-sm font-body-md">
-              © 2024 AOCA Resources Limited. All Rights Reserved.
+               © 2026 AOCA Resources Limited. All Rights Reserved.
             </div>
           </div>
         </div>

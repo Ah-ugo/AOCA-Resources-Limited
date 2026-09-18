@@ -202,7 +202,7 @@ function AboutUs() {
   const accreditations = [
     {
       icon: 'fact_check',
-      title: 'CAC RC-7049182',
+      title: 'CAC Registration',
       desc: 'Duly registered under the Companies and Allied Matters Act, Federal Republic of Nigeria.',
     },
     {
@@ -270,8 +270,7 @@ function AboutUs() {
               <div className="mt-8 pt-6 border-t border-outline-variant/30 flex items-center gap-3 text-on-surface-variant">
                 <Verified className="h-5 w-5 text-secondary" />
                 <span className="font-body-sm text-body-sm font-medium">
-                  Headquartered at 70 Eligbolo Rd, Rumudumaya, Port Harcourt •
-                  CAC Registered RC-7049182
+                  Headquartered at 70 Eligbolo Rd, Rumudumaya, Port Harcourt
                 </span>
               </div>
             </div>
@@ -738,7 +737,9 @@ function AboutUs() {
                         Admissions & Consultation Hotlines
                       </p>
                       <p className="font-body-md text-body-md text-on-surface-variant">
-                        +234 816 191 0975 • +234 803 886 5466
+                        <a href="tel:+2348161910975" className="hover:text-primary transition-colors font-semibold">+234 816 191 0975</a>
+                        <span className="text-on-surface-variant/50 mx-1">•</span>
+                        <a href="tel:+2348038865466" className="hover:text-primary transition-colors font-semibold">+234 803 886 5466</a>
                       </p>
                     </div>
                   </div>

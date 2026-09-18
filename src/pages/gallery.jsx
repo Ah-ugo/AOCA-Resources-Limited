@@ -116,7 +116,7 @@ const videoData = [
     category: 'language',
     categoryLabel: 'Language Studio',
     title:
-      'Live German B1 Grammar Seminar & ICT Coding Session at Rumudumaya Campus',
+      'German B1 Grammar Seminar & ICT Coding Session at Rumudumaya Campus',
     desc: "Instructor explaining reflexive pronouns ('sich vorstellen', 'sich waschen') and syntax drills for Goethe exam readiness.",
     poster: '/image1.png',
     src: 'https://res.cloudinary.com/dejeplzpv/video/upload/v1789516639/WhatsApp_Video_2026-09-13_at_16.13.36_n1kn5n.mp4',
@@ -369,6 +369,7 @@ function VideoGallerySection() {
   const [active, setActive] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [progress, setProgress] = useState(0);
   const videoRef = useRef(null);
 
   const filteredVideos =
@@ -381,6 +382,7 @@ function VideoGallerySection() {
   const switchVideo = (index) => {
     setActive(index);
     setIsPlaying(true);
+    setProgress(0);
   };
 
   useEffect(() => {
@@ -399,20 +401,38 @@ function VideoGallerySection() {
     }
   }, [isMuted]);
 
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleTimeUpdate = () => {
+      if (video.duration && isFinite(video.duration)) {
+        setProgress((video.currentTime / video.duration) * 100);
+      }
+    };
+
+    video.addEventListener('timeupdate', handleTimeUpdate);
+    return () => video.removeEventListener('timeupdate', handleTimeUpdate);
+  }, [active]);
+
   const handleFilterChange = (id) => {
     setVideoFilter(id);
     setActive(0);
-    setIsPlaying(false);
+    setProgress(0);
   };
 
   const toggleVideoPlayback = () => setIsPlaying((p) => !p);
   const toggleAudio = () => setIsMuted((m) => !m);
 
   const scrubVideo = (e) => {
+    const video = videoRef.current;
+    if (!video || !isFinite(video.duration)) return;
+
     const rect = e.currentTarget.getBoundingClientRect();
-    const pos = (e.clientX - rect.left) / rect.width;
-    const bar = document.getElementById('galleryVideoProgress');
-    if (bar) bar.style.width = pos * 100 + '%';
+    const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const newTime = pos * video.duration;
+    video.currentTime = newTime;
+    setProgress(pos * 100);
   };
 
   const expandVideo = () => {
@@ -441,18 +461,18 @@ function VideoGallerySection() {
           className="flex flex-col md:flex-row md:items-end justify-between gap-4"
         >
           <div className="flex flex-col gap-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 text-secondary-fixed text-xs font-bold uppercase tracking-widest">
-              <Video className="h-4 w-4" />
-              <span>VIDEO DOCUMENTARY & LIVE LECTURE FOOTAGE</span>
-            </div>
-            <h2 className="font-headline-lg text-2xl sm:text-4xl font-bold text-white">
-              Video Gallery: Real Tours & Classroom Sessions
-            </h2>
-            <p className="text-white/80 text-sm sm:text-base leading-relaxed">
-              Unscripted classroom dynamics, Goethe exam simulation drills,
-              computer lab workstations, and nursing relocation interviews
-              recorded directly at our campuses.
-            </p>
+             <div className="inline-flex items-center gap-2 text-secondary-fixed text-xs font-bold uppercase tracking-widest">
+               <Video className="h-4 w-4" />
+               <span>VIDEO GALLERY</span>
+             </div>
+             <h2 className="font-headline-lg text-2xl sm:text-4xl font-bold text-white">
+               Video Gallery: Real Tours & Classroom Sessions
+             </h2>
+             <p className="text-white/80 text-sm sm:text-base leading-relaxed">
+               Unscripted classroom dynamics, Goethe exam simulation drills,
+               computer lab workstations, and nursing relocation interviews
+               recorded directly at our campuses.
+             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2 bg-white/10 p-1 rounded-xl border border-white/15 text-xs font-semibold">
             {videoFilters.map((f) => (
@@ -505,25 +525,25 @@ function VideoGallerySection() {
                 )}
               </button>
               <div className="absolute top-4 left-4 flex items-center gap-2">
-                <span className="bg-rose-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1 shadow">
-                  <span className="w-1.5 h-1.5 rounded-full bg-surface-container-lowest animate-pulse" />
-                  HD STREAM
+                <span className="bg-white/10 backdrop-blur-md text-white text-[11px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1 shadow border border-white/10">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/70"></span>
+                  Recorded Class
                 </span>
                 <span className="bg-black/70 backdrop-blur-md text-white/90 text-xs px-2.5 py-1 rounded-md border border-white/10 font-mono">
                   {current.duration}
                 </span>
               </div>
               <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/95 to-transparent flex flex-col gap-2">
-                <div
-                  className="w-full bg-white/20 h-1.5 rounded-full overflow-hidden cursor-pointer"
-                  onClick={scrubVideo}
-                >
-                  <div
-                    className="bg-secondary-fixed h-full transition-all duration-300"
-                    id="galleryVideoProgress"
-                    style={{ width: current.progress }}
-                  />
-                </div>
+                 <div
+                   className="w-full bg-white/20 h-1.5 rounded-full overflow-hidden cursor-pointer"
+                   onClick={scrubVideo}
+                 >
+                   <div
+                     className="bg-secondary-fixed h-full transition-all duration-300"
+                     id="galleryVideoProgress"
+                     style={{ width: `${progress}%` }}
+                   />
+                 </div>
                 <div className="flex items-center justify-between text-xs text-white/90 pt-1">
                   <div className="flex items-center gap-3">
                     <button
@@ -592,7 +612,7 @@ function VideoGallerySection() {
           >
             <div className="flex items-center justify-between pb-1 border-b border-white/10">
               <span className="text-xs font-bold text-secondary-fixed uppercase tracking-wider">
-                SELECT VIDEO CHAPTER
+                SELECT SESSION
               </span>
               <span className="text-[11px] text-white/60">
                 {filteredVideos.length} Sessions
