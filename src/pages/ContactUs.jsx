@@ -253,12 +253,12 @@ export default function Contact() {
                   </div>
                 </div>
                 <div className="pt-space-sm flex flex-col sm:flex-row gap-space-xs">
-                  <a
-                    href="https://wa.me/2348161910975"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 inline-flex items-center justify-center gap-space-xs px-space-md py-space-sm rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-md text-label-md transition-all shadow-sm"
-                  >
+                   <a
+                     href="https://wa.me/4915901149844"
+                     target="_blank"
+                     rel="noopener noreferrer"
+                     className="flex-1 inline-flex items-center justify-center gap-space-xs px-space-md py-space-sm rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-md text-label-md transition-all shadow-sm"
+                   >
                     <MessageCircle className="h-4 w-4 text-secondary-fixed" />
                     <span>WhatsApp Desk</span>
                   </a>
@@ -402,29 +402,40 @@ export default function Contact() {
                       </span>
                     </div>
                   </div>
-                  <div className="flex items-start gap-space-sm text-on-surface">
-                     <Mail className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                     <div>
-                       <span className="font-label-md text-label-md font-semibold text-on-surface block">
-                         Gmail Address
-                       </span>
-                       <a href="mailto:aocaresourcesltd@gmail.com" className="font-body-sm text-body-sm text-secondary hover:underline font-semibold">
-                         aocaresourcesltd@gmail.com
-                       </a>
-                     </div>
-                   </div>
                    <div className="flex items-start gap-space-sm text-on-surface">
-                     <Mail className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                     <div>
-                       <span className="font-label-md text-label-md font-semibold text-on-surface block">
-                         Official Email
-                       </span>
-                       <span className="font-body-sm text-body-sm text-on-surface-variant">
-                         info@aocaresourcesltd.com
-                       </span>
-                     </div>
-                   </div>
-                  <div className="p-space-sm bg-surface-container-low rounded-lg text-body-sm text-on-surface-variant">
+                      <Mail className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                      <div>
+                        <span className="font-label-md text-label-md font-semibold text-on-surface block">
+                          Gmail Address
+                        </span>
+                        <a href="mailto:aocaresourcesltd@gmail.com" className="font-body-sm text-body-sm text-secondary hover:underline font-semibold">
+                          aocaresourcesltd@gmail.com
+                        </a>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-space-sm text-on-surface">
+                      <Mail className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                      <div>
+                        <span className="font-label-md text-label-md font-semibold text-on-surface block">
+                          Official Email
+                        </span>
+                        <span className="font-body-sm text-body-sm text-on-surface-variant">
+                          info@aocaresourcesltd.com
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-space-sm text-on-surface">
+                      <Phone className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                      <div>
+                        <span className="font-label-md text-label-md font-semibold text-on-surface block">
+                          German Desk Phone
+                        </span>
+                        <a href="tel:+4915901149844" className="font-body-sm text-body-sm text-secondary hover:underline font-semibold">
+                          +49 159 0114984
+                        </a>
+                      </div>
+                    </div>
+                   <div className="p-space-sm bg-surface-container-low rounded-lg text-body-sm text-on-surface-variant">
                     <strong className="text-primary font-semibold block mb-1">
                       German Labor Compliance:
                     </strong>
@@ -592,7 +603,7 @@ export default function Contact() {
                   </p>
                   <div className="pt-space-sm flex gap-space-sm">
                     <a
-                      href="https://wa.me/2348161910975"
+                      href="https://wa.me/4915901149844"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-space-md py-space-sm bg-primary text-on-primary rounded-lg font-label-md text-label-md inline-flex items-center gap-2"
@@ -849,14 +860,14 @@ export default function Contact() {
           </div>
           <div className="flex items-center gap-space-sm shrink-0">
             <a
-              href="https://wa.me/2348161910975?text=Hello%20AOCA%20Admissions%20Director,%20I%20need%20urgent%20guidance%20on%20German%20migration%20and%20language%20classes."
+              href="https://wa.me/4915901149844?text=Hello%20AOCA%20Admissions%20Director,%20I%20need%20urgent%20guidance%20on%20German%20migration%20and%20language%20classes."
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-space-xs px-space-lg py-space-sm rounded-lg bg-secondary text-on-secondary font-label-md text-label-md font-semibold hover:bg-secondary-container hover:text-on-secondary-container transition-all shadow-md"
             >
-              <MessageCircle className="h-5 w-5" />
-              <span>WhatsApp Admissions Director: </span>
-              <a href="tel:+2348161910975" className="font-semibold underline hover:text-secondary-fixed transition-colors">+234 816 191 0975</a>
+               <MessageCircle className="h-5 w-5" />
+               <span>WhatsApp Admissions Director: </span>
+               <span className="font-semibold underline hover:text-secondary-fixed transition-colors">+49 159 0114984</span>
             </a>
           </div>
         </div>

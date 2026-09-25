@@ -34,7 +34,6 @@ const CourseForm = () => {
     description: '',
     instructor_id: '',
     status: 'draft',
-    price: '',
     duration: '',
     duration_unit: 'weeks',
     max_students: '',
@@ -89,7 +88,6 @@ const CourseForm = () => {
             end_date: courseData.end_date
               ? new Date(courseData.end_date).toISOString().split('T')[0]
               : '',
-            price: courseData.price?.toString() || '',
             max_students: courseData.max_students?.toString() || '',
             duration: courseData.duration?.toString() || '',
             instructor_id:
@@ -160,7 +158,6 @@ const CourseForm = () => {
       const courseData = {
         ...formData,
         name: formData.name || formData.title, // Ensure name is sent (fallback to title)
-        price: formData.price ? Number.parseFloat(formData.price) : undefined,
         max_students: formData.max_students
           ? Number.parseInt(formData.max_students)
           : undefined,
@@ -409,28 +406,6 @@ const CourseForm = () => {
             </select>
           </div>
 
-          {/* Price */}
-          <div>
-            <label
-              className='block text-gray-700 text-sm font-bold mb-2'
-              htmlFor='price'
-            >
-              <div className='flex items-center'>
-                <FiDollarSign className='mr-1' />
-                Price
-              </div>
-            </label>
-            <input
-              id='price'
-              name='price'
-              type='number'
-              min='0'
-              step='0.01'
-              value={formData.price}
-              onChange={handleChange}
-              className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
-            />
-          </div>
 
           {/* Duration */}
           <div>

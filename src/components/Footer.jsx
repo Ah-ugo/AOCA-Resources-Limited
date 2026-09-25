@@ -34,18 +34,22 @@ function Footer() {
                 70 Eligbolo Rd, Rumudumaya, Port Harcourt, Rivers State
               </span>
             </p>
-            <p className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px] text-secondary-fixed shrink-0">
-                call
-              </span>
-              <a href="tel:+2348161910975" className="hover:text-secondary-fixed transition-colors font-semibold">
-                +234 816 191 0975
-              </a>
-              <span className="text-on-primary-container/50">,</span>
-              <a href="tel:+2348038865466" className="hover:text-secondary-fixed transition-colors font-semibold">
-                +234 803 886 5466
-              </a>
-            </p>
+             <p className="flex items-center gap-2">
+               <span className="material-symbols-outlined text-[18px] text-secondary-fixed shrink-0">
+                 call
+               </span>
+               <a href="tel:+2348161910975" className="hover:text-secondary-fixed transition-colors font-semibold">
+                 +234 816 191 0975
+               </a>
+               <span className="text-on-primary-container/50">,</span>
+               <a href="tel:+2348038865466" className="hover:text-secondary-fixed transition-colors font-semibold">
+                 +234 803 886 5466
+               </a>
+               <span className="text-on-primary-container/50">,</span>
+               <a href="tel:+4915901149844" className="hover:text-secondary-fixed transition-colors font-semibold">
+                 +49 159 0114984
+               </a>
+             </p>
             <p className="flex items-center gap-2">
               <span className="material-symbols-outlined text-[18px] text-secondary-fixed shrink-0">
                 mail

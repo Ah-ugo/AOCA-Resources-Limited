@@ -171,7 +171,7 @@
 
 /** @format */
 
-const API = 'https://aoca-resources-backend.onrender.com';
+const API = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
 
 function getToken() {
   try {
@@ -281,11 +281,16 @@ export async function getMyEnrollments() {
   return apiFetch('/students/my-enrollments');
 }
 
-export async function applyForCourse(courseId, message = '') {
-  return apiFetch('/students/apply', {
+// Submit an enrollment REQUEST — pending until admin approves
+export async function requestEnrollment(courseId) {
+  return apiFetch(`/students/courses/${courseId}/enroll-request`, {
     method: 'POST',
-    body: JSON.stringify({ course_id: courseId, message }),
   });
+}
+
+// Legacy alias kept for backwards-compat — now points at the correct endpoint
+export async function applyForCourse(courseId) {
+  return requestEnrollment(courseId);
 }
 
 // ── Progress ─────────────────────────────────────────────────────────────────

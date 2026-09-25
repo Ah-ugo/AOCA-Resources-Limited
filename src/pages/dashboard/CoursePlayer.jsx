@@ -1,12 +1,8 @@
 /** @format */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import {
-  getCourseDetail,
-  getCourseProgress,
-  markLessonComplete,
-} from '../../services/student-service';
+import useCourseStore from '../../stores/useCourseStore';
 import {
   Play,
   CheckCircle,
@@ -14,49 +10,75 @@ import {
   Loader2,
   FileText,
   Video,
+  Download,
+  Upload,
 } from 'lucide-react';
 
 const CoursePlayer = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
-  const [course, setCourse] = useState(null);
-  const [progress, setProgress] = useState({ completed_lesson_ids: [] });
-  const [activeLesson, setActiveLesson] = useState(null);
-  const [loading, setLoading] = useState(true);
+  
+  const {
+    activeCourse: course,
+    progress,
+    activeLesson,
+    isLoading: loading,
+    fetchCourseData,
+    markLessonComplete,
+    submitAssignment,
+    setActiveLesson,
+  } = useCourseStore();
 
-  const fetchAll = useCallback(async () => {
-    try {
-      const [courseData, progressData] = await Promise.all([
-        getCourseDetail(courseId),
-        getCourseProgress(courseId),
-      ]);
-      setCourse(courseData);
-      setProgress(progressData);
-
-      // Auto-select first lesson or last active
-      if (courseData.modules?.length > 0) {
-        const firstLesson = courseData.modules[0].lessons?.[0];
-        setActiveLesson(firstLesson);
-      }
-    } catch (err) {
-      console.error('Failed to load course player', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [courseId]);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [assignmentText, setAssignmentText] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    fetchAll();
-  }, [fetchAll]);
+    fetchCourseData(courseId);
+  }, [fetchCourseData, courseId]);
 
   const handleComplete = async (lessonId) => {
     try {
       await markLessonComplete(lessonId, courseId);
-      const updatedProgress = await getCourseProgress(courseId);
-      setProgress(updatedProgress);
     } catch (err) {
       alert('Failed to save progress');
     }
+  };
+
+  const handleAssignmentSubmit = async (e) => {
+    e.preventDefault();
+    if (!assignmentText.trim()) return;
+    
+    setIsSubmitting(true);
+    try {
+      await submitAssignment(activeLesson._id || activeLesson.id, { content: assignmentText });
+      setAssignmentText('');
+      alert('Assignment submitted successfully!');
+    } catch (err) {
+      alert('Failed to submit assignment');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Helper to render video securely
+  const renderVideo = (url) => {
+    if (!url) return null;
+    
+    // Check if YouTube
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      const videoId = url.split('v=')[1]?.split('&')[0] || url.split('youtu.be/')[1];
+      return <iframe className="w-full h-full" src={`https://www.youtube.com/embed/${videoId}`} title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>;
+    }
+    
+    // Check if Vimeo
+    if (url.includes('vimeo.com')) {
+      const videoId = url.split('vimeo.com/')[1];
+      return <iframe className="w-full h-full" src={`https://player.vimeo.com/video/${videoId}`} frameBorder="0" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen></iframe>;
+    }
+
+    // Fallback standard video
+    return <video src={url} controls className="w-full h-full" />;
   };
 
   if (loading)
@@ -85,11 +107,7 @@ const CoursePlayer = () => {
             <div className='max-w-4xl mx-auto space-y-6'>
               <div className='aspect-video bg-black rounded-2xl shadow-lg flex items-center justify-center overflow-hidden'>
                 {activeLesson.video_url ? (
-                  <iframe
-                    src={activeLesson.video_url}
-                    className='w-full h-full'
-                    allowFullScreen
-                  />
+                  renderVideo(activeLesson.video_url)
                 ) : (
                   <div className='text-white text-center'>
                     <Play size={48} className='mx-auto mb-4 opacity-20' />
@@ -102,19 +120,16 @@ const CoursePlayer = () => {
                   <h2 className='text-2xl font-bold text-gray-900'>
                     {activeLesson.title}
                   </h2>
-                  <p className='text-gray-500 mt-2'>
-                    {activeLesson.description}
-                  </p>
                 </div>
                 <button
                   onClick={() =>
                     handleComplete(activeLesson._id || activeLesson.id)
                   }
-                  disabled={progress.completed_lesson_ids.includes(
+                  disabled={progress?.completed_lesson_ids?.includes(
                     activeLesson._id || activeLesson.id,
                   )}
                   className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold transition-all ${
-                    progress.completed_lesson_ids.includes(
+                    progress?.completed_lesson_ids?.includes(
                       activeLesson._id || activeLesson.id,
                     )
                       ? 'bg-emerald-100 text-emerald-700 cursor-default'
@@ -122,13 +137,86 @@ const CoursePlayer = () => {
                   }`}
                 >
                   <CheckCircle size={18} />
-                  {progress.completed_lesson_ids.includes(
+                  {progress?.completed_lesson_ids?.includes(
                     activeLesson._id || activeLesson.id,
                   )
                     ? 'Completed'
                     : 'Mark as Complete'}
                 </button>
               </div>
+
+              {/* Tabs */}
+              <div className="border-b border-gray-200 mt-8">
+                <nav className="-mb-px flex gap-8">
+                  {['overview', 'materials', 'assignments'].map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setActiveTab(tab)}
+                      className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm capitalize transition-colors ${
+                        activeTab === tab
+                          ? 'border-emerald-500 text-emerald-600'
+                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      }`}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </nav>
+              </div>
+
+              <div className="py-4">
+                {activeTab === 'overview' && (
+                  <div className="prose max-w-none text-gray-600">
+                    <p>{activeLesson.description || 'No description provided for this lesson.'}</p>
+                  </div>
+                )}
+
+                {activeTab === 'materials' && (
+                  <div className="space-y-4">
+                    {activeLesson.materials?.length > 0 ? activeLesson.materials.map((mat, i) => (
+                      <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                        <div className="flex items-center gap-3">
+                          <FileText className="text-gray-400" />
+                          <span className="font-medium text-gray-900">{mat.title || 'Course Material'}</span>
+                        </div>
+                        <a href={mat.url} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm font-bold text-emerald-600 hover:text-emerald-700">
+                          <Download size={16} /> Download
+                        </a>
+                      </div>
+                    )) : (
+                      <p className="text-gray-500 italic">No materials attached to this lesson.</p>
+                    )}
+                  </div>
+                )}
+
+                {activeTab === 'assignments' && (
+                  <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <h3 className="font-bold text-gray-900 mb-4">Submit Assignment</h3>
+                    <form onSubmit={handleAssignmentSubmit} className="space-y-4">
+                      <div>
+                        <textarea 
+                          value={assignmentText}
+                          onChange={(e) => setAssignmentText(e.target.value)}
+                          rows="4" 
+                          placeholder="Type your answer or paste a link to your work..."
+                          className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
+                        ></textarea>
+                      </div>
+                      <div className="flex justify-end">
+                        <button 
+                          type="submit" 
+                          disabled={isSubmitting || !assignmentText.trim()}
+                          className="flex items-center gap-2 px-6 py-2 bg-gray-900 text-white rounded-lg font-bold hover:bg-gray-800 transition-colors disabled:opacity-50"
+                        >
+                          {isSubmitting ? <Loader2 className="animate-spin" size={16} /> : <Upload size={16} />}
+                          Submit Work
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+              </div>
+
             </div>
           ) : (
             <div className='h-full flex items-center justify-center text-gray-400 italic'>
@@ -144,9 +232,9 @@ const CoursePlayer = () => {
           <h3 className='font-bold text-gray-900 mb-1'>Course Content</h3>
           <div className='flex items-center justify-between text-xs font-medium text-gray-500'>
             <span>
-              {progress.completed_count} / {progress.total_lessons} Completed
+              {progress?.completed_count || 0} / {progress?.total_lessons || 0} Completed
             </span>
-            <span>{progress.percentage}%</span>
+            <span>{progress?.percentage || 0}%</span>
           </div>
         </div>
         <div className='flex-1 overflow-y-auto'>
@@ -167,7 +255,7 @@ const CoursePlayer = () => {
                     onClick={() => setActiveLesson(lesson)}
                     className={`w-full px-6 py-4 flex items-center gap-3 text-left transition-colors ${activeLesson?._id === lesson._id ? 'bg-emerald-50' : 'hover:bg-gray-50'}`}
                   >
-                    {progress.completed_lesson_ids.includes(lesson._id) ? (
+                    {progress?.completed_lesson_ids?.includes(lesson._id) ? (
                       <CheckCircle
                         size={16}
                         className='text-emerald-500 shrink-0'

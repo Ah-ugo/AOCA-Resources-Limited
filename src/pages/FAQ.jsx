@@ -38,7 +38,7 @@ function FAQ() {
       {
         question: 'How can I contact AOCA Resources for more information?',
         answer:
-          'You can contact us through multiple channels: Phone: 08038865466, +49 1522 1688675; WhatsApp: 08038865466; Email: info@aocaresourcesltd.com or aocaresources@gmail.com. You can also visit our offices in Lagos or Port Harcourt, or use the contact form on our website.',
+          'You can contact us through multiple channels: Phone: 08038865466, +49 1522 1688675, +49 159 0114984; WhatsApp: 08038865466; Email: info@aocaresourcesltd.com or aocaresources@gmail.com. You can also visit our offices in Lagos or Port Harcourt, or use the contact form on our website.',
       },
       {
         question: 'What is the success rate of your programs?',

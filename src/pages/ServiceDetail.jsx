@@ -84,7 +84,7 @@ const serviceData = {
     image:
       '/image2.png',
   },
-  'corporate-training': {
+   'corporate-training': {
     title: 'Corporate & Staff Professional Training',
     subtitle: 'Data Analysis, Project Management, Programming, HSE 1-3',
     description:
@@ -94,7 +94,10 @@ const serviceData = {
       'Project Management certification prep',
       'Computer Programming bootcamps',
       'HSE Level 1, 2, and 3 certification',
-      'Customizable corporate packages',
+      'First Aid Courses',
+      'Fire Prevention and Protection',
+      'Permit To Work (PTW)',
+      'Other Related HSE Courses',
     ],
     stats: [
       { label: 'Corporate Clients', value: '50+' },
@@ -102,7 +105,7 @@ const serviceData = {
       { label: 'Certifications', value: '15+' },
     ],
     image:
-      '/image8.png',
+      '/image4.png',
   },
   'ict-programs': {
     title: 'Basic & Advanced Professional ICT Programs',
@@ -122,7 +125,7 @@ const serviceData = {
       { label: 'Certification Rate', value: '90%' },
     ],
     image:
-      '/image4.png',
+      '/image3.png',
   },
   'kids-tech': {
     title: 'Kids & Teens Tech Programs',
@@ -222,7 +225,7 @@ const serviceData = {
       { label: 'Pass Rate', value: '90%' },
     ],
     image:
-      '/ukaegbu.jpeg',
+      '/image3.png',
   },
   'project-management': {
     title: 'Project Management',

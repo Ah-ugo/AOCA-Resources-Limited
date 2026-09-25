@@ -21,9 +21,11 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import PageLayout from '../components/PageLayout';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Register() {
   const navigate = useNavigate();
+  const { register } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     first_name: '',
@@ -77,48 +79,25 @@ export default function Register() {
     setErrorMessage('');
 
     try {
-      const response = await fetch(
-        'https://aoca-resources-backend.onrender.com/register',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            accept: 'application/json',
-          },
-          body: JSON.stringify(formData),
-        },
-      );
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setStatus('success');
-        if (data.access_token) {
-          localStorage.setItem('token', data.access_token);
-        }
-        setTimeout(() => navigate('/login'), 2000);
-      } else {
-        if (data.detail) {
-          if (Array.isArray(data.detail)) {
-            const backendErrors = {};
-            data.detail.forEach((err) => {
-              const field = err.loc[err.loc.length - 1];
-              backendErrors[field] = err.msg;
-            });
-            setFieldErrors(backendErrors);
-            throw new Error('Please check the form for errors');
-          } else {
-            throw new Error(data.detail || 'Registration failed');
-          }
-        } else {
-          throw new Error(data.message || 'Registration failed');
-        }
-      }
+      await register(formData);
+      setStatus('success');
+      setTimeout(() => navigate('/login'), 2000);
     } catch (error) {
+      console.error('Registration error:', error);
       setStatus('error');
-      setErrorMessage(
-        error.message || 'Something went wrong. Please try again.',
-      );
+      
+      const detail = error.response?.data?.detail;
+      if (Array.isArray(detail)) {
+        const backendErrors = {};
+        detail.forEach((err) => {
+          const field = err.loc[err.loc.length - 1];
+          backendErrors[field] = err.msg;
+        });
+        setFieldErrors(backendErrors);
+        setErrorMessage('Please check the form for errors');
+      } else {
+        setErrorMessage(detail || error.message || 'Something went wrong. Please try again.');
+      }
     }
   };
 

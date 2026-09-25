@@ -258,10 +258,10 @@ function Header({ onNavigate }) {
               Login
             </Link>
             <Link
-              to="/register"
+              to="/admissionAd"
               className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary hover:bg-primary-container text-on-primary font-label-md text-xs sm:text-sm font-semibold shadow-md transition-all hover:shadow-lg"
             >
-              <span>Get Started</span>
+              <span>Register</span>
               <ChevronRight className="h-4 w-4" />
             </Link>
             <button
@@ -362,7 +362,7 @@ function Header({ onNavigate }) {
                       >
                         {item.name}
                       </Link>
-                    )
+                    ),
                   )}
                 </nav>
                 <div className="pt-8 flex flex-col gap-3">
@@ -374,11 +374,11 @@ function Header({ onNavigate }) {
                     Login
                   </Link>
                   <Link
-                    to="/register"
-                    className="text-center py-4 text-sm font-bold uppercase tracking-widest text-white bg-primary rounded-2xl hover:bg-primary-container transition-colors"
+                    to="/admissionAd"
+                    className="text-center py-4 text-sm font-bold uppercase tracking-widest text-white bg-secondary rounded-2xl hover:bg-secondary-container transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Register Free
+                    Start Application
                   </Link>
                 </div>
               </div>

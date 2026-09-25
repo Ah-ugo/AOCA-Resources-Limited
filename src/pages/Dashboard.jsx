@@ -20,6 +20,8 @@ import {
   Video,
   LogOut,
   User,
+  Award,
+  ClipboardList,
 } from 'lucide-react';
 import {
   isAuthenticated,
@@ -33,6 +35,7 @@ import Assignments from './dashboard/Assignments';
 import Classes from './dashboard/Classes';
 import Resources from './dashboard/Resources';
 import Profile from './dashboard/Profile';
+import Certificates from './dashboard/Certificates';
 
 function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -176,6 +179,18 @@ function Dashboard() {
               <span>Learning Resources</span>
             </Link>
             <Link
+              to='/dashboard/certificates'
+              className={`flex items-center gap-3 px-3 py-2 rounded-md ${
+                location.pathname === '/dashboard/certificates'
+                  ? 'bg-emerald-600 text-white'
+                  : 'hover:bg-gray-100 text-gray-700'
+              }`}
+              onClick={() => setIsSidebarOpen(false)}
+            >
+              <Award className='h-5 w-5' />
+              <span>Certificates</span>
+            </Link>
+            <Link
               to='/dashboard/profile'
               className={`flex items-center gap-3 px-3 py-2 rounded-md ${
                 location.pathname === '/dashboard/profile'
@@ -209,6 +224,7 @@ function Dashboard() {
             <Route path='/assignments' element={<Assignments />} />
             <Route path='/classes' element={<Classes />} />
             <Route path='/resources' element={<Resources />} />
+            <Route path='/certificates' element={<Certificates />} />
             <Route path='/profile' element={<Profile />} />
           </Routes>
         </div>

@@ -740,7 +740,7 @@ export default function Gallery() {
               </div>
             </div>
             <a
-              href="https://wa.me/2348161910975"
+              href="https://wa.me/4915901149844"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary text-on-primary hover:bg-primary-container px-6 py-3 rounded-full font-label-md font-semibold transition-all shadow-md text-sm"

@@ -169,11 +169,6 @@ const CareerDetail = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!user) {
-      setShowLoginPrompt(true);
-      return;
-    }
-
     if (!validateForm()) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;

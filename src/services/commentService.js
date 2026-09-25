@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://aoca-resources-backend.onrender.com";
+const API_URL = "http://localhost:8000";
 const token = localStorage.getItem("token");
 
 // Create axios instance with base URL

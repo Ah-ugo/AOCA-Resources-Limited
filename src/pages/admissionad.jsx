@@ -1648,9 +1648,10 @@ const AdmissionLandingPage = () => {
                   desc: 'HSE certification and professional training for healthcare settings. Levels 1 through 3 aligned with global safety standards.',
                   features: [
                     'HSE Level 1, 2 & 3',
-                    'Emergency Procedures',
-                    'Risk Assessment',
-                    'Safety Leadership',
+                    'First Aid Courses',
+                    'Fire Prevention and Protection',
+                    'Permit To Work (PTW)',
+                    'Other Related HSE Courses',
                   ],
                 },
                 {
@@ -2019,12 +2020,12 @@ const AdmissionLandingPage = () => {
                       &ldquo;{t.text}&rdquo;
                     </p>
                     <div className="flex items-center gap-3 pt-4 border-t border-outline-variant/30">
-                      <img
-                        src={[
-                          '/ukaegbu.jpeg',
-                          '/study-group.jpg',
-                          '/image2.png',
-                        ][i]}
+                       <img
+                         src={[
+                           '/study-group.jpg',
+                           '/image2.png',
+                           '/image2.png',
+                         ][i]}
                         alt={t.name}
                         className="w-10 h-10 rounded-full object-cover border border-outline-variant/30"
                       />
@@ -2352,11 +2353,11 @@ const AdmissionLandingPage = () => {
               <div className="lg:col-span-5">
                 <div className="bg-surface-container-lowest rounded-3xl p-8 shadow-xl border border-outline-variant/30 sticky top-40">
                    <div className="flex items-center gap-4 mb-6">
-                     <img
-                       src="/ukaegbu.jpeg"
-                       alt={candidateDossier.name}
-                       className="w-14 h-14 rounded-full object-cover border-2 border-outline-variant/30"
-                     />
+                      <img
+                        src="/aocalogo.jpeg"
+                        alt={candidateDossier.name}
+                        className="w-14 h-14 rounded-full object-cover border-2 border-outline-variant/30"
+                      />
                      <div>
                        <h3 className="font-headline-sm text-headline-sm text-on-surface">
                          {candidateDossier.name}

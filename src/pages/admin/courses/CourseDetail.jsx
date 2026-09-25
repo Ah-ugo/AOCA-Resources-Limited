@@ -483,15 +483,6 @@ const CourseDetail = () => {
               </div>
             )}
 
-            {/* Price */}
-            <div className='mb-4'>
-              <h3 className='text-sm font-medium text-gray-500 mb-1'>Price</h3>
-              <div className='flex items-center text-gray-900'>
-                <FiDollarSign className='mr-1 h-4 w-4 text-gray-500' />
-                {course.price ? `${course.price.toFixed(2)}` : 'Free'}
-              </div>
-            </div>
-
             {/* Duration */}
             {course.duration && (
               <div className='mb-4'>

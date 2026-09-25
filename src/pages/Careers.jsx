@@ -17,7 +17,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { getJobListings } from '../services/career-service';
+import { getJobCategories, getJobListings } from '../services/career-service';
 
 const BADGE_STYLES = [
   'bg-primary text-on-primary',
@@ -64,6 +64,7 @@ export default function Careers() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [jobs, setJobs] = useState([]);
+  const [jobCategories, setJobCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -71,8 +72,14 @@ export default function Careers() {
     const fetchJobs = async () => {
       try {
         setLoading(true);
-        const response = await getJobListings({ limit: 50 });
-        setJobs(response.jobs || []);
+        const [jobsResponse, categoriesResponse] = await Promise.all([
+          getJobListings({ limit: 50 }),
+          getJobCategories().catch(() => []),
+        ]);
+
+        const nextJobs = jobsResponse.jobs || [];
+        setJobs(nextJobs);
+        setJobCategories(categoriesResponse || []);
       } catch (err) {
         console.error('Error fetching jobs:', err);
         setError(err.message || 'Failed to fetch jobs');
@@ -85,8 +92,12 @@ export default function Careers() {
   }, []);
 
   const categories = useMemo(() => {
-    return ['All', ...new Set(jobs.map((job) => job.category).filter(Boolean))];
-  }, [jobs]);
+    const categoryNames = [
+      ...jobCategories.map((category) => category.name || category.title),
+      ...jobs.map((job) => job.category).filter(Boolean),
+    ];
+    return ['All', ...new Set(categoryNames.filter(Boolean))];
+  }, [jobCategories, jobs]);
 
   const filteredJobs = jobs.filter((job) => {
     const matchesSearch =

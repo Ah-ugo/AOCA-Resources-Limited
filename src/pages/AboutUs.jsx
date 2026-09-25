@@ -133,11 +133,7 @@ function AboutUs() {
       title: 'Cyber Security Training ★ Special Emphasis',
       icon: Shield,
       desc: 'Network security fundamentals, ethical hacking essentials, cyber defense tactics, risk mitigation, and security architecture training with hands-on lab drills.',
-      features: [
-        'Ethical hacking',
-        'Network defense',
-        'Risk mitigation',
-      ],
+      features: ['Ethical hacking', 'Network defense', 'Risk mitigation'],
       highlight: true,
     },
     {
@@ -146,8 +142,10 @@ function AboutUs() {
       desc: 'General and Advanced Health, Safety & Environment (HSE) Level 1, 2 & 3 Certification. Essential for oil & gas, maritime, construction, and global corporate safety roles.',
       features: [
         'HSE Level 1, 2 & 3',
-        'Internationally recognised',
-        'Corporate & individual',
+        'First Aid Courses',
+        'Fire Prevention and Protection',
+        'Permit To Work (PTW)',
+        'Other Related HSE Courses',
       ],
       highlight: true,
     },
@@ -253,7 +251,7 @@ function AboutUs() {
               </p>
               <div className="flex flex-wrap items-center gap-4">
                 <Link
-                  to="/register"
+                  to="/admissionAd"
                   className="px-7 py-3.5 rounded-full bg-primary-container hover:bg-primary text-on-primary font-label-md text-label-md font-semibold transition-all duration-200 shadow-md flex items-center gap-3"
                 >
                   <span>Book Sovereign Campus Tour</span>
@@ -279,7 +277,7 @@ function AboutUs() {
                  <img
                   alt="AOCA Resources Port Harcourt Corporate Admissions and Consular Reception"
                   className="w-full h-[460px] object-cover object-center"
-                  src="/ukaegbu.jpeg"
+                  src="/study-group.jpg"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent flex flex-col justify-end p-6 text-on-primary">
                   <span className="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-widest mb-1">
@@ -373,11 +371,15 @@ function AboutUs() {
               >
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${service.highlight ? 'bg-secondary text-secondary-fixed' : 'bg-primary/10 text-primary'}`}>
+                    <div
+                      className={`w-12 h-12 rounded-xl flex items-center justify-center ${service.highlight ? 'bg-secondary text-secondary-fixed' : 'bg-primary/10 text-primary'}`}
+                    >
                       <service.icon className="h-6 w-6" />
                     </div>
                     {service.highlight && (
-                      <span className="font-label-caps text-[9px] bg-secondary text-secondary-fixed px-2 py-0.5 rounded font-bold uppercase tracking-wider">Special Emphasis</span>
+                      <span className="font-label-caps text-[9px] bg-secondary text-secondary-fixed px-2 py-0.5 rounded font-bold uppercase tracking-wider">
+                        Special Emphasis
+                      </span>
                     )}
                   </div>
                   <h3 className="font-headline-sm text-headline-sm text-on-surface font-semibold mb-2">
@@ -388,9 +390,14 @@ function AboutUs() {
                   </p>
                   <ul className="space-y-2 font-body-sm text-body-sm text-on-surface-variant">
                     {service.features.map((feature, j) => (
-                      <li key={j} className="flex items-start gap-2.5">
+                      <li
+                        key={j}
+                        className="flex items-start gap-2.5 rounded-lg border border-secondary/15 bg-secondary/5 px-2.5 py-1.5"
+                      >
                         <CheckCircle className="h-4 w-4 text-secondary shrink-0 mt-0.5" />
-                        <span>{feature}</span>
+                        <span className="font-semibold text-on-surface">
+                          {feature}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -442,7 +449,7 @@ function AboutUs() {
               className="lg:col-span-5 bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between"
             >
               <div className="relative h-80 overflow-hidden bg-surface-container">
-                 <img
+                <img
                   alt="Live German Language Grammar Instruction"
                   className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-500"
                   src="/image3.png"
@@ -480,7 +487,7 @@ function AboutUs() {
               className="lg:col-span-7 bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between"
             >
               <div className="relative h-80 overflow-hidden bg-surface-container">
-                 <img
+                <img
                   alt="Dual Monitor ICT Software & Systems Training Center"
                   className="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-500"
                   src="/image8.png"
@@ -529,7 +536,7 @@ function AboutUs() {
               className="lg:col-span-8 bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm flex flex-col md:flex-row"
             >
               <div className="md:w-1/2 relative h-64 md:h-auto bg-surface-container overflow-hidden">
-                 <img
+                <img
                   alt="Executive Admissions & Sovereign Advisory Office"
                   className="w-full h-full object-cover object-center"
                   src="/study-group.jpg"
@@ -737,9 +744,21 @@ function AboutUs() {
                         Admissions & Consultation Hotlines
                       </p>
                       <p className="font-body-md text-body-md text-on-surface-variant">
-                        <a href="tel:+2348161910975" className="hover:text-primary transition-colors font-semibold">+234 816 191 0975</a>
-                        <span className="text-on-surface-variant/50 mx-1">•</span>
-                        <a href="tel:+2348038865466" className="hover:text-primary transition-colors font-semibold">+234 803 886 5466</a>
+                        <a
+                          href="tel:+2348161910975"
+                          className="hover:text-primary transition-colors font-semibold"
+                        >
+                          +234 816 191 0975
+                        </a>
+                        <span className="text-on-surface-variant/50 mx-1">
+                          •
+                        </span>
+                        <a
+                          href="tel:+2348038865466"
+                          className="hover:text-primary transition-colors font-semibold"
+                        >
+                          +234 803 886 5466
+                        </a>
                       </p>
                     </div>
                   </div>
@@ -783,12 +802,11 @@ function AboutUs() {
                     </span>
                   </div>
                   <div
-                     className="w-full h-72 rounded-2xl bg-cover bg-center shadow-inner overflow-hidden mb-6"
-                     style={{
-                       backgroundImage:
-                         "url('/image4.png')",
-                     }}
-                   ></div>
+                    className="w-full h-72 rounded-2xl bg-cover bg-center shadow-inner overflow-hidden mb-6"
+                    style={{
+                      backgroundImage: "url('/image4.png')",
+                    }}
+                  ></div>
                 </div>
                 <div className="bg-surface-container-lowest p-5 rounded-xl flex items-center justify-between gap-4">
                   <div>
@@ -830,7 +848,7 @@ function AboutUs() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
-              to="/register"
+              to="/admissionAd"
               className="px-8 py-4 rounded-full bg-secondary-fixed hover:bg-secondary-fixed-dim text-on-secondary-fixed font-label-md text-label-md font-bold transition-all duration-200 shadow-lg"
             >
               Schedule Free Diagnostic Assessment

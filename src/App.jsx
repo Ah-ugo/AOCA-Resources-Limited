@@ -55,15 +55,17 @@ import FAQ from './pages/FAQ';
 // import NotFound from './pages/NotFound';
 import Careers from './pages/Careers';
 import CareerDetail from './pages/CareerDetail';
+import JobApplication from './pages/JobApplication';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import PathwayDetail from './pages/PathwayDetail';
 import ServiceDetail from './pages/ServiceDetail';
 import NotFound from './pages/NotFound';
-import { AuthProvider } from './contexts/auth-context';
+import { AuthProvider } from './contexts/AuthContext';
 import { authService } from './services/auth-service';
 import ScrollToTop from './components/ScrollToTop';
 import Layout from './components/PageLayout';
+import { ProtectedRoute } from './routes/ProtectedRoute';
 
 // User Dashboard Pages
 import StudentDashboard from './pages/dashboard/StudentDashboard';
@@ -97,8 +99,15 @@ import AdminContactSubmissions from './pages/admin/contact-forms/ContactMain';
 import ApplicationDetails from './pages/admin/careers/ApplicationDetails';
 import AdmissionLandingPage from './pages/admissionad';
 import InstructorDashboard from './pages/instructor/Dashboard';
-import InstructorCourseCreate from './pages/instructor/CourseCreate';
 import Messages from './pages/instructor/Messages';
+import AssessmentsList from './pages/instructor/AssessmentsList';
+import InstructorStudents from './pages/instructor/Students';
+import InstructorClasses from './pages/instructor/Classes';
+import InstructorResources from './pages/instructor/Resources';
+import InstructorSettings from './pages/instructor/Settings';
+import InstructorLessons from './pages/instructor/Lessons';
+import CertificateVerification from './pages/CertificateVerification';
+import InstructorLayout from './components/instructor/InstructorLayout';
 import AdmissionInquiries from './pages/admin/AdmissionInquiries';
 import EnrollmentManagement from './pages/admin/EnrollmentManagement';
 import FloatingWhatsApp from './components/FloatingWhatsApp';
@@ -171,7 +180,7 @@ function WelcomeModal({ onClose }) {
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
-              to="/register"
+              to="/admissionAd"
               className="flex-1 text-center py-3 bg-primary text-on-primary rounded-full font-semibold text-sm hover:bg-primary-container transition-colors"
               onClick={onClose}
             >
@@ -204,22 +213,25 @@ function HeroSection() {
             <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 w-fit">
               <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
               <span className="font-label-caps text-[11px] uppercase tracking-wider font-bold">
-                THE AFRICAN POWER HOUSE • ACCREDITED EXCELLENCE
+                Build Your Skills. Learn a New Language. Prepare for Global
+                Opportunities.
               </span>
             </div>
             <h1 className="font-display-hero text-3xl sm:text-5xl lg:text-5xl text-primary font-bold tracking-tight leading-tight">
-              German & French Fluency, Practical ICT Labs & Sovereign
-              Relocation.
+              Language Training, Practical ICT Skills & International Career
+              Pathways.
             </h1>
             <p className="font-body-lg text-base sm:text-lg text-on-surface-variant leading-relaxed">
               Welcome to{' '}
               <strong className="text-primary font-semibold">
                 AOCA Resources Limited
               </strong>{' '}
-              in Port Harcourt. We equip professionals, nurses, and aspiring
-              students with Goethe-accredited German/French mastery, hands-on
-              software development, HSE 1–3, and authentic relocation pathways
-              into Germany's healthcare and higher education ecosystems.
+              in Port Harcourt. We provide German and French language training,
+              practical ICT and software development programmes, HSE
+              certification, IELTS preparation, and structured guidance for
+              students and professionals pursuing education, employment,
+              healthcare, vocational training and relocation opportunities in
+              Germany.
             </p>
             <div className="p-4 rounded-xl bg-surface-container-lowest border-l-4 border-secondary shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-start gap-3">
@@ -578,12 +590,12 @@ function VideoShowcaseSection() {
                   <span className="w-1.5 h-1.5 rounded-full bg-white/70"></span>
                   Recorded Class
                 </span>
-                 <span
-                   className="bg-black/70 backdrop-blur-md text-white/90 text-xs px-2.5 py-1 rounded-md border border-white/10 font-mono"
-                   id="videoDurationBadge"
-                 >
-                   {currentVideo.duration}
-                 </span>
+                <span
+                  className="bg-black/70 backdrop-blur-md text-white/90 text-xs px-2.5 py-1 rounded-md border border-white/10 font-mono"
+                  id="videoDurationBadge"
+                >
+                  {currentVideo.duration}
+                </span>
               </div>
               <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/95 to-transparent flex flex-col gap-2">
                 <div
@@ -618,12 +630,12 @@ function VideoShowcaseSection() {
                         <Volume2 className="h-5 w-5" />
                       )}
                     </button>
-                     <span
-                       className="font-mono text-[11px] text-white/75"
-                       id="videoTimeCounter"
-                     >
-                       {currentVideo.time}
-                     </span>
+                    <span
+                      className="font-mono text-[11px] text-white/75"
+                      id="videoTimeCounter"
+                    >
+                      {currentVideo.time}
+                    </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-[11px] text-secondary-fixed font-semibold uppercase hidden sm:inline">
@@ -648,11 +660,11 @@ function VideoShowcaseSection() {
                   className="font-title-md text-lg font-bold text-white"
                   id="currentVideoTitle"
                 >
-                   {currentVideo.title}
-                 </h3>
-                 <p className="text-xs text-white/70" id="currentVideoDesc">
-                   {currentVideo.desc}
-                 </p>
+                  {currentVideo.title}
+                </h3>
+                <p className="text-xs text-white/70" id="currentVideoDesc">
+                  {currentVideo.desc}
+                </p>
               </div>
               <a
                 href="tel:+2348161910975"
@@ -675,7 +687,8 @@ function VideoShowcaseSection() {
                 SELECT SESSION
               </span>
               <span className="text-[11px] text-white/60">
-                {filteredVideos.length} Session{filteredVideos.length !== 1 ? 's' : ''} Available
+                {filteredVideos.length} Session
+                {filteredVideos.length !== 1 ? 's' : ''} Available
               </span>
             </div>
             {filteredVideos.map((video, i) => {
@@ -708,7 +721,8 @@ function VideoShowcaseSection() {
                       {video.title}
                     </h4>
                     <span className="text-[11px] text-white/60 mt-1 flex items-center gap-1">
-                      <Eye className="h-3 w-3" />{[2840, 3410, 4920, 1730][originalIndex]} views
+                      <Eye className="h-3 w-3" />
+                      {[2840, 3410, 4920, 1730][originalIndex]} views
                     </span>
                   </div>
                 </motion.div>
@@ -1118,9 +1132,11 @@ const paths = [
   {
     title: 'Health, Safety & Environment (HSE)',
     items: [
-      'HSE Levels 1, 2 & 3 — General & Advanced',
-      'Corporate & individual enrollment',
-      'Internationally recognised curriculum',
+      'HSE Level 1, 2 & 3',
+      'First Aid Courses',
+      'Fire Prevention and Protection',
+      'Permit To Work (PTW)',
+      'Other Related HSE Courses',
     ],
   },
   {
@@ -1252,11 +1268,14 @@ function PathToExcellenceSection() {
                   ][i]
                 }
               </p>
-              <ul className="text-xs space-y-1.5 text-on-surface font-medium pt-2 border-t border-outline-variant/20">
+              <ul className="text-xs space-y-2 text-on-surface font-medium pt-2 border-t border-outline-variant/20">
                 {path.items.map((item, j) => (
-                  <li key={j} className="flex items-center gap-1.5">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-secondary" />
-                    <span>{item}</span>
+                  <li
+                    key={j}
+                    className="flex items-center gap-2 rounded-lg border border-secondary/20 bg-secondary/5 px-2 py-1.5"
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5 text-secondary shrink-0" />
+                    <span className="font-bold text-primary">{item}</span>
                   </li>
                 ))}
               </ul>
@@ -1997,6 +2016,14 @@ function App() {
             }
           />
           <Route
+            path="/careers/:id/apply"
+            element={
+              <Layout>
+                <JobApplication />
+              </Layout>
+            }
+          />
+          <Route
             path="/blogs"
             element={
               <Layout>
@@ -2021,26 +2048,46 @@ function App() {
             }
           />
           <Route
+            path="/verify"
+            element={
+              <Layout>
+                <CertificateVerification />
+              </Layout>
+            }
+          />
+          <Route
+            path="/verify/:id"
+            element={
+              <Layout>
+                <CertificateVerification />
+              </Layout>
+            }
+          />
+          <Route
             path="/dashboard/*"
             element={
-              <PrivateRoute>
+              <ProtectedRoute allowedRoles={['student', 'admin', 'instructor']}>
                 {/* <Layout hideHeaderFooter={true}> */}
                 <Routes>
                   <Route path="/" element={<StudentDashboard />} />
                   <Route path="course/:courseId" element={<CoursePlayer />} />
                 </Routes>
                 {/* </Layout> */}
-              </PrivateRoute>
+              </ProtectedRoute>
             }
+          />
+          <Route
+            path="/instructor"
+            element={<Navigate to="/instructor/dashboard" replace />}
           />
           <Route
             path="/messages"
             element={
-              <PrivateRoute>
-                <Layout>
-                  <Messages />
-                </Layout>
-              </PrivateRoute>
+              <ProtectedRoute allowedRoles={['student', 'admin', 'instructor']}>
+                {/* <Layout> */}
+                <Messages />
+                {/* </Layout> */}
+              </ProtectedRoute>
             }
           />
           <Route
@@ -2050,7 +2097,7 @@ function App() {
           <Route
             path="/admin/*"
             element={
-              <AdminRoute>
+              <ProtectedRoute allowedRoles={['admin']}>
                 {/* <Layout hideHeaderFooter={true}> */}
                 <AdminLayout>
                   <Routes>
@@ -2119,27 +2166,26 @@ function App() {
                   </Routes>
                 </AdminLayout>
                 {/* </Layout> */}
-              </AdminRoute>
+              </ProtectedRoute>
             }
           />
           <Route
             path="/instructor/*"
             element={
-              <InstructorRoute>
-                {/* <Layout hideHeaderFooter={true}> */}
-                {/* You can create a specific InstructorLayout later */}
-                <div className="min-h-screen bg-gray-50">
+              <ProtectedRoute allowedRoles={['admin', 'instructor']}>
+                <InstructorLayout>
                   <Routes>
                     <Route path="dashboard" element={<InstructorDashboard />} />
-                    <Route
-                      path="courses/create"
-                      element={<InstructorCourseCreate />}
-                    />
+                    <Route path="assessments" element={<AssessmentsList />} />
+                    <Route path="students" element={<InstructorStudents />} />
+                    <Route path="classes" element={<InstructorClasses />} />
+                    <Route path="lessons" element={<InstructorLessons />} />
+                    <Route path="resources" element={<InstructorResources />} />
+                    <Route path="settings" element={<InstructorSettings />} />
                     <Route path="messages" element={<Messages />} />
                   </Routes>
-                </div>
-                {/* </Layout> */}
-              </InstructorRoute>
+                </InstructorLayout>
+              </ProtectedRoute>
             }
           />
           <Route
@@ -2162,31 +2208,6 @@ function App() {
       </AuthProvider>
     </>
   );
-}
-
-function PrivateRoute({ children }) {
-  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
-  return children;
-}
-
-function InstructorRoute({ children }) {
-  const isAuthenticated = authService.isAuthenticated();
-  const currentUser = authService.getCurrentUser();
-  const isInstructor =
-    currentUser?.role === 'instructor' || currentUser?.role === 'admin';
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
-  if (!isInstructor) return <Navigate to="/dashboard" replace />;
-  return children;
-}
-
-function AdminRoute({ children }) {
-  const isAuthenticated = authService.isAuthenticated();
-  const currentUser = authService.getCurrentUser();
-  const isAdmin = currentUser?.role === 'admin';
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
-  if (!isAdmin) return <Navigate to="/dashboard" replace />;
-  return children;
 }
 
 export default App;
