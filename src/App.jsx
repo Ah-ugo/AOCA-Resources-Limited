@@ -1747,6 +1747,18 @@ function EnrollFormSection() {
                 />
               </div>
             </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold text-primary uppercase">
+                Phone Number
+              </label>
+              <input
+                className="w-full bg-surface-container-low px-4 py-3 rounded-xl text-sm text-on-surface border border-outline-variant/40 focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
+                placeholder="e.g. 08012345678"
+                required
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              />
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-bold text-primary uppercase">
