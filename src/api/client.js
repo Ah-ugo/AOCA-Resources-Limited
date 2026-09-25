@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:800';
+const API_URL = import.meta.env.VITE_API_BASE_URL || 'https://aoca-resources-backend.onrender.com';
 
 export const apiClient = axios.create({
   baseURL: API_URL,

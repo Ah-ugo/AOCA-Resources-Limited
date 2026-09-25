@@ -11,16 +11,16 @@ import {
 } from 'lucide-react';
 import { authService } from '../../services/auth-service';
 
-const API = 'https://aoca-resources-backend.onrender.com';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://aoca-resources-backend.onrender.com';
 
 const getRuntimeWebSocketBase = () => {
   if (typeof window === 'undefined')
-    return 'wss://aoca-resources-backend.onrender.com';
+    return API_BASE.replace(/^http/, 'ws');
   const host = window.location.hostname;
   if (host === 'localhost' || host === '127.0.0.1') {
     return 'ws://localhost:8000';
   }
-  return 'wss://aoca-resources-backend.onrender.com';
+  return API_BASE.replace(/^http/, 'ws');
 };
 
 export default function Messages() {
@@ -85,12 +85,12 @@ export default function Messages() {
     activeChatRef.current = activeChat;
   }, [activeChat]);
 
-  // ── FIX #14: load real conversations from API ─────────────────────────────
+  // ── FIX #14: load real conversations from API_BASE ─────────────────────────────
   useEffect(() => {
     const fetchConversations = async () => {
       try {
         const token = authService.getToken();
-        const res = await fetch(`${API}/messages/conversations`, {
+        const res = await fetch(`${API_BASE}/messages/conversations`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.ok) {
@@ -116,7 +116,7 @@ export default function Messages() {
       try {
         const token = authService.getToken();
         const res = await fetch(
-          `${API}/messages/conversations/${activeChat.id}`,
+          `${API_BASE}/messages/conversations/${activeChat.id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           },

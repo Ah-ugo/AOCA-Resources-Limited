@@ -4,7 +4,7 @@ import axios from 'axios';
 import apiClient from './api-client';
 
 // Create a separate client for public endpoints (no auth)
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_BASE_URL || 'https://aoca-resources-backend.onrender.com';
 
 const publicClient = axios.create({
   baseURL: API_URL,
