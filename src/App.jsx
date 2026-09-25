@@ -40,6 +40,7 @@ import {
   VolumeX,
   AlertCircle,
 } from 'lucide-react';
+import { submitAdmissionInquiry } from './services/admission-service';
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
 
 import Header from './components/Header';
@@ -1664,43 +1665,26 @@ function EnrollFormSection() {
     };
 
     try {
-      const response = await fetch(
-        'https://aoca-resources-backend.onrender.com/admission-inquiry',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        },
-      );
+      await submitAdmissionInquiry(payload);
 
-      if (response.ok) {
-        setStatus('success');
-        setSubmitted(true);
-        setForm({
-          first_name: '',
-          last_name: '',
-          phone: '',
-          email: '',
-          program: 'german',
-          location: 'port-harcourt',
-          message: '',
-        });
-      } else {
-        const data = await response.json().catch(() => ({}));
-        const backendMsg = data.detail
-          ? Array.isArray(data.detail)
-            ? data.detail
-                .map((err) => `${err.loc[err.loc.length - 1]}: ${err.msg}`)
-                .join(', ')
-            : data.detail
-          : data.message || 'Failed to submit. Please try again.';
-        throw new Error(backendMsg);
-      }
+      setStatus('success');
+      setSubmitted(true);
+      setForm({
+        first_name: '',
+        last_name: '',
+        phone: '',
+        email: '',
+        program: 'german',
+        location: 'port-harcourt',
+        message: '',
+      });
     } catch (error) {
+      const backendMsg =
+        error?.detail ||
+        error?.message ||
+        'Failed to submit. Please try again.';
       setStatus('error');
-      setErrorMessage(
-        error.message || 'Something went wrong. Please try again later.',
-      );
+      setErrorMessage(backendMsg);
     }
   };
 

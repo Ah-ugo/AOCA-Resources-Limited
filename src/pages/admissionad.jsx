@@ -41,6 +41,7 @@ import {
   BookMarked,
   HeartHandshake,
 } from 'lucide-react';
+import { submitAdmissionInquiry } from '../services/admission-service';
 
 // ─── FONTS ───────────────────────────────────────────────────────────────────
 const FontLoader = () => (
@@ -254,33 +255,21 @@ const AdmissionPopup = ({ isOpen, onClose }) => {
     setStatus('loading');
     setErrorMessage('');
     try {
-      const response = await fetch(
-        'https://aoca-resources-backend.onrender.com/admission-inquiry',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
-        },
-      );
-      if (response.ok) {
-        setStatus('success');
-        setFormData({
-          first_name: '',
-          last_name: '',
-          email: '',
-          phone: '',
-          program: '',
-          location: '',
-          message: '',
-        });
-        setTimeout(() => {
-          onClose();
-          setStatus('idle');
-        }, 3000);
-      } else {
-        const data = await response.json();
-        throw new Error(data.message || 'Failed to submit');
-      }
+      await submitAdmissionInquiry(formData);
+      setStatus('success');
+      setFormData({
+        first_name: '',
+        last_name: '',
+        email: '',
+        phone: '',
+        program: '',
+        location: '',
+        message: '',
+      });
+      setTimeout(() => {
+        onClose();
+        setStatus('idle');
+      }, 3000);
     } catch (error) {
       setStatus('error');
       setErrorMessage(
